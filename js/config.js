@@ -44,8 +44,8 @@ var CONFIG = {
     DEFAULT_AVATAR: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#6A1B9A"/><circle cx="50" cy="38" r="16" fill="#D4AF37"/><ellipse cx="50" cy="78" rx="28" ry="22" fill="#D4AF37"/></svg>'),
 
     // ---- LANDING PAGE ----
-    LANDING_URL: 'landing.html',
-    APP_PRICE: 100,
+    LANDING_URL: '/app-store/',
+    APP_PRICE: 5000,
 
     // ---- LIMITES ----
     MAX_LOGIN_ATTEMPTS: 5,
