@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1A1A2E">
+    <title>AKOLABS - Admin</title>
+    <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+    <!-- NAV -->
+    <nav class="admin-nav">
+        <div class="admin-nav-left">
+            <img src="assets/images/logo.png" class="admin-nav-logo" alt="" onerror="this.style.display='none'">
+            <span class="admin-nav-title">Admin</span>
+            <span class="admin-nav-badge">LIVE</span>
+        </div>
+        <div class="admin-nav-right">
+            <button class="admin-nav-btn outline" onclick="window.open('index.html','_blank')"><i class="fas fa-external-link-alt"></i> App</button>
+            <button class="admin-nav-btn outline" onclick="AdminApp.logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="admin-content" id="admin-content">
+        <div style="text-align:center;padding:60px 20px;">
+            <div class="spinner"></div>
+            <p style="color:#6C6C7E;margin-top:16px;font-size:14px;">Chargement...</p>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+    // ============================================
+    // AKOLABS ADMIN
+    // ============================================
+
+    var AdminApp = {
+        currentTab: 'dashboard',
+        stats: null,
+        users: [],
+        sections: [],
+        purchases: [],
+        notifications: []
+    };
+
+    AdminApp.init = async function() {
+        try {
+            var session = await db.auth.getSession();
+            if (!session.data.session) {
+                AdminApp.showLogin();
+                return;
+            }
+
+            var profile = await db.from('users').select('*').eq('id', session.data.session.user.id).single();
+            if (!profile.data || !profile.data.is_admin) {
+                AdminApp.showLogin('Acces refuse. Compte admin requis.');
+                return;
+            }
+
+            AdminApp.profile = profile.data;
+            AdminApp.renderDashboard();
+        } catch(e) {
+            AdminApp.showLogin('Erreur de connexion');
+        }
+    };
+
+    AdminApp.showLogin = function(msg) {
+        var c = document.getElementById('admin-content');
+        c.innerHTML = '<div style="max-width:380px;margin:60px auto;padding:32px;background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.2);border-radius:20px;">'
+            + '<h2 style="font-family:Cinzel;color:#D4AF37;text-align:center;margin-bottom:8px;">Admin AKOLABS</h2>'
+            + '<p style="color:#8E8E9E;text-align:center;font-size:13px;margin-bottom:24px;">' + (msg || 'Connectez-vous avec un compte admin') + '</p>'
+            + '<div class="admin-form-group"><label class="admin-form-label">Email</label><input type="email" class="admin-form-input" id="admin-email"></div>'
+            + '<div class="admin-form-group"><label class="admin-form-label">Mot de passe</label><input type="password" class="admin-form-input" id="admin-pwd"></div>'
+            + '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.login()"><i class="fas fa-sign-in-alt"></i> Connexion</button>'
+            + '</div>';
+    };
+
+    AdminApp.login = async function() {
+        var email = document.getElementById('admin-email').value.trim();
+        var pwd = document.getElementById('admin-pwd').value;
+        try {
+            var r = await db.auth.signInWithPassword({ email: email, password: pwd });
+            if (r.error) throw r.error;
+            window.location.reload();
+        } catch(e) {
+            Utils.showToast('Erreur: ' + (e.message || 'Identifiants invalides'), 'error');
+        }
+    };
+
+    AdminApp.logout = async function() {
+        await db.auth.signOut();
+        window.location.reload();
+    };
+
+    AdminApp.renderDashboard = async function() {
+        var c = document.getElementById('admin-content');
+
+        // Tabs
+        var tabs = '<div class="admin-tabs">';
+        var tabList = [
+            { id: 'dashboard', icon: 'fa-chart-pie', label: 'Dashboard' },
+            { id: 'analytics', icon: 'fa-chart-line', label: 'Analytics' },
+            { id: 'flash', icon: 'fa-bolt', label: 'Flash' },
+            { id: 'popups', icon: 'fa-bullhorn', label: 'Popups' },
+            { id: 'users', icon: 'fa-users', label: 'Utilisateurs' },
+            { id: 'sections', icon: 'fa-th-large', label: 'Sections' },
+            { id: 'purchases', icon: 'fa-receipt', label: 'Achats' },
+            { id: 'notifications', icon: 'fa-bell', label: 'Notifs' },
+            { id: 'promos', icon: 'fa-tag', label: 'Promos' },
+            { id: 'emails', icon: 'fa-envelope', label: 'Emails' },
+            { id: 'visuels', icon: 'fa-images', label: 'Visuels' }
+        ];
+
+        for (var i = 0; i < tabList.length; i++) {
+            var t = tabList[i];
+            var cls = t.id === AdminApp.currentTab ? 'admin-tab active' : 'admin-tab';
+            tabs += '<button class="' + cls + '" onclick="AdminApp.switchTab(\'' + t.id + '\')"><i class="fas ' + t.icon + '"></i> ' + t.label + '</button>';
+        }
+        tabs += '</div>';
+
+        c.innerHTML = tabs + '<div id="admin-tab-content"><div style="text-align:center;padding:40px;"><div class="spinner"></div></div></div>';
+
+        AdminApp.switchTab(AdminApp.currentTab);
+    };
+
+    AdminApp.switchTab = async function(tab) {
+        AdminApp.currentTab = tab;
+
+        // Update tabs UI
+        var allTabs = document.querySelectorAll('.admin-tab');
+        for (var i = 0; i < allTabs.length; i++) {
+            allTabs[i].classList.remove('active');
+            if (allTabs[i].textContent.toLowerCase().indexOf(tab) !== -1 || allTabs[i].onclick.toString().indexOf(tab) !== -1) {
+                allTabs[i].classList.add('active');
+            }
+        }
+
+        var content = document.getElementById('admin-tab-content');
+        content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+
+        if (tab === 'dashboard') await AdminApp.renderStats(content);
+        else if (tab === 'users') await AdminApp.renderUsers(content);
+        else if (tab === 'sections') await AdminApp.renderSections(content);
+        else if (tab === 'purchases') await AdminApp.renderPurchases(content);
+        else if (tab === 'notifications') await AdminApp.renderNotifications(content);
+        else if (tab === 'promos') await AdminApp.renderPromos(content);
+        else if (tab === 'emails') await AdminApp.renderEmails(content);
+        else if (tab === 'analytics') await AdminApp.renderAnalytics(content);
+        else if (tab === 'flash') await AdminApp.renderFlash(content);
+        else if (tab === 'popups') await AdminApp.renderPopups(content);
+        else if (tab === 'visuels') await AdminApp.renderVisuels(content);
+    };
+
+    // ===== DASHBOARD =====
+    AdminApp.renderStats = async function(container) {
+        try {
+            var usersR = await db.from('users').select('id, created_at', { count: 'exact' });
+            var purchasesR = await db.from('purchases').select('amount, created_at', { count: 'exact' }).eq('status', 'confirmed');
+            var sectionsR = await db.from('sections').select('id', { count: 'exact' }).eq('is_active', true);
+
+            var totalUsers = usersR.count || 0;
+            var totalRevenue = 0;
+            var todayRevenue = 0;
+            var todayUsers = 0;
+            var today = new Date().toISOString().split('T')[0];
+
+            if (purchasesR.data) {
+                for (var i = 0; i < purchasesR.data.length; i++) {
+                    totalRevenue += purchasesR.data[i].amount || 0;
+                    if (purchasesR.data[i].created_at && purchasesR.data[i].created_at.indexOf(today) === 0) {
+                        todayRevenue += purchasesR.data[i].amount || 0;
+                    }
+                }
+            }
+
+            if (usersR.data) {
+                for (var j = 0; j < usersR.data.length; j++) {
+                    if (usersR.data[j].created_at && usersR.data[j].created_at.indexOf(today) === 0) {
+                        todayUsers++;
+                    }
+                }
+            }
+
+            var h = '';
+
+            // Stats
+            h += '<div class="admin-stats">';
+            h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-users"></i></div><div class="admin-stat-value">' + totalUsers + '</div><div class="admin-stat-label">Utilisateurs</div><div class="admin-stat-change up">+' + todayUsers + ' aujourd\'hui</div></div>';
+            h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-coins"></i></div><div class="admin-stat-value">' + Utils.formatPrice(totalRevenue) + '</div><div class="admin-stat-label">Revenus totaux</div><div class="admin-stat-change up">+' + Utils.formatPrice(todayRevenue) + ' aujourd\'hui</div></div>';
+            h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-shopping-cart"></i></div><div class="admin-stat-value">' + (purchasesR.count || 0) + '</div><div class="admin-stat-label">Achats</div></div>';
+            h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-th-large"></i></div><div class="admin-stat-value">' + (sectionsR.count || 0) + '</div><div class="admin-stat-label">Sections actives</div></div>';
+            h += '</div>';
+
+            // Quick actions
+            h += '<div class="admin-quick-actions">';
+            h += '<div class="admin-quick-action" onclick="AdminApp.switchTab(\'sections\')"><i class="fas fa-plus"></i><span>Ajouter section</span></div>';
+            h += '<div class="admin-quick-action" onclick="AdminApp.switchTab(\'notifications\')"><i class="fas fa-paper-plane"></i><span>Envoyer notif</span></div>';
+            h += '<div class="admin-quick-action" onclick="AdminApp.switchTab(\'promos\')"><i class="fas fa-tag"></i><span>Creer promo</span></div>';
+            h += '<div class="admin-quick-action" onclick="AdminApp.switchTab(\'users\')"><i class="fas fa-user-shield"></i><span>Gerer users</span></div>';
+            h += '</div>';
+
+            // Recent purchases
+            var recentP = await db.from('purchases').select('*, users(full_name, email)').eq('status', 'confirmed').order('created_at', { ascending: false }).limit(5);
+
+            h += '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title">Achats recents</div></div>';
+
+            if (recentP.data && recentP.data.length > 0) {
+                h += '<div class="admin-table"><table><tr><th>Utilisateur</th><th>Type</th><th>Montant</th><th>Date</th></tr>';
+                for (var k = 0; k < recentP.data.length; k++) {
+                    var p = recentP.data[k];
+                    var userName = (p.users && p.users.full_name) ? p.users.full_name : (p.users && p.users.email) ? p.users.email : 'Inconnu';
+                    h += '<tr><td>' + userName + '</td><td>' + p.purchase_type + '</td><td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td><td>' + Utils.timeAgo(p.created_at) + '</td></tr>';
+                }
+                h += '</table></div>';
+            } else {
+                h += '<p style="color:#6C6C7E;text-align:center;padding:20px;">Aucun achat</p>';
+            }
+            h += '</div>';
+
+            // Top affiliés
+            try {
+                var affiliateR = await db.from('affiliation_leaderboard').select('*').limit(5);
+                var topAffiliates = affiliateR.data || [];
+                if (topAffiliates.length > 0) {
+                    var medals = ['🥇', '🥈', '🥉', '4.', '5.'];
+                    h += '<div class="admin-card">';
+                    h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-trophy" style="color:#C9A84C;margin-right:8px;"></i>Top Affiliés</div></div>';
+                    topAffiliates.forEach(function(a, idx) {
+                        h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);">';
+                        h += '<span style="font-size:16px;width:24px;">' + medals[idx] + '</span>';
+                        h += '<div style="flex:1;font-size:12px;color:#E2E0EC;font-weight:500;">' + (a.full_name || 'Anonyme') + '</div>';
+                        h += '<div style="font-size:11px;color:#8A87A0;">' + a.total_referrals + ' filleul(s)</div>';
+                        h += '<div style="font-size:12px;font-weight:700;color:#C9A84C;">' + Utils.formatPrice(a.total_earnings) + '</div>';
+                        h += '</div>';
+                    });
+                    h += '</div>';
+                }
+                container.innerHTML = h;
+            } catch(e2) {
+                container.innerHTML = h;
+            }
+
+        } catch(e) {
+            container.innerHTML = '<p style="color:#DC3545;text-align:center;">Erreur: ' + e.message + '</p>';
+        }
+    };
+
+    // ===== USERS =====
+    AdminApp.renderUsers = async function(container) {
+        var r = await db.from('users').select('*').order('created_at', { ascending: false }).limit(50);
+        var users = r.data || [];
+
+        var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Utilisateurs (' + users.length + ')</div></div>';
+        h += '<div class="admin-table"><table><tr><th>Nom</th><th>Email</th><th>App</th><th>Niveau</th><th>Inscrit</th></tr>';
+
+        for (var i = 0; i < users.length; i++) {
+            var u = users[i];
+            var appStatus = u.is_app_purchased ? '<span class="status active">Oui</span>' : '<span class="status inactive">Non</span>';
+            h += '<tr><td>' + (u.full_name || '-') + '</td><td style="font-size:11px;">' + u.email + '</td><td>' + appStatus + '</td><td>' + (u.level || 'Bronze') + '</td><td>' + Utils.timeAgo(u.created_at) + '</td></tr>';
+        }
+
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    // ===== SECTIONS =====
+    AdminApp.renderSections = async function(container) {
+        var r = await db.from('sections').select('*').order('order_index');
+        var sections = r.data || [];
+
+        var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Sections (' + sections.length + ')</div><button class="admin-card-action" onclick="AdminApp.showAddSection()"><i class="fas fa-plus"></i> Ajouter</button></div>';
+        h += '<div class="admin-table"><table><tr><th>Titre</th><th>Type</th><th>Prix</th><th>Gratuit</th><th>Actif</th><th>Vues</th><th>Actions</th></tr>';
+
+        for (var i = 0; i < sections.length; i++) {
+            var s = sections[i];
+            var freeStatus = s.is_free ? '<span class="status active">Oui</span>' : '<span class="status inactive">Non</span>';
+            var activeStatus = s.is_active ? '<span class="status active">Oui</span>' : '<span class="status inactive">Non</span>';
+
+            h += '<tr>';
+            h += '<td style="font-weight:600;color:#F8F9FA;">' + s.title + '</td>';
+            h += '<td>' + s.type + '</td>';
+            h += '<td style="color:#D4AF37;">' + Utils.formatPrice(s.price) + '</td>';
+            h += '<td>' + freeStatus + '</td>';
+            h += '<td>' + activeStatus + '</td>';
+            h += '<td>' + (s.total_views || 0) + '</td>';
+            h += '<td><button class="admin-btn" style="padding:4px 10px;font-size:10px;background:rgba(212,175,55,0.1);color:#D4AF37;border:1px solid rgba(212,175,55,0.2);" onclick="AdminApp.editSection(\'' + s.id + '\')"><i class="fas fa-edit"></i></button></td>';
+            h += '</tr>';
+        }
+
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    AdminApp.showAddSection = function() {
+        AdminApp.showSectionForm(null);
+    };
+
+    AdminApp.editSection = async function(id) {
+        var r = await db.from('sections').select('*').eq('id', id).single();
+        if (r.data) AdminApp.showSectionForm(r.data);
+    };
+
+    AdminApp.showSectionForm = function(section) {
+        var isEdit = !!section;
+        var s = section || {};
+
+        var h = '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title">' + (isEdit ? 'Modifier' : 'Ajouter') + ' une section</div><button class="admin-card-action" onclick="AdminApp.switchTab(\'sections\')"><i class="fas fa-times"></i> Annuler</button></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Titre</label><input class="admin-form-input" id="sf-title" value="' + (s.title || '') + '"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Slug</label><input class="admin-form-input" id="sf-slug" value="' + (s.slug || '') + '" placeholder="auto-genere si vide"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Description</label><textarea class="admin-form-textarea" id="sf-desc">' + (s.description || '') + '</textarea></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Description longue</label><textarea class="admin-form-textarea" id="sf-longdesc">' + (s.long_description || '') + '</textarea></div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Type</label><select class="admin-form-select" id="sf-type"><option value="webview" ' + (s.type === 'webview' ? 'selected' : '') + '>WebView (Site)</option><option value="drive" ' + (s.type === 'drive' ? 'selected' : '') + '>Drive (Formation)</option></select></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Prix (FCFA)</label><input class="admin-form-input" id="sf-price" type="number" value="' + (s.price || 0) + '"></div>';
+        h += '</div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Prix promo</label><input class="admin-form-input" id="sf-promo-price" type="number" value="' + (s.promo_price || '') + '"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Fin promo</label><input class="admin-form-input" id="sf-promo-end" type="datetime-local" value="' + (s.promo_end_date ? s.promo_end_date.slice(0, 16) : '') + '"></div>';
+        h += '</div>';
+
+         // Remplacer l'ancienne partie des URLs par ceci :
+        h += '<div class="admin-form-group"><label class="admin-form-label">URL du site (webview)</label><input class="admin-form-input" id="sf-siteurl" value="' + (s.site_url || '') + '"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">URL Google Drive (formation)</label><input class="admin-form-input" id="sf-driveurl" value="' + (s.drive_url || '') + '"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Nom custom (affiche dans webview)</label><input class="admin-form-input" id="sf-customname" value="' + (s.custom_name || '') + '"></div>';
+
+        // Ouverture dans le navigateur ou webview
+        var oib = s.open_in_browser ? 'checked' : '';
+        h += '<div class="admin-form-group" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;">';
+        h += '<label style="display:flex;align-items:center;gap:12px;cursor:pointer;">';
+        h += '<input type="checkbox" id="sf-open-in-browser" ' + oib + ' style="width:18px;height:18px;accent-color:#C9A84C;cursor:pointer;">';
+        h += '<div>';
+        h += '<div style="font-size:13px;font-weight:600;color:#E2E0EC;">Ouvrir dans le navigateur externe</div>';
+        h += '<div style="font-size:11px;color:#8A87A0;margin-top:2px;">Si activé, le lien s\'ouvre dans Chrome au lieu du WebView intégré</div>';
+        h += '</div>';
+        h += '</label>';
+        h += '</div>';
+
+        // Champs avec bouton Upload
+        h += '<div class="admin-form-group"><label class="admin-form-label">Logo custom (WebView)</label>';
+        h += '<div style="display:flex;gap:8px;">';
+        h += '<input class="admin-form-input" id="sf-customlogo" value="' + (s.custom_logo_url || '') + '" placeholder="Importez une image ->">';
+        h += '<button class="admin-btn admin-btn-primary" onclick="AdminApp.uploadMedia(\'sf-customlogo\', \'image/*\')"><i class="fas fa-upload"></i></button>';
+        h += '</div></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Banniere de la section</label>';
+        h += '<div style="display:flex;gap:8px;">';
+        h += '<input class="admin-form-input" id="sf-banner" value="' + (s.banner_url || '') + '" placeholder="Importez une image ->">';
+        h += '<button class="admin-btn admin-btn-primary" onclick="AdminApp.uploadMedia(\'sf-banner\', \'image/*\')"><i class="fas fa-upload"></i></button>';
+        h += '</div></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Apercu Video (Optionnel)</label>';
+        h += '<div style="display:flex;gap:8px;">';
+        h += '<input class="admin-form-input" id="sf-video" value="' + (s.preview_video_url || '') + '" placeholder="Lien YouTube ou importez video ->">';
+        h += '<button class="admin-btn admin-btn-primary" onclick="AdminApp.uploadMedia(\'sf-video\', \'video/*\')"><i class="fas fa-upload"></i></button>';
+        h += '</div></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Duree estimee (formations)</label><input class="admin-form-input" id="sf-duration" value="' + (s.duration_estimate || '') + '"></div>';
+        
+        h += '<div class="admin-form-group"><label class="admin-form-label">Ordre d\'affichage</label><input class="admin-form-input" id="sf-order" type="number" value="' + (s.order_index || 0) + '"></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Avantages (un par ligne)</label><textarea class="admin-form-textarea" id="sf-advantages">' + (s.advantages ? s.advantages.join('\n') : '') + '</textarea></div>';
+
+        h += '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">';
+        h += '<div class="admin-form-check"><input type="checkbox" id="sf-free" ' + (s.is_free ? 'checked' : '') + '><label for="sf-free">Gratuit</label></div>';
+        h += '<div class="admin-form-check"><input type="checkbox" id="sf-active" ' + (s.is_active !== false ? 'checked' : '') + '><label for="sf-active">Actif</label></div>';
+        h += '<div class="admin-form-check"><input type="checkbox" id="sf-featured" ' + (s.is_featured ? 'checked' : '') + '><label for="sf-featured">Featured</label></div>';
+        h += '<div class="admin-form-check"><input type="checkbox" id="sf-coming" ' + (s.is_coming_soon ? 'checked' : '') + '><label for="sf-coming">Coming Soon</label></div>';
+        h += '</div>';
+
+        h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.saveSection(\'' + (s.id || '') + '\')"><i class="fas fa-save"></i> ' + (isEdit ? 'Modifier' : 'Creer') + '</button>';
+
+        if (isEdit) {
+            h += '<button class="admin-btn admin-btn-danger admin-btn-block" style="margin-top:8px;" onclick="AdminApp.deleteSection(\'' + s.id + '\')"><i class="fas fa-trash"></i> Supprimer</button>';
+        }
+
+        h += '</div>';
+
+        document.getElementById('admin-tab-content').innerHTML = h;
+    };
+        AdminApp.uploadMedia = function(inputId, acceptType) {
+        var inputFile = document.createElement('input');
+        inputFile.type = 'file';
+        inputFile.accept = acceptType;
+        
+        inputFile.onchange = async function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+
+            Utils.showToast('Upload en cours... Patientez.', 'info');
+            
+            var targetInput = document.getElementById(inputId);
+            var originalValue = targetInput.value;
+            targetInput.value = 'Telechargement...';
+            targetInput.disabled = true;
+
+            try {
+                var url = await Utils.uploadToCloudinary(file);
+                targetInput.value = url;
+                Utils.showToast('Fichier uploadé avec succès !', 'success');
+            } catch (err) {
+                targetInput.value = originalValue;
+                Utils.showToast('Erreur d\'upload', 'error');
+            }
+            
+            targetInput.disabled = false;
+        };
+
+        inputFile.click();
+    };
+    
+
+    AdminApp.saveSection = async function(id) {
+        var title = document.getElementById('sf-title').value.trim();
+        if (!title) { Utils.showToast('Titre requis', 'warning'); return; }
+
+        var slug = document.getElementById('sf-slug').value.trim() || Utils.slugify(title);
+        var advantagesText = document.getElementById('sf-advantages').value.trim();
+        var advantages = advantagesText ? advantagesText.split('\n').filter(function(a) { return a.trim(); }) : [];
+
+        var promoEnd = document.getElementById('sf-promo-end').value;
+
+                var data = {
+            title: title,
+            slug: slug,
+            description: document.getElementById('sf-desc').value.trim(),
+            long_description: document.getElementById('sf-longdesc').value.trim(),
+            type: document.getElementById('sf-type').value,
+            price: parseFloat(document.getElementById('sf-price').value) || 0,
+            promo_price: parseFloat(document.getElementById('sf-promo-price').value) || null,
+            promo_end_date: promoEnd ? new Date(promoEnd).toISOString() : null,
+            site_url: document.getElementById('sf-siteurl').value.trim() || null,
+            drive_url: document.getElementById('sf-driveurl').value.trim() || null,
+            custom_name: document.getElementById('sf-customname').value.trim() || null,
+            custom_logo_url: document.getElementById('sf-customlogo').value.trim() || null,
+            banner_url: document.getElementById('sf-banner').value.trim() || null,
+            
+            // 👇 VOICI LA LIGNE AJOUTÉE POUR LA VIDÉO 👇
+            preview_video_url: document.getElementById('sf-video') ? document.getElementById('sf-video').value.trim() || null : null,
+            
+            duration_estimate: document.getElementById('sf-duration').value.trim() || null,
+            order_index: parseInt(document.getElementById('sf-order').value) || 0,
+            advantages: advantages,
+            is_free: document.getElementById('sf-free').checked,
+            is_active: document.getElementById('sf-active').checked,
+            is_featured: document.getElementById('sf-featured').checked,
+            is_coming_soon: document.getElementById('sf-coming').checked,
+            open_in_browser: document.getElementById('sf-open-in-browser') ? document.getElementById('sf-open-in-browser').checked : false
+        };
+        
+        try {
+            if (id) {
+                await db.from('sections').update(data).eq('id', id);
+                Utils.showToast('Section modifiee !', 'success');
+            } else {
+                await db.from('sections').insert(data);
+                Utils.showToast('Section creee !', 'success');
+            }
+            AdminApp.switchTab('sections');
+        } catch(e) {
+            Utils.showToast('Erreur: ' + e.message, 'error');
+        }
+    };
+
+    AdminApp.deleteSection = async function(id) {
+        if (!confirm('Supprimer cette section ?')) return;
+        try {
+            await db.from('sections').delete().eq('id', id);
+            Utils.showToast('Section supprimee', 'success');
+            AdminApp.switchTab('sections');
+        } catch(e) {
+            Utils.showToast('Erreur', 'error');
+        }
+    };
+
+    // ===== PURCHASES =====
+    AdminApp.renderPurchases = async function(container) {
+        var r = await db.from('purchases').select('*, users(full_name, email)').order('created_at', { ascending: false }).limit(50);
+        var items = r.data || [];
+
+        var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Achats (' + items.length + ')</div></div>';
+        h += '<div class="admin-table"><table><tr><th>User</th><th>Type</th><th>Montant</th><th>Statut</th><th>Paiement</th><th>Date</th></tr>';
+
+        for (var i = 0; i < items.length; i++) {
+            var p = items[i];
+            var name = (p.users && p.users.full_name) || (p.users && p.users.email) || '-';
+            var statusCls = p.status === 'confirmed' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive';
+
+            h += '<tr><td>' + name + '</td><td>' + p.purchase_type + '</td><td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td><td><span class="status ' + statusCls + '">' + p.status + '</span></td><td>' + (p.payment_provider || '-') + '</td><td>' + Utils.timeAgo(p.created_at) + '</td></tr>';
+        }
+
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    // ===== NOTIFICATIONS =====
+    AdminApp.renderNotifications = async function(container) {
+        // Charger stats push et historique en parallèle
+        var [subsR, notifR] = await Promise.all([
+            db.from('push_subscriptions').select('id', { count: 'exact' }).eq('is_active', true),
+            db.from('notifications').select('*').order('created_at', { ascending: false }).limit(20)
+        ]);
+
+        var totalSubs = subsR.count || 0;
+        var notifs = notifR.data || [];
+
+        var h = '';
+
+        // Compteur abonnés
+        h += '<div style="background:rgba(46,158,91,0.08);border:1px solid rgba(46,158,91,0.2);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">';
+        h += '<i class="fas fa-bell" style="color:#2E9E5B;font-size:20px;"></i>';
+        h += '<div>';
+        h += '<div style="font-size:18px;font-weight:700;color:#2E9E5B;">' + totalSubs + ' appareil' + (totalSubs > 1 ? 's' : '') + '</div>';
+        h += '<div style="font-size:11px;color:#8A87A0;">Abonnés aux notifications push</div>';
+        h += '</div></div>';
+
+        // Formulaire envoi
+        h += '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-paper-plane" style="color:#C9A84C;margin-right:8px;"></i>Envoyer une notification</div></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Titre</label><input class="admin-form-input" id="nf-title" placeholder="Ex: Offre exclusive pour toi 🎁"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Message</label><textarea class="admin-form-textarea" id="nf-message" rows="3" placeholder="Contenu de la notification..."></textarea></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Lien à ouvrir (optionnel)</label><input class="admin-form-input" id="nf-url" placeholder="/ ou /section/id"></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Ciblage</label>';
+        h += '<select class="admin-form-select" id="nf-target">';
+        h += '<option value="all">📢 Tous les abonnés</option>';
+        h += '<option value="inactive_7d">😴 Inactifs depuis 7 jours</option>';
+        h += '<option value="not_purchased">🔒 Non-acheteurs uniquement</option>';
+        h += '</select></div>';
+
+        h += '<div id="nf-send-result" style="margin-bottom:12px;display:none;"></div>';
+        h += '<button class="admin-btn admin-btn-primary admin-btn-block" id="nf-send-btn" onclick="AdminApp.sendPushNotification()"><i class="fas fa-paper-plane"></i> Envoyer la notification</button>';
+        h += '</div>';
+
+        // Historique
+        h += '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title">Historique (' + notifs.length + ')</div></div>';
+
+        if (notifs.length === 0) {
+            h += '<p style="color:#8A87A0;text-align:center;padding:20px;font-size:13px;">Aucune notification envoyée.</p>';
+        } else {
+            h += '<div class="admin-table"><table><tr><th>Titre</th><th>Cible</th><th>Envoyé</th><th>Date</th></tr>';
+            notifs.forEach(function(n) {
+                var meta = n.metadata || {};
+                var sentCount = meta.sent !== undefined ? meta.sent : '-';
+                var targetLabel = n.target === 'all' ? '📢 Tous' : n.target === 'inactive_7d' ? '😴 Inactifs' : '🔒 Non-acheteurs';
+                h += '<tr>';
+                h += '<td style="font-weight:600;color:#F0EEF8;max-width:120px;overflow:hidden;text-overflow:ellipsis;">' + n.title + '</td>';
+                h += '<td>' + targetLabel + '</td>';
+                h += '<td style="color:#2E9E5B;">' + sentCount + '</td>';
+                h += '<td style="color:#6B6880;">' + Utils.timeAgo(n.created_at) + '</td>';
+                h += '</tr>';
+            });
+            h += '</table></div>';
+        }
+        h += '</div>';
+
+        container.innerHTML = h;
+    };
+
+    AdminApp.sendPushNotification = async function() {
+        var title = document.getElementById('nf-title').value.trim();
+        var message = document.getElementById('nf-message').value.trim();
+        var url = document.getElementById('nf-url').value.trim() || '/';
+        var target = document.getElementById('nf-target').value;
+        var resultDiv = document.getElementById('nf-send-result');
+        var btn = document.getElementById('nf-send-btn');
+
+        if (!title || !message) { Utils.showToast('Titre et message requis', 'warning'); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+        resultDiv.style.display = 'none';
+
+        try {
+            // Appeler via le SDK Supabase (gère auth + CORS automatiquement)
+            var response = await db.functions.invoke('send-push', {
+                body: { title: title, body: message, url: url, target: target }
+            });
+
+            if (response.error) throw new Error(response.error.message || JSON.stringify(response.error));
+            var result = response.data;
+
+            if (result && result.success) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<div style="background:rgba(46,158,91,0.1);border:1px solid rgba(46,158,91,0.3);border-radius:10px;padding:12px;color:#2E9E5B;font-size:13px;">'
+                    + '✅ Envoyé à <strong>' + result.sent + '</strong> appareil' + (result.sent > 1 ? 's' : '')
+                    + (result.failed > 0 ? ' · ' + result.failed + ' échec(s)' : '')
+                    + '</div>';
+                Utils.showToast('Notification envoyée !', 'success');
+            } else {
+                throw new Error(result.error || 'Erreur inconnue');
+            }
+        } catch(e) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="background:rgba(220,53,69,0.1);border:1px solid rgba(220,53,69,0.3);border-radius:10px;padding:12px;color:#DC3545;font-size:13px;">'
+                + '❌ Erreur : ' + e.message + '</div>';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer la notification';
+        }
+    };
+
+    // ===== EMAILS =====
+    AdminApp.renderEmails = async function(container) {
+        container.innerHTML = '<p style="color:#8A87A0;text-align:center;padding:20px;">Chargement...</p>';
+
+        var [seqR, logR] = await Promise.all([
+            db.from('email_sequences').select('*').order('created_at', { ascending: true }),
+            db.from('email_logs').select('*').order('sent_at', { ascending: false }).limit(30)
+        ]);
+
+        var sequences = seqR.data || [];
+        var logs = logR.data || [];
+
+        var triggerLabels = {
+            'signup': '🎉 Inscription',
+            'purchase': '💳 Achat',
+            'inactive_7d': '😴 Inactif 7j',
+            'inactive_30d': '💤 Inactif 30j',
+            'flash_sale': '⚡ Offre flash'
+        };
+
+        var h = '';
+
+        // Créer une nouvelle séquence
+        h += '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-plus-circle" style="color:#C9A84C;margin-right:8px;"></i>Nouvelle séquence</div></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Nom</label><input class="admin-form-input" id="em-name" placeholder="Ex: Bienvenue J+1"></div>';
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Déclencheur</label><select class="admin-form-select" id="em-trigger">';
+        h += '<option value="signup">🎉 Inscription</option>';
+        h += '<option value="purchase">💳 Achat</option>';
+        h += '<option value="inactive_7d">😴 Inactif 7 jours</option>';
+        h += '<option value="inactive_30d">💤 Inactif 30 jours</option>';
+        h += '<option value="flash_sale">⚡ Offre flash</option>';
+        h += '</select></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Délai</label><select class="admin-form-select" id="em-delay">';
+        h += '<option value="0">Immédiat</option>';
+        h += '<option value="1">1 heure</option>';
+        h += '<option value="24">J+1 (24h)</option>';
+        h += '<option value="48">J+2 (48h)</option>';
+        h += '<option value="168">J+7 (7 jours)</option>';
+        h += '<option value="720">J+30 (30 jours)</option>';
+        h += '</select></div>';
+        h += '</div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Objet de l\'email</label><input class="admin-form-input" id="em-subject" placeholder="Ex: Bienvenue sur AKOLABS 🚀"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Template EmailJS ID</label><input class="admin-form-input" id="em-template" placeholder="Ex: template_cv1s60p" value="template_cv1s60p"></div>';
+        h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.createEmailSequence()"><i class="fas fa-plus"></i> Créer la séquence</button>';
+        h += '</div>';
+
+        // Liste des séquences
+        h += '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-list" style="color:#C9A84C;margin-right:8px;"></i>Séquences (' + sequences.length + ')</div></div>';
+
+        if (sequences.length === 0) {
+            h += '<p style="color:#8A87A0;text-align:center;padding:20px;font-size:13px;">Aucune séquence créée.</p>';
+        } else {
+            sequences.forEach(function(seq) {
+                var trigLabel = triggerLabels[seq.trigger_event] || seq.trigger_event;
+                var delayLabel = seq.delay_hours === 0 ? 'Immédiat' : (seq.delay_hours < 24 ? seq.delay_hours + 'h' : 'J+' + Math.round(seq.delay_hours / 24));
+                var statusColor = seq.is_active ? '#2E9E5B' : '#8A87A0';
+                var statusText = seq.is_active ? 'Active' : 'Inactive';
+                var sentCount = logs.filter(function(l) { return l.sequence_id === seq.id && l.status === 'sent'; }).length;
+
+                h += '<div style="border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;margin-bottom:10px;background:rgba(255,255,255,0.02);">';
+                h += '<div style="display:flex;align-items:flex-start;gap:10px;">';
+                h += '<div style="flex:1;">';
+                h += '<div style="font-weight:600;color:#E2E0EC;font-size:13px;margin-bottom:4px;">' + seq.name + '</div>';
+                h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">';
+                h += '<span style="background:rgba(201,168,76,0.1);color:#C9A84C;border-radius:20px;padding:2px 8px;font-size:11px;">' + trigLabel + '</span>';
+                h += '<span style="background:rgba(255,255,255,0.05);color:#B0AEC0;border-radius:20px;padding:2px 8px;font-size:11px;">⏱ ' + delayLabel + '</span>';
+                h += '<span style="background:rgba(255,255,255,0.05);color:#8A87A0;border-radius:20px;padding:2px 8px;font-size:11px;">' + seq.template_id + '</span>';
+                h += '</div>';
+                h += '<div style="font-size:11px;color:#8A87A0;">' + sentCount + ' envoi(s) • <span style="color:' + statusColor + ';">' + statusText + '</span></div>';
+                h += '</div>';
+
+                // Actions
+                h += '<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">';
+                var toggleLabel = seq.is_active ? 'Désactiver' : 'Activer';
+                var toggleColor = seq.is_active ? '#D93B3B' : '#2E9E5B';
+                h += '<button style="padding:5px 10px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:8px;color:#C9A84C;font-size:11px;cursor:pointer;" onclick="AdminApp.testEmailSequence(\'' + seq.id + '\')">Test</button>';
+                h += '<button style="padding:5px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:' + toggleColor + ';font-size:11px;cursor:pointer;" onclick="AdminApp.toggleEmailSequence(\'' + seq.id + '\',' + seq.is_active + ')">' + toggleLabel + '</button>';
+                h += '</div>';
+
+                h += '</div></div>';
+            });
+        }
+        h += '</div>';
+
+        // Logs
+        var sentOk = logs.filter(function(l) { return l.status === 'sent'; }).length;
+        var sentFail = logs.filter(function(l) { return l.status === 'failed'; }).length;
+
+        h += '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-history" style="color:#C9A84C;margin-right:8px;"></i>Derniers envois</div>';
+        h += '<div style="font-size:11px;color:#8A87A0;">' + sentOk + ' ok · ' + sentFail + ' échec(s)</div></div>';
+
+        if (logs.length === 0) {
+            h += '<p style="color:#8A87A0;text-align:center;padding:20px;font-size:13px;">Aucun email envoyé pour le moment.</p>';
+        } else {
+            h += '<div class="admin-table"><table><tr><th>Email</th><th>Séquence</th><th>Statut</th><th>Date</th></tr>';
+            logs.forEach(function(l) {
+                var statusColor = l.status === 'sent' ? '#2E9E5B' : '#D93B3B';
+                var statusIcon = l.status === 'sent' ? '✅' : '❌';
+                var seqName = sequences.find(function(s) { return s.id === l.sequence_id; });
+                h += '<tr>';
+                h += '<td style="font-size:12px;max-width:130px;overflow:hidden;text-overflow:ellipsis;">' + l.email + '</td>';
+                h += '<td style="font-size:11px;color:#8A87A0;">' + (seqName ? seqName.name : (l.trigger_event || '-')) + '</td>';
+                h += '<td><span style="color:' + statusColor + ';font-size:13px;">' + statusIcon + '</span></td>';
+                h += '<td style="font-size:11px;color:#6B6880;">' + Utils.timeAgo(l.sent_at) + '</td>';
+                h += '</tr>';
+            });
+            h += '</table></div>';
+        }
+        h += '</div>';
+
+        container.innerHTML = h;
+    };
+
+    AdminApp.createEmailSequence = async function() {
+        var name = document.getElementById('em-name').value.trim();
+        var trigger = document.getElementById('em-trigger').value;
+        var delay = parseInt(document.getElementById('em-delay').value);
+        var subject = document.getElementById('em-subject').value.trim();
+        var template = document.getElementById('em-template').value.trim();
+
+        if (!name || !subject || !template) { Utils.showToast('Tous les champs sont requis', 'warning'); return; }
+
+        try {
+            await db.from('email_sequences').insert({
+                name: name,
+                trigger_event: trigger,
+                delay_hours: delay,
+                subject: subject,
+                template_id: template,
+                is_active: true
+            });
+            Utils.showToast('Séquence créée !', 'success');
+            AdminApp.switchTab('emails');
+        } catch(e) {
+            Utils.showToast('Erreur : ' + e.message, 'error');
+        }
+    };
+
+    AdminApp.toggleEmailSequence = async function(id, currentState) {
+        try {
+            await db.from('email_sequences').update({ is_active: !currentState }).eq('id', id);
+            Utils.showToast(currentState ? 'Séquence désactivée' : 'Séquence activée', 'success');
+            AdminApp.switchTab('emails');
+        } catch(e) {
+            Utils.showToast('Erreur', 'error');
+        }
+    };
+
+    AdminApp.testEmailSequence = async function(id) {
+        var testEmail = prompt('Email de test :');
+        if (!testEmail) return;
+
+        try {
+            Utils.showToast('Envoi du test...', 'info');
+            if (typeof EmailMarketing !== 'undefined') {
+                await EmailMarketing.sendTest(id, testEmail);
+                Utils.showToast('Email de test envoyé !', 'success');
+            } else {
+                Utils.showToast('Module email non disponible ici', 'warning');
+            }
+        } catch(e) {
+            Utils.showToast('Erreur : ' + e.message, 'error');
+        }
+    };
+
+    // ===== PROMOS =====
+    AdminApp.renderPromos = async function(container) {
+        var h = '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title">Creer un code promo</div></div>';
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Code</label><input class="admin-form-input" id="pf-code" placeholder="Ex: PROMO2025" style="text-transform:uppercase;"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Reduction (%)</label><input class="admin-form-input" id="pf-percent" type="number" value="10"></div>';
+        h += '</div>';
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Utilisations max</label><input class="admin-form-input" id="pf-max" type="number" placeholder="Illimite si vide"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Valide jusqu\'au</label><input class="admin-form-input" id="pf-until" type="datetime-local"></div>';
+        h += '</div>';
+        h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.createPromo()"><i class="fas fa-plus"></i> Creer</button>';
+        h += '</div>';
+
+        var r = await db.from('promo_codes').select('*').order('created_at', { ascending: false });
+        var promos = r.data || [];
+
+        h += '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Codes promo (' + promos.length + ')</div></div>';
+        h += '<div class="admin-table"><table><tr><th>Code</th><th>Reduction</th><th>Utilise</th><th>Max</th><th>Actif</th><th>Actions</th></tr>';
+
+        for (var i = 0; i < promos.length; i++) {
+            var p = promos[i];
+            var activeStatus = p.is_active ? '<span class="status active">Oui</span>' : '<span class="status inactive">Non</span>';
+
+            h += '<tr><td style="font-weight:700;color:#D4AF37;letter-spacing:1px;">' + p.code + '</td><td>' + p.discount_percent + '%</td><td>' + (p.current_uses || 0) + '</td><td>' + (p.max_uses || '∞') + '</td><td>' + activeStatus + '</td>';
+            h += '<td><button class="admin-btn" style="padding:4px 8px;font-size:10px;background:rgba(220,53,69,0.1);color:#DC3545;border:1px solid rgba(220,53,69,0.2);" onclick="AdminApp.togglePromo(\'' + p.id + '\',' + !p.is_active + ')"><i class="fas fa-power-off"></i></button></td></tr>';
+        }
+
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    AdminApp.createPromo = async function() {
+        var code = document.getElementById('pf-code').value.trim().toUpperCase();
+        var percent = parseFloat(document.getElementById('pf-percent').value) || 10;
+        var maxUses = document.getElementById('pf-max').value ? parseInt(document.getElementById('pf-max').value) : null;
+        var until = document.getElementById('pf-until').value;
+
+        if (!code) { Utils.showToast('Code requis', 'warning'); return; }
+
+        try {
+            await db.from('promo_codes').insert({
+                code: code,
+                discount_percent: percent,
+                max_uses: maxUses,
+                valid_until: until ? new Date(until).toISOString() : null,
+                is_active: true
+            });
+            Utils.showToast('Code promo cree !', 'success');
+            AdminApp.switchTab('promos');
+        } catch(e) {
+            Utils.showToast('Erreur: ' + e.message, 'error');
+        }
+    };
+
+    AdminApp.togglePromo = async function(id, active) {
+        try {
+            await db.from('promo_codes').update({ is_active: active }).eq('id', id);
+            Utils.showToast(active ? 'Code active' : 'Code desactive', 'success');
+            AdminApp.switchTab('promos');
+        } catch(e) {
+            Utils.showToast('Erreur', 'error');
+        }
+    };
+
+
+    // ===== ANALYTICS =====
+    AdminApp._chartRevenue = null;
+    AdminApp._chartViews = null;
+    AdminApp._analyticsFilter = '7d';
+
+    AdminApp.renderAnalytics = async function(container) {
+        container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+        await AdminApp._loadAnalytics(container, AdminApp._analyticsFilter);
+    };
+
+    AdminApp._loadAnalytics = async function(container, filter) {
+        AdminApp._analyticsFilter = filter;
+        try {
+            // Calculer plage de dates
+            var now = new Date();
+            var days = filter === '1d' ? 1 : filter === '7d' ? 7 : filter === '30d' ? 30 : 90;
+            var from = new Date(now - days * 86400000).toISOString();
+
+            // Charger les données en parallèle
+            var [viewsR, purchasesR, usersR, opensR, topSectR] = await Promise.all([
+                db.from('section_views').select('created_at, is_free, section_id').gte('created_at', from),
+                db.from('purchases').select('amount, created_at').eq('status', 'confirmed').gte('created_at', from),
+                db.from('users').select('created_at').gte('created_at', from),
+                db.from('app_opens').select('created_at').gte('created_at', from),
+                db.from('section_views').select('section_id, sections(title)').gte('created_at', from)
+            ]);
+
+            var views = viewsR.data || [];
+            var purchases = purchasesR.data || [];
+            var newUsers = usersR.data || [];
+            var opens = opensR.data || [];
+
+            // Calculs KPIs
+            var totalViews = views.length;
+            var totalRevenue = purchases.reduce(function(s, p) { return s + (p.amount || 0); }, 0);
+            var totalPurchases = purchases.length;
+            var conversion = newUsers.length > 0 ? ((totalPurchases / newUsers.length) * 100).toFixed(1) : 0;
+            var freeViews = views.filter(function(v) { return v.is_free; }).length;
+
+            // Construire les données par jour
+            var dayMap = {};
+            for (var d = 0; d < days; d++) {
+                var dd = new Date(now - (days - 1 - d) * 86400000);
+                var key = dd.toISOString().split('T')[0];
+                dayMap[key] = { views: 0, revenue: 0, users: 0, opens: 0 };
+            }
+
+            views.forEach(function(v) { 
+                var k = v.created_at.split('T')[0]; 
+                if (dayMap[k]) dayMap[k].views++; 
+            });
+            purchases.forEach(function(p) { 
+                var k = p.created_at.split('T')[0]; 
+                if (dayMap[k]) dayMap[k].revenue += (p.amount || 0); 
+            });
+            newUsers.forEach(function(u) { 
+                var k = u.created_at.split('T')[0]; 
+                if (dayMap[k]) dayMap[k].users++; 
+            });
+            opens.forEach(function(o) { 
+                var k = o.created_at.split('T')[0]; 
+                if (dayMap[k]) dayMap[k].opens++; 
+            });
+
+            var labels = Object.keys(dayMap).map(function(k) {
+                var d = new Date(k);
+                return days <= 7 ? ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()] + ' ' + d.getDate() : d.getDate() + '/' + (d.getMonth()+1);
+            });
+            var viewsData = Object.values(dayMap).map(function(d) { return d.views; });
+            var revenueData = Object.values(dayMap).map(function(d) { return d.revenue; });
+            var usersData = Object.values(dayMap).map(function(d) { return d.users; });
+
+            // Top sections
+            var sectCount = {};
+            (topSectR.data || []).forEach(function(v) {
+                var title = v.sections ? v.sections.title : v.section_id;
+                sectCount[title] = (sectCount[title] || 0) + 1;
+            });
+            var topSects = Object.entries(sectCount).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+
+            // HTML
+            var filterBtns = ['1d','7d','30d','90d'].map(function(f) {
+                var active = f === filter ? 'background:#4B0082;color:#fff;border-color:#4B0082;' : '';
+                return '<button onclick="AdminApp._loadAnalytics(document.getElementById(\'admin-tab-content\'),' + "\'" + f + "\'" + ')" style="padding:6px 14px;border:1px solid #C8C4DC;border-radius:20px;background:transparent;color:#4A4767;font-size:12px;cursor:pointer;' + active + '">' + f + '</button>';
+            }).join('');
+
+            var h = '';
+            
+            // Filtres
+            h += '<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">' + filterBtns + '</div>';
+
+            // KPI Cards
+            h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;">';
+            h += AdminApp._kpiCard('👁️', 'Vues', totalViews, freeViews + ' gratuites', '#4B0082');
+            h += AdminApp._kpiCard('💰', 'Revenus', Utils.formatPrice(totalRevenue), totalPurchases + ' achats', '#C9A84C');
+            h += AdminApp._kpiCard('👥', 'Nouveaux users', newUsers.length, conversion + '% conversion', '#2E9E5B');
+            h += AdminApp._kpiCard('📱', 'Ouvertures', opens.length, 'sessions', '#2B7FD4');
+            h += '</div>';
+
+            // Graphique Revenus + Vues (style trading)
+            h += '<div class="admin-card" style="margin-bottom:16px;">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-chart-line" style="color:#C9A84C;margin-right:8px;"></i>Revenus & Vues</div></div>';
+            h += '<div style="position:relative;height:220px;"><canvas id="chart-revenue-views"></canvas></div>';
+            h += '</div>';
+
+            // Graphique Nouveaux utilisateurs
+            h += '<div class="admin-card" style="margin-bottom:16px;">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-users" style="color:#2E9E5B;margin-right:8px;"></i>Nouveaux utilisateurs</div></div>';
+            h += '<div style="position:relative;height:160px;"><canvas id="chart-users"></canvas></div>';
+            h += '</div>';
+
+            // Top sections
+            h += '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-fire" style="color:#E8A020;margin-right:8px;"></i>Sections les plus vues</div></div>';
+            if (topSects.length > 0) {
+                var maxVal = topSects[0][1];
+                topSects.forEach(function(s, idx) {
+                    var pct = Math.round((s[1] / maxVal) * 100);
+                    h += '<div style="margin-bottom:12px;">';
+                    h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:12px;color:#1A1A2E;font-weight:500;">' + (idx+1) + '. ' + (s[0] || 'Inconnue') + '</span><span style="font-size:12px;color:#C9A84C;font-weight:700;">' + s[1] + ' vues</span></div>';
+                    h += '<div style="height:6px;background:#F0EFF7;border-radius:3px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#4B0082,#C9A84C);border-radius:3px;transition:width 0.8s;"></div></div>';
+                    h += '</div>';
+                });
+            } else {
+                h += '<p style="color:#8A87A0;text-align:center;padding:20px;font-size:13px;">Aucune vue enregistrée sur la période</p>';
+            }
+            h += '</div>';
+
+            container.innerHTML = h;
+
+            // Initialiser les graphiques Chart.js
+            AdminApp._initChartRevenueViews(labels, revenueData, viewsData);
+            AdminApp._initChartUsers(labels, usersData);
+
+        } catch(e) {
+            container.innerHTML = '<div class="admin-card"><p style="color:#D93B3B;text-align:center;padding:20px;">Erreur: ' + e.message + '</p><p style="color:#8A87A0;text-align:center;font-size:12px;">Vérifiez que les tables section_views et app_opens existent dans Supabase.</p></div>';
+        }
+    };
+
+    AdminApp._kpiCard = function(emoji, label, value, sub, color) {
+        return '<div style="background:#fff;border:1px solid #E2E0EC;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(75,0,130,0.08);">'
+            + '<div style="font-size:22px;margin-bottom:4px;">' + emoji + '</div>'
+            + '<div style="font-size:20px;font-weight:700;color:' + color + ';font-family:Cinzel,serif;">' + value + '</div>'
+            + '<div style="font-size:11px;color:#1A1A2E;font-weight:600;margin-top:2px;">' + label + '</div>'
+            + '<div style="font-size:10px;color:#8A87A0;margin-top:2px;">' + sub + '</div>'
+            + '</div>';
+    };
+
+    AdminApp._initChartRevenueViews = function(labels, revenueData, viewsData) {
+        var ctx = document.getElementById('chart-revenue-views');
+        if (!ctx) return;
+        if (AdminApp._chartRevenue) AdminApp._chartRevenue.destroy();
+        AdminApp._chartRevenue = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Revenus (FCFA)',
+                        data: revenueData,
+                        borderColor: '#C9A84C',
+                        backgroundColor: 'rgba(201,168,76,0.08)',
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#C9A84C',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Vues',
+                        data: viewsData,
+                        borderColor: '#4B0082',
+                        backgroundColor: 'rgba(75,0,130,0.06)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#4B0082',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { color: '#1A1A2E', font: { size: 11, family: 'Poppins' } } },
+                    tooltip: {
+                        backgroundColor: '#1A1A2E',
+                        titleColor: '#C9A84C',
+                        bodyColor: '#E2E0EC',
+                        borderColor: '#4B0082',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#8A87A0', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    y: { type: 'linear', display: true, position: 'left', ticks: { color: '#C9A84C', font: { size: 10 }, callback: function(v) { return v + 'F'; } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+                    y1: { type: 'linear', display: true, position: 'right', ticks: { color: '#4B0082', font: { size: 10 } }, grid: { drawOnChartArea: false } }
+                }
+            }
+        });
+    };
+
+    AdminApp._initChartUsers = function(labels, usersData) {
+        var ctx = document.getElementById('chart-users');
+        if (!ctx) return;
+        if (AdminApp._chartUsers) AdminApp._chartUsers.destroy();
+        AdminApp._chartUsers = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Nouveaux utilisateurs',
+                    data: usersData,
+                    backgroundColor: 'rgba(46,158,91,0.7)',
+                    borderColor: '#2E9E5B',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#8A87A0', font: { size: 10 } }, grid: { display: false } },
+                    y: { ticks: { color: '#2E9E5B', font: { size: 10 }, stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' } }
+                }
+            }
+        });
+    };
+
+    // ===== POPUPS ADMIN =====
+    AdminApp.renderPopups = async function(container) {
+        container.innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner"></div></div>';
+        
+        var r = await db.from('popups').select('*').order('created_at', { ascending: false });
+        var popups = r.data || [];
+
+        var h = '';
+
+        // Formulaire création
+        h += '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-plus-circle" style="color:#C9A84C;margin-right:8px;"></i>Créer un popup</div></div>';
+        
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Titre interne</label><input class="admin-form-input" id="pop-title" placeholder="Ex: Promo Été 2025"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Type</label>';
+        h += '<select class="admin-form-select" id="pop-type" onchange="AdminApp._togglePopupFields()">';
+        h += '<option value="image">🖼️ Image cliquable</option>';
+        h += '<option value="video">🎬 Vidéo avec timer</option>';
+        h += '<option value="offer">🎁 Offre / Promo texte</option>';
+        h += '</select></div>';
+        h += '</div>';
+
+        h += '<div id="pop-content-url-group" class="admin-form-group"><label class="admin-form-label">URL Image / Vidéo</label>';
+        h += '<div style="display:flex;gap:8px;"><input class="admin-form-input" id="pop-content-url" placeholder="https://... ou uploader"><button class="admin-btn admin-btn-primary" onclick="AdminApp.uploadMedia(\'pop-content-url\', \'image/*,video/*\')"><i class="fas fa-upload"></i></button></div></div>';
+        
+        h += '<div class="admin-form-group"><label class="admin-form-label">Texte / Message</label><textarea class="admin-form-textarea" id="pop-text" rows="2" placeholder="Description de l&#39;offre..."></textarea></div>';
+        
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Bouton CTA (texte)</label><input class="admin-form-input" id="pop-cta-label" placeholder="Ex: Profiter maintenant"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">URL du CTA</label><input class="admin-form-input" id="pop-cta-url" placeholder="https://... ou /section/id"></div>';
+        h += '</div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Déclencheur</label>';
+        h += '<select class="admin-form-select" id="pop-trigger">';
+        h += '<option value="app_open">📱 Ouverture de l&#39;app</option>';
+        h += '<option value="section_open">📂 Ouverture d&#39;une section</option>';
+        h += '<option value="time_on_page">⏱️ Après X secondes sur page</option>';
+        h += '</select></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Valeur (secondes/ouvertures)</label><input class="admin-form-input" id="pop-trigger-val" type="number" value="30" min="1"></div>';
+        h += '</div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Durée avant fermeture (sec)</label><input class="admin-form-input" id="pop-duration" type="number" value="5" min="0" placeholder="0 = immédiat"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Fréquence d&#39;affichage</label>';
+        h += '<select class="admin-form-select" id="pop-repeat">';
+        h += '<option value="once">Une seule fois</option>';
+        h += '<option value="every_open">À chaque ouverture</option>';
+        h += '<option value="interval_hours">Toutes les X heures</option>';
+        h += '<option value="until_action">Jusqu&#39;à l&#39;action CTA</option>';
+        h += '</select></div>';
+        h += '</div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Intervalle (heures)</label><input class="admin-form-input" id="pop-interval" type="number" value="24" min="1"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Ciblage utilisateurs</label>';
+        h += '<select class="admin-form-select" id="pop-target">';
+        h += '<option value="all">Tous</option>';
+        h += '<option value="not_purchased">Non-acheteurs seulement</option>';
+        h += '<option value="no_affiliation">Sans code affiliation</option>';
+        h += '</select></div>';
+        h += '</div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Date début</label><input class="admin-form-input" id="pop-start" type="datetime-local"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Date fin (optionnel)</label><input class="admin-form-input" id="pop-end" type="datetime-local"></div>';
+        h += '</div>';
+
+        h += '<div style="display:flex;gap:16px;margin-bottom:16px;">';
+        h += '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4A4767;cursor:pointer;"><input type="checkbox" id="pop-free" checked> Sections gratuites</label>';
+        h += '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4A4767;cursor:pointer;"><input type="checkbox" id="pop-paid"> Sections payantes</label>';
+        h += '</div>';
+
+        h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.createPopup()"><i class="fas fa-rocket"></i> Créer le popup</button>';
+        h += '</div>';
+
+        // Liste des popups
+        h += '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title">Popups actifs (' + popups.length + ')</div></div>';
+
+        if (popups.length > 0) {
+            popups.forEach(function(p) {
+                var typeIcon = p.type === 'image' ? '🖼️' : p.type === 'video' ? '🎬' : '🎁';
+                var statusColor = p.is_active ? '#2E9E5B' : '#D93B3B';
+                var ctr = p.total_shown > 0 ? Math.round((p.total_clicks / p.total_shown) * 100) : 0;
+                
+                h += '<div style="background:#FAF9FD;border:1px solid #E2E0EC;border-radius:12px;padding:14px;margin-bottom:10px;">';
+                h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">';
+                h += '<div style="flex:1;">';
+                h += '<div style="font-weight:600;color:#1A1A2E;font-size:13px;">' + typeIcon + ' ' + p.title + '</div>';
+                h += '<div style="font-size:11px;color:#8A87A0;margin-top:3px;">' + p.trigger_type + ' · ' + p.repeat_type + ' · ' + p.target + '</div>';
+                h += '<div style="display:flex;gap:12px;margin-top:6px;">';
+                h += '<span style="font-size:11px;color:#4A4767;">👁 ' + (p.total_shown||0) + ' vues</span>';
+                h += '<span style="font-size:11px;color:#C9A84C;">👆 ' + (p.total_clicks||0) + ' clics</span>';
+                h += '<span style="font-size:11px;color:#4B0082;">📊 CTR ' + ctr + '%</span>';
+                h += '</div></div>';
+                h += '<div style="display:flex;gap:6px;">';
+                h += '<button onclick="AdminApp.togglePopup(\'' + p.id + '\',' + !p.is_active + ')" style="padding:5px 10px;border:1px solid ' + statusColor + ';background:transparent;color:' + statusColor + ';border-radius:20px;font-size:11px;cursor:pointer;">' + (p.is_active ? '⏸ Pause' : '▶ Activer') + '</button>';
+                h += '<button onclick="AdminApp.deletePopup(\'' + p.id + '\')" style="padding:5px 8px;border:1px solid #D93B3B;background:transparent;color:#D93B3B;border-radius:20px;font-size:11px;cursor:pointer;"><i class="fas fa-trash"></i></button>';
+                h += '</div></div></div>';
+            });
+        } else {
+            h += '<p style="color:#8A87A0;text-align:center;padding:20px;font-size:13px;">Aucun popup créé. Utilisez le formulaire ci-dessus.</p>';
+        }
+        h += '</div>';
+
+        container.innerHTML = h;
+    };
+
+    AdminApp._togglePopupFields = function() {
+        var type = document.getElementById('pop-type').value;
+        var urlGroup = document.getElementById('pop-content-url-group');
+        if (urlGroup) {
+            urlGroup.style.display = type === 'offer' ? 'none' : 'block';
+        }
+    };
+
+    AdminApp.createPopup = async function() {
+        var title = document.getElementById('pop-title').value.trim();
+        var type = document.getElementById('pop-type').value;
+        if (!title) { Utils.showToast('Titre requis', 'warning'); return; }
+
+        var startVal = document.getElementById('pop-start').value;
+        var endVal = document.getElementById('pop-end').value;
+
+        try {
+            await db.from('popups').insert({
+                title: title,
+                type: type,
+                content_url: document.getElementById('pop-content-url').value.trim() || null,
+                content_text: document.getElementById('pop-text').value.trim() || null,
+                cta_label: document.getElementById('pop-cta-label').value.trim() || 'Voir plus',
+                cta_url: document.getElementById('pop-cta-url').value.trim() || null,
+                trigger_type: document.getElementById('pop-trigger').value,
+                trigger_value: parseInt(document.getElementById('pop-trigger-val').value) || 30,
+                display_duration: parseInt(document.getElementById('pop-duration').value) || 5,
+                repeat_type: document.getElementById('pop-repeat').value,
+                repeat_interval_hours: parseInt(document.getElementById('pop-interval').value) || 24,
+                target: document.getElementById('pop-target').value,
+                show_on_free_sections: document.getElementById('pop-free').checked,
+                show_on_paid_sections: document.getElementById('pop-paid').checked,
+                starts_at: startVal ? new Date(startVal).toISOString() : new Date().toISOString(),
+                ends_at: endVal ? new Date(endVal).toISOString() : null,
+                is_active: true
+            });
+            Utils.showToast('Popup créé !', 'success');
+            AdminApp.switchTab('popups');
+        } catch(e) {
+            Utils.showToast('Erreur: ' + e.message, 'error');
+        }
+    };
+
+    AdminApp.togglePopup = async function(id, active) {
+        try {
+            await db.from('popups').update({ is_active: active }).eq('id', id);
+            Utils.showToast(active ? 'Popup activé' : 'Popup mis en pause', 'success');
+            AdminApp.switchTab('popups');
+        } catch(e) { Utils.showToast('Erreur', 'error'); }
+    };
+
+    AdminApp.deletePopup = async function(id) {
+        if (!confirm('Supprimer ce popup définitivement ?')) return;
+        try {
+            await db.from('popup_logs').delete().eq('popup_id', id);
+            await db.from('popups').delete().eq('id', id);
+            Utils.showToast('Popup supprimé', 'success');
+            AdminApp.switchTab('popups');
+        } catch(e) { Utils.showToast('Erreur', 'error'); }
+    };
+
+
+    // ===== FLASH SALES ADMIN =====
+    AdminApp.renderFlash = async function(container) {
+        container.innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner"></div></div>';
+
+        // Charger sections et flash sales en parallèle
+        var [sectR, flashR] = await Promise.all([
+            db.from('sections').select('id, title, price').eq('is_active', true).order('order_index'),
+            db.from('flash_sales').select('*, sections(title)').order('created_at', { ascending: false })
+        ]);
+
+        var sections = sectR.data || [];
+        var flashes = flashR.data || [];
+        var now = new Date();
+
+        var h = '';
+
+        // Formulaire création
+        h += '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-bolt" style="color:#D93B3B;margin-right:8px;"></i>Créer une offre flash</div></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Titre de l&#39;offre</label><input class="admin-form-input" id="fl-title" placeholder="Ex: Offre Exclusive 24h"></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Message affiché (barre landing)</label><input class="admin-form-input" id="fl-desc" placeholder="Ex: -30% sur l\'accès AKOLABS — aujourd\'hui seulement"></div>';
+
+        h += '<div class="admin-form-group"><label class="admin-form-label">Section ciblée</label>';
+        h += '<select class="admin-form-select" id="fl-section">';
+        h += '<option value="">🌍 Toutes les sections</option>';
+        for (var i = 0; i < sections.length; i++) {
+            var s = sections[i];
+            h += '<option value="' + s.id + '">' + s.title + ' (' + (s.price ? s.price + ' FCFA' : 'Gratuit') + ')</option>';
+        }
+        h += '</select></div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Réduction (%)</label><input class="admin-form-input" id="fl-percent" type="number" min="1" max="99" placeholder="Ex: 30"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">OU Prix fixe (FCFA)</label><input class="admin-form-input" id="fl-price" type="number" min="0" placeholder="Ex: 2000"></div>';
+        h += '</div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Début</label><input class="admin-form-input" id="fl-start" type="datetime-local"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Fin</label><input class="admin-form-input" id="fl-end" type="datetime-local"></div>';
+        h += '</div>';
+
+        h += '<div class="admin-form-row">';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Texte du badge</label><input class="admin-form-input" id="fl-badge" value="⚡ FLASH" placeholder="⚡ FLASH"></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Couleur bannière</label>';
+        h += '<div style="display:flex;gap:8px;align-items:center;">';
+        h += '<input class="admin-form-input" id="fl-color" value="#D93B3B" style="flex:1;">';
+        h += '<div id="fl-color-preview" style="width:36px;height:36px;border-radius:8px;background:#D93B3B;flex-shrink:0;"></div>';
+        h += '</div></div>';
+        h += '</div>';
+
+        h += '<button class="admin-btn admin-btn-primary admin-btn-block" style="background:linear-gradient(135deg,#D93B3B,#B52D2D);border:none;" onclick="AdminApp.createFlash()"><i class="fas fa-bolt"></i> Lancer l&#39;offre flash</button>';
+        h += '</div>';
+
+        // Liste des offres flash
+        h += '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title">Offres flash (' + flashes.length + ')</div></div>';
+
+        if (flashes.length === 0) {
+            h += '<p style="color:#8A87A0;text-align:center;padding:20px;font-size:13px;">Aucune offre flash créée.</p>';
+        } else {
+            flashes.forEach(function(f) {
+                var isActive = f.is_active && new Date(f.ends_at) > now && new Date(f.starts_at) <= now;
+                var isExpired = new Date(f.ends_at) <= now;
+                var isPending = new Date(f.starts_at) > now;
+
+                var statusLabel = isExpired ? '⛔ Expirée' : isPending ? '⏳ Planifiée' : isActive ? '🟢 En cours' : '⏸ Pausée';
+                var statusColor = isExpired ? '#8A87A0' : isPending ? '#C9A84C' : isActive ? '#2E9E5B' : '#D93B3B';
+
+                var discountInfo = f.discount_percent ? '-' + f.discount_percent + '%' : f.flash_price ? Utils.formatPrice(f.flash_price) : '-';
+                var targetInfo = f.sections ? f.sections.title : 'Toutes les sections';
+                var ctr = f.total_views > 0 ? Math.round((f.total_purchases / f.total_views) * 100) : 0;
+
+                h += '<div style="background:#FAF9FD;border:1px solid #E2E0EC;border-radius:12px;padding:14px;margin-bottom:10px;">';
+                h += '<div style="display:flex;align-items:flex-start;gap:10px;">';
+                h += '<div style="width:10px;height:10px;border-radius:50%;background:' + statusColor + ';margin-top:4px;flex-shrink:0;"></div>';
+                h += '<div style="flex:1;min-width:0;">';
+                h += '<div style="font-weight:600;color:#1A1A2E;font-size:13px;">' + f.title + '</div>';
+                h += '<div style="font-size:11px;color:#8A87A0;margin-top:2px;">' + targetInfo + ' · ' + discountInfo + '</div>';
+                h += '<div style="font-size:11px;color:#4A4767;margin-top:3px;">📅 ' + new Date(f.starts_at).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + ' → ' + new Date(f.ends_at).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) + '</div>';
+                h += '<div style="display:flex;gap:10px;margin-top:5px;">';
+                h += '<span style="font-size:11px;color:' + statusColor + ';font-weight:600;">' + statusLabel + '</span>';
+                h += '<span style="font-size:11px;color:#8A87A0;">👁 ' + (f.total_views||0) + ' · 🛒 ' + (f.total_purchases||0) + ' · ' + ctr + '%</span>';
+                h += '</div></div>';
+                h += '<div style="display:flex;flex-direction:column;gap:6px;">';
+                if (!isExpired) {
+                    h += '<button onclick="AdminApp.toggleFlash(\'' + f.id + '\',' + !f.is_active + ')" style="padding:5px 10px;border:1px solid ' + (f.is_active ? '#D93B3B' : '#2E9E5B') + ';background:transparent;color:' + (f.is_active ? '#D93B3B' : '#2E9E5B') + ';border-radius:20px;font-size:11px;cursor:pointer;">' + (f.is_active ? '⏸ Pause' : '▶ Activer') + '</button>';
+                }
+                h += '<button onclick="AdminApp.deleteFlash(\'' + f.id + '\')" style="padding:5px 8px;border:1px solid #D93B3B;background:transparent;color:#D93B3B;border-radius:20px;font-size:11px;cursor:pointer;"><i class="fas fa-trash"></i></button>';
+                h += '</div></div></div>';
+            });
+        }
+        h += '</div>';
+
+        container.innerHTML = h;
+
+        // Prévisualisation couleur live
+        var colorInput = document.getElementById('fl-color');
+        var colorPreview = document.getElementById('fl-color-preview');
+        if (colorInput && colorPreview) {
+            colorInput.addEventListener('input', function() {
+                colorPreview.style.background = this.value;
+            });
+        }
+    };
+
+    AdminApp.createFlash = async function() {
+        var title = document.getElementById('fl-title').value.trim();
+        var desc = document.getElementById('fl-desc').value.trim();
+        var sectionId = document.getElementById('fl-section').value;
+        var percent = parseInt(document.getElementById('fl-percent').value) || null;
+        var fixedPrice = parseInt(document.getElementById('fl-price').value) || null;
+        var startVal = document.getElementById('fl-start').value;
+        var endVal = document.getElementById('fl-end').value;
+        var badge = document.getElementById('fl-badge').value.trim() || '⚡ FLASH';
+        var color = document.getElementById('fl-color').value.trim() || '#D93B3B';
+
+        if (!title) { Utils.showToast('Titre requis', 'warning'); return; }
+        if (!endVal) { Utils.showToast('Date de fin requise', 'warning'); return; }
+        if (!percent && !fixedPrice) { Utils.showToast('Indiquez une réduction ou un prix fixe', 'warning'); return; }
+
+        var endsAt = new Date(endVal);
+        if (endsAt <= new Date()) { Utils.showToast('La date de fin doit être dans le futur', 'warning'); return; }
+
+        try {
+            await db.from('flash_sales').insert({
+                title: title,
+                description: desc || null,
+                section_id: sectionId || null,
+                applies_to: sectionId ? 'section' : 'all_sections',
+                discount_percent: percent,
+                flash_price: fixedPrice,
+                badge_text: badge,
+                banner_color: color,
+                starts_at: startVal ? new Date(startVal).toISOString() : new Date().toISOString(),
+                ends_at: endsAt.toISOString(),
+                is_active: true
+            });
+            Utils.showToast('Offre flash lancée ! ⚡', 'success');
+            AdminApp.switchTab('flash');
+        } catch(e) {
+            Utils.showToast('Erreur: ' + e.message, 'error');
+        }
+    };
+
+    AdminApp.toggleFlash = async function(id, active) {
+        try {
+            await db.from('flash_sales').update({ is_active: active }).eq('id', id);
+            Utils.showToast(active ? 'Offre activée' : 'Offre mise en pause', 'success');
+            AdminApp.switchTab('flash');
+        } catch(e) { Utils.showToast('Erreur', 'error'); }
+    };
+
+    AdminApp.deleteFlash = async function(id) {
+        if (!confirm('Supprimer cette offre flash ?')) return;
+        try {
+            await db.from('flash_sales').delete().eq('id', id);
+            Utils.showToast('Offre supprimée', 'success');
+            AdminApp.switchTab('flash');
+        } catch(e) { Utils.showToast('Erreur', 'error'); }
+    };
+
+    // ===== VISUELS (Screenshots landing) =====
+    AdminApp.renderVisuels = async function(container) {
+        try {
+            var { data: shots } = await db.from('app_screenshots').select('*').order('order_index');
+            shots = shots || [];
+
+            var h = '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-images"></i> Captures d\'écran — Aperçu de l\'app</div></div>';
+            h += '<p style="font-size:13px;color:#4A4767;margin-bottom:16px;">Ces images apparaissent dans la section <strong>\"Aperçu de l\'application\"</strong> de la landing page. Format recommandé : portrait 9/16 (ex : 400×720px).</p>';
+
+            // Liste des screenshots existants
+            if (shots.length > 0) {
+                h += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">';
+                shots.forEach(function(s, i) {
+                    var src = s.url;
+                    if (src && src.indexOf('res.cloudinary.com') !== -1) src = src.replace('/upload/', '/upload/f_auto,q_auto,w_120,h_200,c_fill/');
+                    h += '<div style="text-align:center;background:#F5F4F8;border-radius:10px;padding:8px;width:120px;">';
+                    h += '<img src="' + src + '" loading="lazy" style="width:100px;height:180px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 6px;">';
+                    h += '<div style="font-size:11px;color:#4A4767;margin-bottom:4px;">' + (s.label || '—') + '</div>';
+                    h += '<div style="font-size:11px;color:#888;margin-bottom:6px;">Ordre : ' + s.order_index + '</div>';
+                    h += '<button class="admin-btn admin-btn-danger" style="font-size:11px;padding:3px 8px;" onclick="AdminApp.deleteScreenshot(\'' + s.id + '\')"><i class="fas fa-trash"></i></button>';
+                    h += '</div>';
+                });
+                h += '</div>';
+            } else {
+                h += '<div style="text-align:center;padding:20px;color:#888;font-size:13px;margin-bottom:16px;">Aucune capture d\'écran encore. Ajoutez-en ci-dessous.</div>';
+            }
+
+            // Formulaire ajout
+            h += '<div style="border-top:1px solid #E2E0EC;padding-top:16px;">';
+            h += '<div class="admin-card-title" style="font-size:14px;margin-bottom:12px;"><i class="fas fa-plus-circle"></i> Ajouter une capture</div>';
+
+            h += '<div class="admin-form-group">';
+            h += '<label class="admin-form-label">Image *</label>';
+            h += '<div style="display:flex;gap:8px;">';
+            h += '<input class="admin-form-input" id="vs-url" placeholder="URL de l\'image ou uploader →" readonly>';
+            h += '<button class="admin-btn admin-btn-primary" onclick="AdminApp.uploadScreenshot()"><i class="fas fa-upload"></i> Upload</button>';
+            h += '</div>';
+            h += '<div id="vs-preview" style="margin-top:8px;display:none;"><img id="vs-preview-img" style="width:80px;height:140px;object-fit:cover;border-radius:8px;border:2px solid #C9A84C;"></div>';
+            h += '</div>';
+
+            h += '<div class="admin-form-group">';
+            h += '<label class="admin-form-label">Légende (ex : Accueil, Profil...)</label>';
+            h += '<input class="admin-form-input" id="vs-label" placeholder="Accueil">';
+            h += '</div>';
+
+            h += '<div class="admin-form-group">';
+            h += '<label class="admin-form-label">Ordre d\'affichage</label>';
+            h += '<input class="admin-form-input" id="vs-order" type="number" min="0" value="' + shots.length + '">';
+            h += '</div>';
+
+            h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.saveScreenshot()"><i class="fas fa-save"></i> Enregistrer la capture</button>';
+            h += '</div>';
+            h += '</div>';
+
+            container.innerHTML = h;
+        } catch(e) {
+            container.innerHTML = '<div style="padding:20px;color:red;">Erreur : ' + (e.message || e) + '</div>';
+        }
+    };
+
+    AdminApp.uploadScreenshot = function() {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async function() {
+            var file = input.files[0];
+            if (!file) return;
+            Utils.showToast('Upload en cours...', 'info');
+            try {
+                var url = await Utils.uploadToCloudinary(file);
+                document.getElementById('vs-url').value = url;
+                // Aperçu
+                var prev = document.getElementById('vs-preview');
+                var prevImg = document.getElementById('vs-preview-img');
+                prevImg.src = url;
+                prev.style.display = 'block';
+                Utils.showToast('Image uploadée !', 'success');
+            } catch(e) {
+                Utils.showToast('Erreur upload : ' + e, 'error');
+            }
+        };
+        input.click();
+    };
+
+    AdminApp.saveScreenshot = async function() {
+        var url = (document.getElementById('vs-url') || {}).value || '';
+        var label = (document.getElementById('vs-label') || {}).value || '';
+        var order = parseInt((document.getElementById('vs-order') || {}).value) || 0;
+        if (!url) { Utils.showToast('Uploadez d\'abord une image', 'warning'); return; }
+        try {
+            var { error } = await db.from('app_screenshots').insert({ url: url, label: label, order_index: order });
+            if (error) throw error;
+            Utils.showToast('Capture enregistrée !', 'success');
+            AdminApp.switchTab('visuels');
+        } catch(e) {
+            Utils.showToast('Erreur : ' + (e.message || e), 'error');
+        }
+    };
+
+    AdminApp.deleteScreenshot = async function(id) {
+        if (!confirm('Supprimer cette capture ?')) return;
+        try {
+            await db.from('app_screenshots').delete().eq('id', id);
+            Utils.showToast('Capture supprimée', 'success');
+            AdminApp.switchTab('visuels');
+        } catch(e) {
+            Utils.showToast('Erreur', 'error');
+        }
+    };
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', function() {
+        AdminApp.init();
+    });
+    </script>
+
+</body>
+</html>
