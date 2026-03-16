@@ -329,7 +329,7 @@
         h += '<div class="admin-form-group"><label class="admin-form-label">Description longue</label><textarea class="admin-form-textarea" id="sf-longdesc">' + (s.long_description || '') + '</textarea></div>';
 
         h += '<div class="admin-form-row">';
-        h += '<div class="admin-form-group"><label class="admin-form-label">Type</label><select class="admin-form-select" id="sf-type"><option value="webview" ' + (s.type === 'webview' ? 'selected' : '') + '>WebView (Site)</option><option value="drive" ' + (s.type === 'drive' ? 'selected' : '') + '>Drive (Formation)</option></select></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Type</label><select class="admin-form-select" id="sf-type" onchange="AdminApp._toggleSectionTypeFields()"><option value="webview" ' + (s.type === 'webview' ? 'selected' : '') + '>WebView (Universe)</option><option value="drive" ' + (s.type === 'drive' ? 'selected' : '') + '>Drive (Formation)</option><option value="apk" ' + (s.type === 'apk' ? 'selected' : '') + '>APK (App Prime)</option></select></div>';
         h += '<div class="admin-form-group"><label class="admin-form-label">Prix (FCFA)</label><input class="admin-form-input" id="sf-price" type="number" value="' + (s.price || 0) + '"></div>';
         h += '</div>';
 
@@ -341,6 +341,7 @@
          // Remplacer l'ancienne partie des URLs par ceci :
         h += '<div class="admin-form-group"><label class="admin-form-label">URL du site (webview)</label><input class="admin-form-input" id="sf-siteurl" value="' + (s.site_url || '') + '"></div>';
         h += '<div class="admin-form-group"><label class="admin-form-label">URL Google Drive (formation)</label><input class="admin-form-input" id="sf-driveurl" value="' + (s.drive_url || '') + '"></div>';
+        h += '<div class="admin-form-group" id="sf-downloadurl-group"><label class="admin-form-label"><i class="fas fa-download" style="color:#4B0082;"></i> URL de téléchargement APK</label><input class="admin-form-input" id="sf-downloadurl" value="' + (s.download_url || '') + '" placeholder="https://... lien direct vers le fichier .apk"></div>';
         h += '<div class="admin-form-group"><label class="admin-form-label">Nom custom (affiche dans webview)</label><input class="admin-form-input" id="sf-customname" value="' + (s.custom_name || '') + '"></div>';
 
         // Ouverture dans le navigateur ou webview
@@ -439,6 +440,8 @@
 
         var promoEnd = document.getElementById('sf-promo-end').value;
 
+        var downloadUrl = document.getElementById('sf-downloadurl') ? document.getElementById('sf-downloadurl').value.trim() || null : null;
+
                 var data = {
             title: title,
             slug: slug,
@@ -453,10 +456,7 @@
             custom_name: document.getElementById('sf-customname').value.trim() || null,
             custom_logo_url: document.getElementById('sf-customlogo').value.trim() || null,
             banner_url: document.getElementById('sf-banner').value.trim() || null,
-            
-            // 👇 VOICI LA LIGNE AJOUTÉE POUR LA VIDÉO 👇
             preview_video_url: document.getElementById('sf-video') ? document.getElementById('sf-video').value.trim() || null : null,
-            
             duration_estimate: document.getElementById('sf-duration').value.trim() || null,
             order_index: parseInt(document.getElementById('sf-order').value) || 0,
             advantages: advantages,
@@ -466,18 +466,31 @@
             is_coming_soon: document.getElementById('sf-coming').checked,
             open_in_browser: document.getElementById('sf-open-in-browser') ? document.getElementById('sf-open-in-browser').checked : false
         };
+
+        // Ajouter download_url seulement si la colonne existe (type apk)
+        if (downloadUrl !== null) data.download_url = downloadUrl;
         
         try {
+            var result;
             if (id) {
-                await db.from('sections').update(data).eq('id', id);
-                Utils.showToast('Section modifiee !', 'success');
+                result = await db.from('sections').update(data).eq('id', id);
             } else {
-                await db.from('sections').insert(data);
-                Utils.showToast('Section creee !', 'success');
+                result = await db.from('sections').insert(data);
             }
+
+            console.log('[saveSection] Résultat Supabase:', JSON.stringify(result));
+
+            if (result.error) {
+                Utils.showToast('Erreur Supabase: ' + result.error.message, 'error');
+                console.error('[saveSection] Erreur:', result.error);
+                return;
+            }
+
+            Utils.showToast(id ? 'Section modifiée !' : 'Section créée !', 'success');
             AdminApp.switchTab('sections');
         } catch(e) {
             Utils.showToast('Erreur: ' + e.message, 'error');
+            console.error('[saveSection] Exception:', e);
         }
     };
 
@@ -1201,6 +1214,14 @@
         h += '</div>';
 
         container.innerHTML = h;
+    };
+
+    AdminApp._toggleSectionTypeFields = function() {
+        var type = document.getElementById('sf-type').value;
+        var dlGroup = document.getElementById('sf-downloadurl-group');
+        if (dlGroup) {
+            dlGroup.style.display = type === 'apk' ? 'block' : 'none';
+        }
     };
 
     AdminApp._togglePopupFields = function() {
