@@ -113,6 +113,7 @@ var SectionDetail = {
         if (s.is_featured) html += '<span class="badge badge-premium"><i class="fas fa-star"></i> Premium</span>';
         if (s.type === 'webview') html += '<span class="badge badge-new"><i class="fas fa-globe"></i> Universe</span>';
         if (s.type === 'drive') html += '<span class="badge badge-new"><i class="fas fa-graduation-cap"></i> Learning</span>';
+        if (s.type === 'apk') html += '<span class="badge badge-new" style="background:rgba(75,0,130,0.85);color:#C9A84C;border:1px solid rgba(201,168,76,0.4);"><i class="fas fa-mobile-alt"></i> App Prime</span>';
         html += '</div>';
 
         // Back button sur le banner
@@ -131,6 +132,8 @@ var SectionDetail = {
         html += '<div class="detail-meta">';
         if (s.type === 'webview') {
             html += '<span class="detail-meta-item"><i class="fas fa-globe"></i> AKOLABS Universe</span>';
+        } else if (s.type === 'apk') {
+            html += '<span class="detail-meta-item"><i class="fas fa-mobile-alt"></i> AKOLABS App Prime</span>';
         } else {
             html += '<span class="detail-meta-item"><i class="fas fa-graduation-cap"></i> AKOLABS Learning</span>';
         }
@@ -247,40 +250,46 @@ var SectionDetail = {
 
     // ---- ACCES DEJA ACCORDE ----
     buildAccessGranted: function(s) {
-        var btnRoute = '';
-        var btnText = '';
-        var btnIcon = '';
-
-        if (s.type === 'webview') {
-            if (s.open_in_browser && s.site_url) {
-                btnRoute = null;
-                btnText = 'Ouvrir l\'outil';
-                btnIcon = 'fa-external-link-alt';
-            } else {
-                btnRoute = '/webview/' + s.id;
-                btnText = 'Ouvrir l\'outil';
-                btnIcon = 'fa-external-link-alt';
-            }
-        } else {
-            btnRoute = '/formation/' + s.id;
-            btnText = 'Acceder a la formation';
-            btnIcon = 'fa-graduation-cap';
-        }
-
         var h = '';
         h += '<div class="access-granted-box">';
         h += '<div class="access-granted-icon"><i class="fas fa-check-circle"></i></div>';
         h += '<div class="access-granted-title">Acces debloque !</div>';
-        h += '<div class="access-granted-desc">Vous avez acces a cette section. Profitez-en !</div>';
-        if (btnRoute) {
-            h += '<button class="btn btn-success btn-lg btn-block" onclick="Router.navigate(\'' + btnRoute + '\')">';
-        } else {
-            h += '<button class="btn btn-success btn-lg btn-block" onclick="window.open(\'' + (s.site_url||'') + '\',\'_blank\')">';
-        }
-        h += '<i class="fas ' + btnIcon + '"></i> ' + btnText;
-        h += '</button>';
-        h += '</div>';
 
+        if (s.type === 'apk') {
+            // Bouton téléchargement APK
+            var apkUrl = s.download_url || '';
+            h += '<div class="access-granted-desc">Votre accès est confirmé. Téléchargez l\'application ci-dessous.</div>';
+            if (apkUrl) {
+                h += '<div style="background:rgba(75,0,130,0.06);border:1px solid rgba(75,0,130,0.15);border-radius:14px;padding:16px;margin:16px 0;text-align:center;">';
+                h += '<div style="font-size:13px;color:#4A4767;margin-bottom:12px;line-height:1.6;">';
+                h += '<i class="fas fa-info-circle" style="color:#4B0082;"></i> ';
+                h += 'Le fichier APK va se télécharger directement sur votre téléphone. Activez <strong>\"Sources inconnues\"</strong> dans vos paramètres Android pour l\'installer.</div>';
+                h += '<a href="' + apkUrl + '" download class="btn btn-primary btn-lg btn-block" style="background:linear-gradient(135deg,#4B0082,#6A1BAB);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px;">';
+                h += '<i class="fas fa-download" style="font-size:18px;"></i>';
+                h += '<span><strong>Télécharger l\'APK</strong></span>';
+                h += '</a>';
+                h += '</div>';
+            } else {
+                h += '<div class="access-granted-desc" style="color:#E67E22;">Le lien de téléchargement n\'est pas encore disponible. Revenez bientôt.</div>';
+            }
+
+        } else if (s.type === 'webview') {
+            h += '<div class="access-granted-desc">Vous avez acces a cette section. Profitez-en !</div>';
+            if (s.open_in_browser && s.site_url) {
+                h += '<button class="btn btn-success btn-lg btn-block" onclick="window.open(\'' + (s.site_url||'') + '\',\'_blank\')">';
+                h += '<i class="fas fa-external-link-alt"></i> Ouvrir l\'outil</button>';
+            } else {
+                h += '<button class="btn btn-success btn-lg btn-block" onclick="Router.navigate(\'/webview/' + s.id + '\')">';
+                h += '<i class="fas fa-external-link-alt"></i> Ouvrir l\'outil</button>';
+            }
+
+        } else {
+            h += '<div class="access-granted-desc">Vous avez acces a cette formation. Profitez-en !</div>';
+            h += '<button class="btn btn-success btn-lg btn-block" onclick="Router.navigate(\'/formation/' + s.id + '\')">';
+            h += '<i class="fas fa-graduation-cap"></i> Acceder a la formation</button>';
+        }
+
+        h += '</div>';
         return h;
     },
 
