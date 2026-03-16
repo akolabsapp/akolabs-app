@@ -5,6 +5,7 @@
 var HomePage = {
     sections: [],
     formations: [],
+    apkSections: [],
     userAccess: [],
     searchTimeout: null,
 
@@ -74,6 +75,7 @@ var HomePage = {
 
         // Dynamic sections
         html += '<div id="featured-section"></div>';
+        html += '<div id="apk-section"></div>';
         html += '<div id="universe-section"></div>';
         html += '<div id="learning-section"></div>';
         html += '<div id="coming-soon-section"></div>';
@@ -122,9 +124,12 @@ var HomePage = {
             if (sectionsResult.data) {
                 HomePage.sections = [];
                 HomePage.formations = [];
+                HomePage.apkSections = [];
                 for (var i = 0; i < sectionsResult.data.length; i++) {
                     var s = sectionsResult.data[i];
-                    if (s.type === 'webview') {
+                    if (s.type === 'apk') {
+                        HomePage.apkSections.push(s);
+                    } else if (s.type === 'webview') {
                         HomePage.sections.push(s);
                     } else if (s.type === 'drive') {
                         HomePage.formations.push(s);
@@ -155,6 +160,7 @@ var HomePage = {
 
     renderAllSections: function() {
         HomePage.renderFeatured();
+        HomePage.renderAppPrime();
         HomePage.renderUniverse();
         HomePage.renderLearning();
         HomePage.renderComingSoon();
@@ -204,6 +210,42 @@ var HomePage = {
         h += '<div class="featured-banner-desc">' + Utils.truncate(featured.description || '', 60) + '</div>';
         h += '</div>';
         h += '<div class="featured-banner-arrow"><i class="fas fa-chevron-right"></i></div>';
+        h += '</div>';
+
+        container.innerHTML = h;
+        if (typeof AkoLazy !== 'undefined') AkoLazy.refresh();
+    },
+
+    renderAppPrime: function() {
+        var container = document.getElementById('apk-section');
+        if (!container) return;
+
+        var active = [];
+        for (var i = 0; i < HomePage.apkSections.length; i++) {
+            if (!HomePage.apkSections[i].is_coming_soon) active.push(HomePage.apkSections[i]);
+        }
+
+        if (active.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        var cardsHTML = '';
+        for (var j = 0; j < active.length; j++) {
+            cardsHTML += HomePage.buildSectionCard(active[j]);
+        }
+
+        var h = '';
+        h += '<div style="margin-bottom:32px;">';
+        h += '<div class="home-section-header">';
+        h += '<div class="home-section-title-group">';
+        h += '<div class="home-section-icon" style="background:linear-gradient(135deg,#4B0082,#C9A84C);"><i class="fas fa-mobile-alt" style="color:#fff;"></i></div>';
+        h += '<div><div class="home-section-title">AKOLABS App Prime</div>';
+        h += '<div class="home-section-subtitle">Applications Android premium à télécharger</div></div>';
+        h += '</div>';
+        h += '<span class="home-section-count">' + active.length + ' app' + (active.length > 1 ? 's' : '') + '</span>';
+        h += '</div>';
+        h += cardsHTML;
         h += '</div>';
 
         container.innerHTML = h;
@@ -351,6 +393,7 @@ var HomePage = {
         if (hasPromo) badgesHTML += '<span class="badge badge-hot"><i class="fas fa-fire"></i> Promo</span>';
         if (section.is_featured) badgesHTML += '<span class="badge badge-premium"><i class="fas fa-star"></i> Premium</span>';
         if (flash) badgesHTML += '<span class="badge" style="background:#D93B3B;color:#fff;">⚡ Flash</span>';
+        if (section.type === 'apk') badgesHTML += '<span class="badge" style="background:rgba(75,0,130,0.85);color:#C9A84C;border:1px solid rgba(201,168,76,0.4);"><i class="fas fa-download"></i> APK</span>';
 
         // Access
         var accessHTML = '';
