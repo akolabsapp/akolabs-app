@@ -69,6 +69,7 @@ var HomePage = {
         // Quick stats
         html += '<div class="quick-stats">';
         html += '<div class="quick-stat-item"><div class="quick-stat-icon"><i class="fas fa-unlock"></i></div><div class="quick-stat-value" id="stat-unlocked">-</div><div class="quick-stat-label">Debloques</div></div>';
+        html += '<div class="quick-stat-item"><div class="quick-stat-icon"><i class="fas fa-mobile-alt"></i></div><div class="quick-stat-value" id="stat-apk">-</div><div class="quick-stat-label">App Prime</div></div>';
         html += '<div class="quick-stat-item"><div class="quick-stat-icon"><i class="fas fa-globe"></i></div><div class="quick-stat-value" id="stat-universe">-</div><div class="quick-stat-label">Universe</div></div>';
         html += '<div class="quick-stat-item"><div class="quick-stat-icon"><i class="fas fa-graduation-cap"></i></div><div class="quick-stat-value" id="stat-learning">-</div><div class="quick-stat-label">Learning</div></div>';
         html += '</div>';
@@ -239,7 +240,7 @@ var HomePage = {
         h += '<div style="margin-bottom:32px;">';
         h += '<div class="home-section-header">';
         h += '<div class="home-section-title-group">';
-        h += '<div class="home-section-icon" style="background:linear-gradient(135deg,#4B0082,#C9A84C);"><i class="fas fa-mobile-alt" style="color:#fff;"></i></div>';
+        h += '<div class="home-section-icon"><i class="fas fa-mobile-alt"></i></div>';
         h += '<div><div class="home-section-title">AKOLABS App Prime</div>';
         h += '<div class="home-section-subtitle">Applications Android premium à télécharger</div></div>';
         h += '</div>';
@@ -440,8 +441,22 @@ var HomePage = {
             usersHTML = '<span class="section-card-users"><i class="fas fa-users"></i> ' + section.total_users + '</span>';
         }
 
-        // Route
-        var route = (hasAccess || isFree) ? '/webview/' + section.id : '/section/' + section.id;
+        // Route — APK va toujours sur /section/ (page détail avec bouton download)
+        var route;
+        if (section.type === 'apk') {
+            route = '/section/' + section.id;
+        } else {
+            route = (hasAccess || isFree) ? '/webview/' + section.id : '/section/' + section.id;
+        }
+
+        // Bouton APK spécifique
+        if (section.type === 'apk') {
+            if (hasAccess || isFree) {
+                btnHTML = '<span class="section-card-btn section-card-btn-unlocked"><i class="fas fa-download"></i> Télécharger</span>';
+            } else {
+                btnHTML = '<span class="section-card-btn"><i class="fas fa-lock"></i> Débloquer</span>';
+            }
+        }
 
         var h = '';
         h += '<div class="section-card" onclick="Router.navigate(\'' + route + '\')">';
@@ -556,7 +571,7 @@ var HomePage = {
     },
 
     updateStats: function() {
-        var allItems = HomePage.sections.concat(HomePage.formations);
+        var allItems = HomePage.sections.concat(HomePage.formations).concat(HomePage.apkSections);
         var unlocked = 0;
         for (var i = 0; i < allItems.length; i++) {
             if (HomePage.hasAccess(allItems[i].id) || allItems[i].is_free) unlocked++;
@@ -565,10 +580,12 @@ var HomePage = {
         var el1 = document.getElementById('stat-unlocked');
         var el2 = document.getElementById('stat-universe');
         var el3 = document.getElementById('stat-learning');
+        var el4 = document.getElementById('stat-apk');
 
         if (el1) el1.textContent = unlocked;
         if (el2) el2.textContent = HomePage.sections.length;
         if (el3) el3.textContent = HomePage.formations.length;
+        if (el4) el4.textContent = HomePage.apkSections.length;
     },
 
     handleSearch: function(query) {
