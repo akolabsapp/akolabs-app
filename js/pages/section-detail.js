@@ -264,7 +264,7 @@ var SectionDetail = {
                 h += '<div style="font-size:13px;color:#4A4767;margin-bottom:12px;line-height:1.6;">';
                 h += '<i class="fas fa-info-circle" style="color:#4B0082;"></i> ';
                 h += 'Le fichier APK va se télécharger directement sur votre téléphone. Activez <strong>\"Sources inconnues\"</strong> dans vos paramètres Android pour l\'installer.</div>';
-                h += '<a href="' + apkUrl + '" download class="btn btn-primary btn-lg btn-block" style="background:linear-gradient(135deg,#4B0082,#6A1BAB);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px;">';
+                h += '<a href="' + apkUrl + '" download class="btn btn-lg btn-block" style="background:linear-gradient(135deg,#4B0082,#6A1BAB);color:#FFD700;font-weight:700;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px;border:2px solid rgba(201,168,76,0.5);">';
                 h += '<i class="fas fa-download" style="font-size:18px;"></i>';
                 h += '<span><strong>Télécharger l\'APK</strong></span>';
                 h += '</a>';
