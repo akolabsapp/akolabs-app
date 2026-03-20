@@ -469,10 +469,51 @@
 
         // Ajouter download_url seulement si la colonne existe (type apk)
         if (downloadUrl !== null) data.download_url = downloadUrl;
-        
+
         try {
             var result;
             if (id) {
+                // Vérifier si la section passait de gratuit à payant
+                var wasFreePrev = false;
+                var prevR = await db.from('sections').select('is_free').eq('id', id).single();
+                if (prevR.data) wasFreePrev = prevR.data.is_free;
+                var becomingPaid = wasFreePrev && !data.is_free;
+
+                if (becomingPaid) {
+                    // Grandfathering : donner l'accès à vie à tous les utilisateurs existants
+                    // qui avaient accès à cette section via is_free
+                    Utils.showToast('Grandfathering en cours...', 'info');
+                    var usersR = await db.from('users').select('id').eq('is_app_purchased', true);
+                    var allUsers = usersR.data || [];
+
+                    if (allUsers.length > 0) {
+                        // Récupérer ceux qui ont déjà un accès explicite dans user_sections
+                        var existingR = await db.from('user_sections')
+                            .select('user_id')
+                            .eq('section_id', id);
+                        var existingIds = (existingR.data || []).map(function(r) { return r.user_id; });
+
+                        // Ne grafter que ceux qui n'ont pas déjà un accès explicite
+                        var toGrant = allUsers.filter(function(u) {
+                            return existingIds.indexOf(u.id) === -1;
+                        });
+
+                        if (toGrant.length > 0) {
+                            var inserts = toGrant.map(function(u) {
+                                return {
+                                    user_id: u.id,
+                                    section_id: id,
+                                    access_type: 'lifetime',
+                                    granted_by: 'admin',
+                                    is_active: true
+                                };
+                            });
+                            await db.from('user_sections').insert(inserts);
+                            console.log('[saveSection] Grandfathering : ' + toGrant.length + ' utilisateurs migrés');
+                        }
+                    }
+                }
+
                 result = await db.from('sections').update(data).eq('id', id);
             } else {
                 result = await db.from('sections').insert(data);
