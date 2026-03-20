@@ -65,7 +65,6 @@ SectionWebview.render = async function(params) {
     h += '</div>';
     h += '<div class="webview-actions">';
     h += '<button class="webview-action-btn" onclick="SectionWebview.refreshPage()"><i class="fas fa-redo"></i></button>';
-    h += '<button class="webview-action-btn" onclick="SectionWebview.openExternal()"><i class="fas fa-external-link-alt"></i></button>';
     h += '<button class="webview-action-btn" onclick="SectionWebview.goHome()"><i class="fas fa-home"></i></button>';
     h += '</div>';
     h += '</div>';
@@ -85,7 +84,7 @@ SectionWebview.render = async function(params) {
     h += '<div class="spinner"></div>';
     h += '<div class="webview-loader-text" id="webview-loader-text">Chargement de ' + displayName + '...</div>';
     h += '</div>';
-    h += '<iframe class="webview-iframe" id="webview-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads" loading="lazy"></iframe>';
+    h += '<iframe class="webview-iframe" id="webview-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" loading="lazy"></iframe>';
     h += '<div id="webview-error-container" style="display:none;"></div>';
     h += '</div>';
     h += '</div>';
@@ -349,16 +348,22 @@ SectionWebview.injectDownloadInterceptor = function(iframe) {
         var script = iframeDoc.createElement('script');
         script.textContent = [
             '(function(){',
-            '  document.addEventListener("click",function(e){',
+            '  var FILE_EXT=/\\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|gz|7z|mp4|mp3|avi|mov|wmv|jpg|jpeg|png|gif|webp|apk|exe|dmg|iso)(\\?.*)?$/i;',
+            '  function intercept(e){',
             '    var a=e.target.closest?e.target.closest("a"):null;',
-            '    if(!a||!a.href)return;',
+            '    if(!a||!a.href||a.href==="about:blank")return;',
             '    var dl=a.getAttribute("download");',
-            '    var isFile=/\\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|mp4|mp3|avi|mov|jpg|jpeg|png|gif|webp|apk|exe|dmg|7z)(\\?.*)?$/i.test(a.href);',
-            '    if(dl!==null||isFile){',
+            '    var isFile=FILE_EXT.test(a.href)||dl!==null;',
+            '    if(isFile){',
             '      e.preventDefault();',
+            '      e.stopPropagation();',
             '      window.parent.postMessage({type:"akolabs-download",url:a.href,filename:dl||""},"*");',
             '    }',
-            '  },true);',
+            '  }',
+            '  document.addEventListener("click",intercept,true);',
+            '  // Surveiller aussi les nouveaux liens ajoutés dynamiquement',
+            '  var obs=new MutationObserver(function(){});',
+            '  obs.observe(document.body||document.documentElement,{childList:true,subtree:true});',
             '})();'
         ].join('\n');
         iframeDoc.head.appendChild(script);
