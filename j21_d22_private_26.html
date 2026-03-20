@@ -999,15 +999,171 @@
             }
             h += '</div>';
 
+            // ---- BLOC LANDING PAGE TRACKING ----
+            h += await AdminApp._buildLandingBlock(from, days, dayMap, filter);
+
             container.innerHTML = h;
 
             // Initialiser les graphiques Chart.js
             AdminApp._initChartRevenueViews(labels, revenueData, viewsData);
             AdminApp._initChartUsers(labels, usersData);
+            AdminApp._initChartLanding(); // Graphique landing
 
         } catch(e) {
             container.innerHTML = '<div class="admin-card"><p style="color:#D93B3B;text-align:center;padding:20px;">Erreur: ' + e.message + '</p><p style="color:#8A87A0;text-align:center;font-size:12px;">Vérifiez que les tables section_views et app_opens existent dans Supabase.</p></div>';
         }
+    };
+
+    // ===== LANDING PAGE TRACKING =====
+    AdminApp._landingChartInstance = null;
+    AdminApp._landingChartData = null;
+
+    AdminApp._buildLandingBlock = async function(from, days, appDayMap, filter) {
+        try {
+            var lR = await db.from('landing_visits')
+                .select('visitor_id, source, device, duration_seconds, converted, landed_at')
+                .gte('landed_at', from);
+
+            var visits = lR.data || [];
+
+            if (visits.length === 0) {
+                return '<div class="admin-card" style="margin-top:16px;">'
+                    + '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-store" style="color:#C9A84C;margin-right:8px;"></i>Landing Page — Tracking</div></div>'
+                    + '<p style="color:#8A87A0;text-align:center;padding:20px;font-size:13px;">Aucune visite enregistrée sur la période. Assurez-vous que la table <strong>landing_visits</strong> existe dans Supabase.</p>'
+                    + '</div>';
+            }
+
+            // KPIs
+            var totalVisits = visits.length;
+            var uniqueVisitors = new Set(visits.map(function(v) { return v.visitor_id; })).size;
+            var durations = visits.filter(function(v) { return v.duration_seconds > 0; }).map(function(v) { return v.duration_seconds; });
+            var avgDuration = durations.length > 0 ? Math.round(durations.reduce(function(a,b){return a+b;},0) / durations.length) : 0;
+            var conversions = visits.filter(function(v) { return v.converted; }).length;
+            var convRate = totalVisits > 0 ? ((conversions / totalVisits) * 100).toFixed(1) : 0;
+
+            // Sources
+            var sourceMap = {};
+            visits.forEach(function(v) {
+                var s = v.source || 'Direct';
+                sourceMap[s] = (sourceMap[s] || 0) + 1;
+            });
+            var topSources = Object.entries(sourceMap).sort(function(a,b){return b[1]-a[1];});
+
+            // Courbe par jour
+            var ldayMap = {};
+            Object.keys(appDayMap).forEach(function(k) { ldayMap[k] = { visits: 0, unique: new Set() }; });
+            visits.forEach(function(v) {
+                var k = v.landed_at.split('T')[0];
+                if (ldayMap[k]) {
+                    ldayMap[k].visits++;
+                    ldayMap[k].unique.add(v.visitor_id);
+                }
+            });
+            var lVisitsData = Object.values(ldayMap).map(function(d) { return d.visits; });
+            var lUniqueData = Object.values(ldayMap).map(function(d) { return d.unique.size; });
+            var lLabels = Object.keys(ldayMap).map(function(k) {
+                var d = new Date(k);
+                return days <= 7 ? ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()] + ' ' + d.getDate() : d.getDate() + '/' + (d.getMonth()+1);
+            });
+
+            // Stocker pour le graphique
+            AdminApp._landingChartData = { labels: lLabels, visits: lVisitsData, unique: lUniqueData };
+
+            // Format durée
+            var fmtDur = avgDuration >= 60
+                ? Math.floor(avgDuration/60) + 'min ' + (avgDuration%60) + 's'
+                : avgDuration + 's';
+
+            var sourceColors = { 'Facebook': '#1877F2', 'Instagram': '#E1306C', 'TikTok': '#000000', 'WhatsApp': '#25D366', 'Google': '#4285F4', 'Direct': '#4B0082', 'Autre': '#8A87A0' };
+
+            var h = '';
+            h += '<div class="admin-card" style="margin-top:16px;">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-store" style="color:#C9A84C;margin-right:8px;"></i>Landing Page — Tracking</div></div>';
+
+            // KPI row landing
+            h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">';
+            h += AdminApp._kpiCard('👁️', 'Visites totales', totalVisits, 'sur la période', '#4B0082');
+            h += AdminApp._kpiCard('🧑', 'Visiteurs uniques', uniqueVisitors, 'IDs distincts', '#2B7FD4');
+            h += AdminApp._kpiCard('⏱️', 'Temps moyen', fmtDur, 'par visite', '#E8A020');
+            h += AdminApp._kpiCard('🎯', 'Taux conversion', convRate + '%', conversions + ' achats', '#2E9E5B');
+            h += '</div>';
+
+            // Courbe visites landing
+            h += '<div style="position:relative;height:180px;margin-bottom:16px;"><canvas id="chart-landing-visits"></canvas></div>';
+
+            // Sources de trafic
+            h += '<div class="admin-card-title" style="font-size:13px;margin-bottom:10px;"><i class="fas fa-share-alt" style="color:#C9A84C;margin-right:6px;"></i>Sources de trafic</div>';
+            var maxSrc = topSources.length > 0 ? topSources[0][1] : 1;
+            topSources.forEach(function(s) {
+                var pct = Math.round((s[1] / maxSrc) * 100);
+                var pctReal = ((s[1] / totalVisits) * 100).toFixed(1);
+                var color = sourceColors[s[0]] || '#8A87A0';
+                h += '<div style="margin-bottom:10px;">';
+                h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">';
+                h += '<span style="font-size:12px;color:#1A1A2E;font-weight:600;">' + s[0] + '</span>';
+                h += '<span style="font-size:12px;color:#4A4767;">' + s[1] + ' visites (' + pctReal + '%)</span>';
+                h += '</div>';
+                h += '<div style="height:7px;background:#F0EFF7;border-radius:4px;overflow:hidden;">';
+                h += '<div style="height:100%;width:' + pct + '%;background:' + color + ';border-radius:4px;transition:width 0.8s;"></div>';
+                h += '</div></div>';
+            });
+
+            h += '</div>';
+            return h;
+
+        } catch(e) {
+            return '<div class="admin-card" style="margin-top:16px;"><p style="color:#D93B3B;text-align:center;padding:20px;font-size:13px;">Landing tracking — Erreur : ' + e.message + '</p></div>';
+        }
+    };
+
+    AdminApp._initChartLanding = function() {
+        var d = AdminApp._landingChartData;
+        if (!d) return;
+        var ctx = document.getElementById('chart-landing-visits');
+        if (!ctx) return;
+        if (AdminApp._landingChartInstance) AdminApp._landingChartInstance.destroy();
+        AdminApp._landingChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: d.labels,
+                datasets: [
+                    {
+                        label: 'Visites totales',
+                        data: d.visits,
+                        borderColor: '#C9A84C',
+                        backgroundColor: 'rgba(201,168,76,0.08)',
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#C9A84C',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Visiteurs uniques',
+                        data: d.unique,
+                        borderColor: '#4B0082',
+                        backgroundColor: 'rgba(75,0,130,0.06)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#4B0082',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { color: '#4A4767', font: { size: 11 } } }
+                },
+                scales: {
+                    x: { ticks: { color: '#8A87A0', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
+                    y: { ticks: { color: '#8A87A0', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.04)' }, beginAtZero: true }
+                }
+            }
+        });
     };
 
     AdminApp._kpiCard = function(emoji, label, value, sub, color) {
