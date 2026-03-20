@@ -38,7 +38,7 @@
     <section class="hero-section">
         <span class="hero-badge">
             <i class="fas fa-sparkles"></i>
-            ✨ Lancement 2025 — Offre limitée
+            ✨ Lancement 2026 — Offre limitée
         </span>
 
         <img src="../assets/images/logo.png" alt="AKOLABS" class="hero-logo"
@@ -63,12 +63,12 @@
                 <span>+</span>
             </div>
             <span class="dot-live"></span>
-            <span><strong style="color:var(--color-secondary)">127+</strong> utilisateurs actifs</span>
+            <span><strong style="color:var(--color-secondary)">1387+</strong> utilisateurs actifs</span>
         </div>
 
         <!-- Prix -->
         <div class="hero-price-tag">
-            <span class="hero-price-old">45 000 F</span>
+            <span class="hero-price-old">25 000 F</span>
             <div>
                 <div class="hero-price-current">2 500 F</div>
                 <div class="hero-price-label">accès à vie</div>
@@ -394,7 +394,7 @@
             <!-- Prix -->
             <div class="purchase-price-box">
                 <div style="text-decoration:line-through;color:var(--color-gray-500);font-size:var(--text-sm);">
-                    45 000 FCFA
+                    25 000 FCFA
                 </div>
                 <div class="purchase-price-value">2 500 FCFA</div>
                 <div class="purchase-price-period">Paiement unique — Accès à vie</div>
@@ -524,7 +524,7 @@
 
     <!-- ========== FOOTER ========== -->
     <footer class="landing-footer">
-        <p>&copy; 2025 AKOLABS — Tous droits réservés.</p>
+        <p>&copy; 2026 AKOLABS — Tous droits réservés.</p>
         <p style="margin-top:var(--space-sm);">
             <a href="#">Conditions d'utilisation</a> · 
             <a href="#">Confidentialité</a> · 
@@ -563,6 +563,7 @@ const LandingApp = {
         this.setupPromoCheck();
         this.setupFloatingCTA();
         this.setupSmoothScroll();
+        this.trackVisit(); // Tracking visiteur
 
         // Vérifier si un code parrain est dans l'URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -778,6 +779,115 @@ const LandingApp = {
         } catch (e) {
             console.log('[Landing] Flash:', e);
         }
+    },
+
+    // ---- TRACKING VISITEURS ----
+    trackVisit() {
+        try {
+            // Générer ou récupérer visitor_id unique (cookie 1 an)
+            const getVisitorId = () => {
+                const key = 'ako_vid';
+                let vid = localStorage.getItem(key);
+                if (!vid) {
+                    vid = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+                    localStorage.setItem(key, vid);
+                }
+                return vid;
+            };
+
+            // Détecter la source UTM
+            const getSource = () => {
+                const p = new URLSearchParams(window.location.search);
+                const utm = p.get('utm_source') || p.get('utm_medium') || p.get('ref');
+                if (utm) {
+                    if (utm.toLowerCase().includes('facebook') || utm.toLowerCase().includes('fb')) return 'Facebook';
+                    if (utm.toLowerCase().includes('instagram') || utm.toLowerCase().includes('ig')) return 'Instagram';
+                    if (utm.toLowerCase().includes('tiktok')) return 'TikTok';
+                    if (utm.toLowerCase().includes('whatsapp') || utm.toLowerCase().includes('wa')) return 'WhatsApp';
+                    if (utm.toLowerCase().includes('google')) return 'Google';
+                    return utm;
+                }
+                const ref = document.referrer || '';
+                if (ref.includes('facebook.com') || ref.includes('fb.com')) return 'Facebook';
+                if (ref.includes('instagram.com')) return 'Instagram';
+                if (ref.includes('tiktok.com')) return 'TikTok';
+                if (ref.includes('google.com')) return 'Google';
+                if (ref.includes('wa.me') || ref.includes('whatsapp')) return 'WhatsApp';
+                if (ref === '') return 'Direct';
+                return 'Autre';
+            };
+
+            const visitorId = getVisitorId();
+            const source = getSource();
+            const visitStart = Date.now();
+            const sessionKey = 'ako_session_' + new Date().toDateString();
+
+            // Enregistrer la visite dans Supabase
+            const visitData = {
+                visitor_id: visitorId,
+                source: source,
+                referrer: document.referrer || null,
+                user_agent: navigator.userAgent,
+                device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+                landed_at: new Date().toISOString(),
+                duration_seconds: 0,
+                converted: false
+            };
+
+            let visitId = null;
+
+            db.from('landing_visits').insert(visitData).then(r => {
+                if (r.data && r.data[0]) visitId = r.data[0].id;
+            }).catch(() => {});
+
+            // Stocker visit_id pour conversion plus tard
+            LandingApp._visitStart = visitStart;
+            LandingApp._visitId = null;
+
+            // Re-fetch visit_id après insert
+            setTimeout(async () => {
+                try {
+                    const r = await db.from('landing_visits')
+                        .select('id')
+                        .eq('visitor_id', visitorId)
+                        .order('landed_at', { ascending: false })
+                        .limit(1)
+                        .single();
+                    if (r.data) LandingApp._visitId = r.data.id;
+                } catch(e) {}
+            }, 1000);
+
+            // Mettre à jour la durée au départ de la page
+            window.addEventListener('beforeunload', () => {
+                const duration = Math.round((Date.now() - visitStart) / 1000);
+                if (LandingApp._visitId) {
+                    // Utiliser sendBeacon pour fiabilité
+                    const payload = JSON.stringify({
+                        duration_seconds: duration
+                    });
+                    // Mise à jour via fetch synchrone de secours
+                    db.from('landing_visits')
+                        .update({ duration_seconds: duration })
+                        .eq('id', LandingApp._visitId)
+                        .then(() => {}).catch(() => {});
+                }
+            });
+
+        } catch(e) {
+            console.warn('[Tracking] Erreur:', e);
+        }
+    },
+
+    // Appeler après achat confirmé
+    trackConversion() {
+        try {
+            if (LandingApp._visitId) {
+                db.from('landing_visits')
+                    .update({ converted: true })
+                    .eq('id', LandingApp._visitId)
+                    .then(() => {}).catch(() => {});
+            }
+        } catch(e) {}
     },
 
     // ---- Vérification code promo ----
@@ -1108,6 +1218,7 @@ const LandingApp = {
                     affiliate_commission: commission,
                     status: 'confirmed'
                 });
+                LandingApp.trackConversion(); // Marquer la visite comme convertie
                 console.log('[Landing] Achat enregistre');
             } catch (e) {
                 console.log('[Landing] Note: insert achat echoue:', e);
