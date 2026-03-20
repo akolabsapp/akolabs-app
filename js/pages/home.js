@@ -171,7 +171,7 @@ var HomePage = {
         var container = document.getElementById('featured-section');
         if (!container) return;
 
-        var allItems = HomePage.sections.concat(HomePage.formations);
+        var allItems = HomePage.sections.concat(HomePage.formations).concat(HomePage.apkSections);
         var featured = null;
 
         for (var i = 0; i < allItems.length; i++) {
@@ -333,7 +333,7 @@ var HomePage = {
         var container = document.getElementById('coming-soon-section');
         if (!container) return;
 
-        var allItems = HomePage.sections.concat(HomePage.formations);
+        var allItems = HomePage.sections.concat(HomePage.formations).concat(HomePage.apkSections);
         var comingSoon = [];
         for (var i = 0; i < allItems.length; i++) {
             if (allItems[i].is_coming_soon) {
@@ -545,7 +545,7 @@ var HomePage = {
     },
 
     updateProgress: function() {
-        var allItems = HomePage.sections.concat(HomePage.formations);
+        var allItems = HomePage.sections.concat(HomePage.formations).concat(HomePage.apkSections);
         var nonCS = [];
         for (var i = 0; i < allItems.length; i++) {
             if (!allItems[i].is_coming_soon) nonCS.push(allItems[i]);
