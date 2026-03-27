@@ -1,4 +1,4 @@
-m<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr" class="landing-html">
 <head>
     <meta charset="UTF-8">
@@ -19,6 +19,23 @@ m<!DOCTYPE html>
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/landing.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '978376714855213');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body class="landing-body">
 
@@ -1303,6 +1320,17 @@ const LandingApp = {
     },
     // ---- ECRAN DE SUCCES ----
     showSuccessScreen: function(purchaseData) {
+        // --- INTEGRATION META PIXEL ---
+        if (typeof fbq === 'function') {
+            fbq('track', 'Purchase', {
+                value: 5000, 
+                currency: 'XOF',
+                content_name: 'Acces a vie AKOLABS',
+                content_category: 'Digital Tools'
+            });
+        }
+        // ------------------------------
+
         var section = document.getElementById('purchase');
         if (!section) return;
 
@@ -1339,6 +1367,8 @@ const LandingApp = {
 
         section.scrollIntoView({ behavior: 'smooth' });
     },
+
+
     // ---- FLOATING CTA ----
     setupFloatingCTA() {
         const floatingCta = document.getElementById('floating-cta');
