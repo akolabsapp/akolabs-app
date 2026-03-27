@@ -473,7 +473,7 @@
                 <div class="input-group">
                     <label class="input-label">Code promo / Code parrain (optionnel)</label>
                     <input type="text" class="input-field" id="pf-promo" 
-                           placeholder="Ex: BIENVENUE" style="text-transform:uppercase;">
+                           placeholder="Ex: WELCOME" style="text-transform:uppercase;">
                 </div>
 
                 <!-- Résumé du prix -->
@@ -555,6 +555,12 @@ const LandingApp = {
     finalPrice: CONFIG.APP_PRICE,
     promoData: null,
 
+    // ---- Compression Cloudinary ----
+    cloudinaryUrl: function(url, transforms) {
+        if (!url || url.indexOf('res.cloudinary.com') === -1) return url;
+        return url.replace('/upload/', '/upload/' + transforms + '/');
+    },
+
     init() {
         console.log('[Landing] Initialisé');
         this.loadSections();
@@ -595,8 +601,9 @@ const LandingApp = {
 
             container.innerHTML = sections.map((s, idx) => {
             const typeLabel = s.type === 'webview' ? '🌐 Universe' : s.type === 'apk' ? '📱 App Prime' : '📚 Learning';
-                const bannerStyle = s.banner_url
-                    ? `background-image:url(${s.banner_url});background-size:cover;background-position:center;`
+                const bannerOptUrl = LandingApp.cloudinaryUrl(s.banner_url, 'f_auto,q_auto:good,w_400,h_200,c_fill');
+                const bannerStyle = bannerOptUrl
+                    ? `background-image:url(${bannerOptUrl});background-size:cover;background-position:center;`
                     : 'background:linear-gradient(135deg,#4B0082,#5D1494);';
 
                 return `
@@ -636,11 +643,13 @@ const LandingApp = {
 
         const advantages = Array.isArray(s.advantages) ? s.advantages : [];
 
+        const bannerModalUrl = LandingApp.cloudinaryUrl(s.banner_url, 'f_auto,q_auto:good,w_600,h_300,c_fill');
+
         const videoBlock = s.preview_video_url ? `
             <div class="modal-media-wrap" onclick="LandingApp.playModalVideo(this,'${s.preview_video_url}')">
-                <div class="modal-media-thumb" style="${s.banner_url ? 'background-image:url('+s.banner_url+');background-size:cover;background-position:center;' : 'background:#1a1a2e;'}"></div>
+                <div class="modal-media-thumb" style="${bannerModalUrl ? 'background-image:url('+bannerModalUrl+');background-size:cover;background-position:center;' : 'background:#1a1a2e;'}"></div>
                 <div class="showcase-play-btn"><i class="fas fa-play"></i></div>
-            </div>` : (s.banner_url ? `<div class="modal-banner" style="background-image:url(${s.banner_url})"></div>` : '');
+            </div>` : (bannerModalUrl ? `<div class="modal-banner" style="background-image:url(${bannerModalUrl})"></div>` : '');
 
         const advBlock = advantages.length > 0 ? `
             <div class="modal-advantages">
