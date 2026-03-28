@@ -23,7 +23,7 @@ var CONFIG = {
     EMAILJS_TEMPLATE_RECEIPT: 'template_a9dv0cj', // On va le créer juste après
 
     // ---- MODE TEST ----
-    TEST_MODE: false,
+    TEST_MODE: true,
 
     // ---- APP ----
     APP_NAME: 'AKOLABS',
@@ -45,7 +45,7 @@ var CONFIG = {
 
     // ---- LANDING PAGE ----
     LANDING_URL: '/app-store/',
-    APP_PRICE: 100,
+    APP_PRICE: 5000,
 
     // ---- LIMITES ----
     MAX_LOGIN_ATTEMPTS: 5,
