@@ -36,12 +36,7 @@ fbq('track', 'PageView');
 src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
-    <script>
-  fbq('track', 'Purchase', {
-    value: 5000,
-    currency: 'Xof',
-  });
-    </script>
+
 </head>
 <body class="landing-body">
 
@@ -1236,7 +1231,7 @@ const LandingApp = {
                     : 0;
                 var fees = Math.ceil(purchaseData.amount * 3 / 100);
 
-                var purchaseResult = await db.from('purchases').insert({
+                await db.from('purchases').insert({
                     user_id: userId,
                     purchase_type: 'app_access',
                     amount: purchaseData.amount,
@@ -1248,28 +1243,12 @@ const LandingApp = {
                     discount_amount: LandingApp.basePrice - purchaseData.amount,
                     affiliate_user_id: affiliateUserId,
                     affiliate_commission: commission,
-                    status: 'confirmed',
-                    confirmed_at: new Date().toISOString()
+                    status: 'confirmed'
                 });
-                if (purchaseResult.error) {
-                    console.error('[Landing] Erreur insert achat:', purchaseResult.error);
-                    // Retry une fois sans les champs optionnels
-                    await db.from('purchases').insert({
-                        user_id: userId,
-                        purchase_type: 'app_access',
-                        amount: purchaseData.amount,
-                        fees: fees,
-                        total_paid: purchaseData.amount + fees,
-                        payment_ref: String(transactionId || '') + '_retry',
-                        payment_provider: CONFIG.TEST_MODE ? 'test' : 'fedapay',
-                        status: 'confirmed',
-                        confirmed_at: new Date().toISOString()
-                    });
-                }
-                LandingApp.trackConversion();
-                console.log('[Landing] Achat enregistre avec succes');
+                LandingApp.trackConversion(); // Marquer la visite comme convertie
+                console.log('[Landing] Achat enregistre');
             } catch (e) {
-                console.error('[Landing] Erreur critique insert achat:', e);
+                console.log('[Landing] Note: insert achat echoue:', e);
             }
 
             // 6. Incrementer le code promo
@@ -1345,9 +1324,11 @@ const LandingApp = {
         // --- INTEGRATION META PIXEL ---
         if (typeof fbq === 'function') {
             fbq('track', 'Purchase', {
-                value: 5000, 
+                value: purchaseData.amount || 5000,
                 currency: 'XOF',
-            
+                content_type: 'product',
+                content_ids: ['akolabs_access'],
+                content_name: 'AKOLABS Accès à vie'
             });
         }
         // ------------------------------
