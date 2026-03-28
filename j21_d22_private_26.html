@@ -548,18 +548,51 @@
 
     // ===== PURCHASES =====
     AdminApp.renderPurchases = async function(container) {
+        // Essai avec jointure users
         var r = await db.from('purchases').select('*, users(full_name, email)').order('created_at', { ascending: false }).limit(50);
-        var items = r.data || [];
+
+        var items = [];
+        if (r.error || !r.data) {
+            console.warn('[Admin] Jointure purchases+users échouée:', r.error);
+            // Fallback : charger sans jointure
+            var r2 = await db.from('purchases').select('*').order('created_at', { ascending: false }).limit(50);
+            items = r2.data || [];
+        } else {
+            items = r.data;
+        }
+
+        // Enrichir avec les emails si pas de jointure
+        var userMap = {};
+        if (items.length > 0 && !items[0].users) {
+            var userIds = [...new Set(items.map(function(p) { return p.user_id; }).filter(Boolean))];
+            if (userIds.length > 0) {
+                var uR = await db.from('users').select('id, full_name, email').in('id', userIds);
+                (uR.data || []).forEach(function(u) { userMap[u.id] = u; });
+            }
+        }
 
         var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Achats (' + items.length + ')</div></div>';
         h += '<div class="admin-table"><table><tr><th>User</th><th>Type</th><th>Montant</th><th>Statut</th><th>Paiement</th><th>Date</th></tr>';
 
+        if (items.length === 0) {
+            h += '<tr><td colspan="6" style="text-align:center;color:#8A87A0;padding:20px;">Aucun achat</td></tr>';
+        }
+
         for (var i = 0; i < items.length; i++) {
             var p = items[i];
-            var name = (p.users && p.users.full_name) || (p.users && p.users.email) || '-';
+            var userInfo = (p.users) || userMap[p.user_id] || {};
+            var name = userInfo.full_name || userInfo.email || p.user_id || '-';
             var statusCls = p.status === 'confirmed' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive';
+            var dateStr = p.confirmed_at || p.created_at;
 
-            h += '<tr><td>' + name + '</td><td>' + p.purchase_type + '</td><td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td><td><span class="status ' + statusCls + '">' + p.status + '</span></td><td>' + (p.payment_provider || '-') + '</td><td>' + Utils.timeAgo(p.created_at) + '</td></tr>';
+            h += '<tr>';
+            h += '<td style="font-size:11px;">' + name + '</td>';
+            h += '<td style="font-size:11px;">' + (p.purchase_type || '-') + '</td>';
+            h += '<td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td>';
+            h += '<td><span class="status ' + statusCls + '">' + p.status + '</span></td>';
+            h += '<td style="font-size:11px;">' + (p.payment_provider || '-') + '</td>';
+            h += '<td style="font-size:11px;">' + Utils.timeAgo(dateStr) + '</td>';
+            h += '</tr>';
         }
 
         h += '</table></div></div>';
