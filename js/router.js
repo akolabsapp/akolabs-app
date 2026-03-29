@@ -1,5 +1,5 @@
 // ============================================
-// AKOLABS - SPA Router (Hash-based)
+// AKOLABS - SPA Router (Hash-based + iOS fix)
 // ============================================
 
 const Router = {
@@ -8,6 +8,16 @@ const Router = {
     previousRoute: null,
     mainContainer: null,
     onBeforeRoute: null, // hook
+
+    // Détection iOS PWA (standalone)
+    _isIOSStandalone() {
+        return (
+            typeof window !== 'undefined' &&
+            (window.navigator.standalone === true ||
+             window.matchMedia('(display-mode: standalone)').matches) &&
+            /iPhone|iPad|iPod/i.test(navigator.userAgent)
+        );
+    },
 
     // ---- Enregistrer une route ----
     register(path, handler) {
@@ -21,12 +31,23 @@ const Router = {
 
     // ---- Naviguer vers une route ----
     navigate(path) {
-        window.location.hash = '#' + path;
+        if (this._isIOSStandalone()) {
+            // iOS PWA : pushState + dispatch manuel car hashchange ne se déclenche pas
+            window.history.pushState({ path: path }, '', '#' + path);
+            this.handleRoute();
+        } else {
+            window.location.hash = '#' + path;
+        }
     },
 
     // ---- Remplacer la route actuelle (sans historique) ----
     replace(path) {
-        window.location.replace('#' + path);
+        if (this._isIOSStandalone()) {
+            window.history.replaceState({ path: path }, '', '#' + path);
+            this.handleRoute();
+        } else {
+            window.location.replace('#' + path);
+        }
     },
 
     // ---- Retour arrière ----
@@ -175,7 +196,19 @@ const Router = {
     init() {
         this.mainContainer = document.getElementById('main-content');
 
+        // hashchange pour navigateurs normaux
         window.addEventListener('hashchange', () => this.handleRoute());
+
+        // popstate pour iOS PWA (pushState/back)
+        window.addEventListener('popstate', (e) => {
+            // Éviter double déclenchement sur non-iOS
+            if (this._isIOSStandalone()) {
+                this.handleRoute();
+            } else {
+                // Sur desktop/Android, popstate + hashchange peuvent se doubler
+                // On laisse hashchange gérer
+            }
+        });
 
         // Gérer le premier chargement
         this.handleRoute();
