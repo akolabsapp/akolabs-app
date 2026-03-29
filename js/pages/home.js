@@ -203,7 +203,7 @@ var HomePage = {
         var tag = featured.promo_price ? '🔥 PROMO EN COURS' : '⭐ RECOMMANDE';
 
         var h = '';
-        h += '<div class="featured-banner" onclick="Router.navigate(\'/section/' + featured.id + '\')">';
+        h += '<div class="featured-banner" onclick="Router.navigate(\'/section/' + featured.id + '\')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;">';
         h += '<div class="featured-banner-icon"><i class="fas ' + icon + '"></i></div>';
         h += '<div class="featured-banner-content">';
         h += '<div class="featured-banner-tag">' + tag + '</div>';
@@ -459,7 +459,7 @@ var HomePage = {
         }
 
         var h = '';
-        h += '<div class="section-card" onclick="Router.navigate(\'' + route + '\')">';
+        h += '<div class="section-card" onclick="Router.navigate(\'' + route + '\')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;">';
         h += '<div style="position:relative;">';
         h += bannerHTML;
         h += '<div class="section-card-badges">' + badgesHTML + '</div>';
@@ -529,7 +529,7 @@ var HomePage = {
         var route = (hasAccess || isFree) ? '/formation/' + formation.id : '/section/' + formation.id;
 
         var h = '';
-        h += '<div class="formation-card" onclick="Router.navigate(\'' + route + '\')">';
+        h += '<div class="formation-card" onclick="Router.navigate(\'' + route + '\')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;">';
         h += thumbHTML;
         h += '<div class="formation-info">';
         h += '<div class="formation-badges">' + badgesHTML + '</div>';
