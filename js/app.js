@@ -155,6 +155,22 @@ var App = {
 
     init: async function() {
         console.log('[AKOLABS] v' + CONFIG.APP_VERSION + ' - Initialisation...');
+
+        // Fix iOS Safari : les divs onclick ne répondent pas au touch sans ce fix
+        // Injecter un style global pour tous les éléments cliquables
+        (function() {
+            var style = document.createElement('style');
+            style.textContent = [
+                '* { -webkit-tap-highlight-color: transparent; }',
+                '[onclick], .section-card, .formation-card, .featured-banner,',
+                '.apk-card, .nav-item, .btn, button, a {',
+                '  cursor: pointer;',
+                '  touch-action: manipulation;',
+                '}'
+            ].join('\n');
+            document.head.appendChild(style);
+        })();
+
         PWA.init();
 
         // Initialiser EmailJS
