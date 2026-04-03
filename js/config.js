@@ -45,7 +45,7 @@ var CONFIG = {
 
     // ---- LANDING PAGE ----
     LANDING_URL: '/app-store/',
-    APP_PRICE: 100,
+    APP_PRICE: 1000,
 
     // ---- LIMITES ----
     MAX_LOGIN_ATTEMPTS: 5,
