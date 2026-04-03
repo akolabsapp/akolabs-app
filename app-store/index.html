@@ -86,9 +86,9 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
 
         <!-- Prix -->
         <div class="hero-price-tag">
-            <span class="hero-price-old">25 000 F</span>
+            <span class="hero-price-old">15 000 F</span>
             <div>
-                <div class="hero-price-current">2500 F</div>
+                <div class="hero-price-current">1000 F</div>
                 <div class="hero-price-label">accès à vie</div>
             </div>
         </div>
@@ -354,7 +354,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="faq-answer">
-                <p>Oui, à 100%. Un seul paiement de 2500 FCFA, et c'est terminé. Pas de mensualité, pas de renouvellement, pas de frais cachés. Tu accèdes à AKOLABS pour toujours — y compris les nouvelles sections qu'on ajoutera dans le futur. C'est pour ça que le prix actuel ne durera pas.</p>
+                <p>Oui, à 100%. Un seul paiement de 1000 FCFA, et c'est terminé. Pas de mensualité, pas de renouvellement, pas de frais cachés. Tu accèdes à AKOLABS pour toujours — y compris les nouvelles sections qu'on ajoutera dans le futur. C'est pour ça que le prix actuel ne durera pas.</p>
             </div>
         </div>
 
@@ -390,7 +390,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
 
         <div class="faq-item">
             <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>Pourquoi le prix est à 2500 FCFA et pas plus ?</span>
+                <span>Pourquoi le prix est à 1000 FCFA et pas plus ?</span>
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="faq-answer">
@@ -412,9 +412,9 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
             <!-- Prix -->
             <div class="purchase-price-box">
                 <div style="text-decoration:line-through;color:var(--color-gray-500);font-size:var(--text-sm);">
-                    25 000 FCFA
+                    15 000 FCFA
                 </div>
-                <div class="purchase-price-value">2500 FCFA</div>
+                <div class="purchase-price-value">1000 FCFA</div>
                 <div class="purchase-price-period">Paiement unique — Accès à vie</div>
             </div>
 
@@ -498,7 +498,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                 <div id="price-summary" style="display:none;margin:var(--space-base) 0;padding:var(--space-base);background:rgba(40,167,69,0.1);border:1px solid rgba(40,167,69,0.2);border-radius:var(--radius-md);">
                     <div style="display:flex;justify-content:space-between;font-size:var(--text-sm);color:var(--color-gray-400);margin-bottom:4px;">
                         <span>Prix de base</span>
-                        <span id="summary-base">2500 F</span>
+                        <span id="summary-base">1000 F</span>
                     </div>
                     <div id="summary-discount-row" style="display:none;justify-content:space-between;font-size:var(--text-sm);color:var(--color-success);margin-bottom:4px;">
                         <span>Réduction (<span id="summary-discount-percent">10</span>%)</span>
@@ -506,7 +506,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:var(--text-md);font-weight:var(--font-bold);color:var(--color-accent);border-top:1px solid var(--glass-border);padding-top:8px;margin-top:8px;">
                         <span>Total à payer</span>
-                        <span id="summary-total">2500 F</span>
+                        <span id="summary-total">1000 F</span>
                     </div>
                 </div>
 
@@ -554,7 +554,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
     <div class="floating-cta" id="floating-cta">
         <a href="#purchase" class="btn btn-primary">
             <i class="fas fa-bolt"></i>
-            Obtenir l'accès — 2500 F
+            Obtenir l'accès — 1000 F
         </a>
     </div>
 
@@ -1170,13 +1170,14 @@ const LandingApp = {
         var btn = document.getElementById('btn-purchase');
 
         try {
-            Utils.showToast('Paiement recu ! Creation de votre compte...', 'success', 2500);
+            Utils.showToast('Paiement recu ! Creation de votre compte...', 'success', 1000);
 
             // 1. Creer le compte utilisateur
             var signUpResult = await db.auth.signUp({
                 email: purchaseData.email,
                 password: purchaseData.password,
                 options: {
+                    emailRedirectTo: null,
                     data: {
                         full_name: purchaseData.name,
                         phone: purchaseData.phone,
@@ -1231,7 +1232,7 @@ const LandingApp = {
                     : 0;
                 var fees = Math.ceil(purchaseData.amount * 3 / 100);
 
-                await db.from('purchases').insert({
+                var purchaseResult = await db.from('purchases').insert({
                     user_id: userId,
                     purchase_type: 'app_access',
                     amount: purchaseData.amount,
@@ -1243,12 +1244,17 @@ const LandingApp = {
                     discount_amount: LandingApp.basePrice - purchaseData.amount,
                     affiliate_user_id: affiliateUserId,
                     affiliate_commission: commission,
-                    status: 'confirmed'
+                    status: 'confirmed',
+                    confirmed_at: new Date().toISOString()
                 });
-                LandingApp.trackConversion(); // Marquer la visite comme convertie
-                console.log('[Landing] Achat enregistre');
+                if (purchaseResult && purchaseResult.error) {
+                    console.error('[Landing] Erreur insert achat:', purchaseResult.error);
+                } else {
+                    LandingApp.trackConversion();
+                    console.log('[Landing] Achat enregistre avec succes');
+                }
             } catch (e) {
-                console.log('[Landing] Note: insert achat echoue:', e);
+                console.error('[Landing] Insert achat exception:', e);
             }
 
             // 6. Incrementer le code promo
@@ -1277,22 +1283,10 @@ const LandingApp = {
                 console.log('[Landing] Note: analytics echoue:', e);
             }
 
-            // 8. Se deconnecter (l'utilisateur se connectera dans l'app)
-            await db.auth.signOut().catch(function() {});
-
-            // 9. Confetti
-            try {
-                Utils.showConfetti();
-                Utils.vibrate([100, 50, 100, 50, 200]);
-            } catch (e) {
-                console.log('[Landing] Note: confetti echoue:', e);
-            }
-            
-                        // 8.5 ENVOI DE L'EMAIL DE BIENVENUE
+            // 8. Envoyer l'email AVANT de déconnecter
             try {
                 var loginUrl = window.location.origin + '/';
-                var installGuide = '1. Ouvrez ce lien sur votre telephone (Chrome/Safari)\n2. Connectez-vous\n3. Cliquez sur "Ajouter a l\'ecran d\'accueil" quand on vous le propose.';
-                
+                var installGuide = '1. Ouvrez ce lien sur votre telephone (Chrome ou Safari)\n2. Connectez-vous avec votre email et mot de passe\n3. Appuyez sur \"Ajouter a l\'ecran d\'accueil\" quand le message apparait';
                 await Utils.sendEmail(CONFIG.EMAILJS_TEMPLATE_WELCOME, {
                     to_email: purchaseData.email,
                     to_name: purchaseData.name,
@@ -1300,11 +1294,21 @@ const LandingApp = {
                     app_link: loginUrl,
                     install_guide: installGuide
                 });
+                console.log('[Landing] Email bienvenue envoye avec succes');
             } catch(e) {
-                console.log('[Landing] Erreur envoi email (non bloquant)', e);
+                console.error('[Landing] Erreur envoi email:', e);
             }
 
-            // 10. Afficher l'ecran de succes
+            // 9. Deconnecter APRES l'email
+            await db.auth.signOut().catch(function() {});
+
+            // 10. Confetti
+            try {
+                Utils.showConfetti();
+                Utils.vibrate([100, 50, 100, 50, 200]);
+            } catch (e) {}
+
+            // 11. Afficher l'ecran de succes
             LandingApp.showSuccessScreen(purchaseData);
 
         } catch (error) {
@@ -1324,7 +1328,7 @@ const LandingApp = {
         // --- INTEGRATION META PIXEL ---
         if (typeof fbq === 'function') {
             fbq('track', 'Purchase', {
-                value: purchaseData.amount || 2500,
+                value: purchaseData.amount || 1000,
                 currency: 'XOF',
                 content_type: 'product',
                 content_ids: ['akolabs_access'],
