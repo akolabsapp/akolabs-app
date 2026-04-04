@@ -23,7 +23,7 @@ var CONFIG = {
     EMAILJS_TEMPLATE_RECEIPT: 'template_a9dv0cj', // On va le créer juste après
 
     // ---- MODE TEST ----
-    TEST_MODE: true,
+    TEST_MODE: false,
 
     // ---- APP ----
     APP_NAME: 'AKOLABS',
