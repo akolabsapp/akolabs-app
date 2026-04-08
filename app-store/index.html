@@ -422,7 +422,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
             <div class="payment-methods">
                 <i class="fas fa-lock"></i>
                 Paiement sécurisé — <strong>Tous les moyens de paiement acceptés</strong>
-                <br><small>Mobile Money, cartes, virement et plus via FedaPay</small>
+                <br><small>Mobile Money, cartes, virement et plus via FeexPay</small>
             </div>
 
             <!-- Ce qui est inclus -->
@@ -1054,7 +1054,7 @@ const LandingApp = {
                 console.log('[Landing] MODE TEST — Simulation de paiement');
                 this.simulatePayment(purchaseData);
             } else {
-                this.openFedaPay(purchaseData);
+                this.openFeexPay(purchaseData);
             }
 
         } catch (error) {
@@ -1075,7 +1075,7 @@ const LandingApp = {
                     Mode Test
                 </h3>
                 <p style="color:var(--color-gray-400);font-size:var(--text-sm);margin-bottom:var(--space-xl);line-height:var(--line-height-relaxed);">
-                    FedaPay n'est pas encore actif.<br>
+                    Mode test activé.<br>
                     Voulez-vous simuler un paiement réussi de <strong style="color:var(--color-accent);">${Utils.formatPrice(purchaseData.amount)}</strong> ?
                 </p>
                 
@@ -1102,64 +1102,52 @@ const LandingApp = {
         this._tempPurchaseData = purchaseData;
     },
 
-    // ---- OUVRIR FEDAPAY (quand le compte sera actif) ----
-    openFedaPay: function(purchaseData) {
+    // ---- OUVRIR FEEXPAY ----
+    openFeexPay: function(purchaseData) {
         var btn = document.getElementById('btn-purchase');
-
-        var feePercent = 3;
-        var fees = Math.ceil(purchaseData.amount * feePercent / 100);
-        var totalWithFees = purchaseData.amount + fees;
-
         this._tempPurchaseData = purchaseData;
 
         try {
-            console.log('[FedaPay] Initialisation du widget...');
-            
-            // On initialise SANS lier au bouton '#btn-purchase'
-            var widget = FedaPay.init({
-                public_key: CONFIG.FEDAPAY_PUBLIC_KEY,
-                transaction: {
-                    amount: totalWithFees,
-                    description: 'Acces AKOLABS - Application Premium'
-                },
-                customer: {
-                    email: purchaseData.email,
-                    firstname: purchaseData.name.split(' ')[0] || purchaseData.name,
-                    lastname: purchaseData.name.split(' ').slice(1).join(' ') || '-',
-                    phone_number: {
-                        number: purchaseData.phone.replace(/[\s\-\+]/g, ''),
-                        country: 'bj'
-                    }
-                },
-                currency: {
-                    iso: CONFIG.FEDAPAY_CURRENCY
-                },
-                environment: CONFIG.FEDAPAY_ENV,
-                onComplete: async function(resp) {
-                    console.log('[FedaPay] Reponse:', resp);
-                    if (resp.reason === FedaPay.CHECKOUT_COMPLETED || 
-                        resp.reason === 'CHECKOUT_COMPLETE' ||
-                        (resp.transaction && resp.transaction.status === 'approved')) {
-                        
-                        var tid = resp.transaction ? resp.transaction.id : (resp.id || 'FDP-' + Date.now());
-                        await LandingApp.completePurchase(purchaseData, tid);
+            console.log('[FeexPay] Initialisation du paiement...');
+
+            var fees = Math.ceil(purchaseData.amount * 3 / 100);
+            var totalWithFees = purchaseData.amount + fees;
+
+            // Référence unique pour ce paiement
+            var reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+            LandingApp._feexReference = reference;
+
+            // Ouvrir le widget FeexPay
+            FeexPay.init({
+                token: CONFIG.FEEXPAY_TOKEN,
+                store: CONFIG.FEEXPAY_STORE,
+                amount: totalWithFees,
+                currency: CONFIG.FEEXPAY_CURRENCY,
+                description: 'Acces AKOLABS - Application Premium',
+                firstname: purchaseData.name.split(' ')[0] || purchaseData.name,
+                lastname: purchaseData.name.split(' ').slice(1).join(' ') || '-',
+                email: purchaseData.email,
+                phone: purchaseData.phone.replace(/[\s\-\+]/g, ''),
+                reference: reference,
+                callback: function(response) {
+                    console.log('[FeexPay] Reponse:', response);
+                    if (response && (response.status === 'SUCCESS' || response.status === 'success' || response.code === '200')) {
+                        var tid = response.reference || response.transaction_id || reference;
+                        LandingApp.completePurchase(purchaseData, tid);
                     } else {
-                        Utils.showToast('Paiement non complete. Reessayez.', 'warning');
+                        Utils.showToast('Paiement non completé. Réessayez.', 'warning');
                         if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
                     }
                 },
                 onClose: function() {
-                    console.log('[FedaPay] Widget ferme');
+                    console.log('[FeexPay] Widget fermé');
                     if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
                 }
             });
 
-            // ON L'OUVRE FORCÉMENT ICI 👇
-            widget.open();
-
         } catch (e) {
-            console.error('[FedaPay] Erreur init:', e);
-            Utils.showToast('Erreur avec le systeme de paiement.', 'error');
+            console.error('[FeexPay] Erreur init:', e);
+            Utils.showToast('Erreur avec le système de paiement.', 'error');
             if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
         }
     },
@@ -1239,7 +1227,7 @@ const LandingApp = {
                     fees: fees,
                     total_paid: purchaseData.amount + fees,
                     payment_ref: String(transactionId || ''),
-                    payment_provider: CONFIG.TEST_MODE ? 'test' : 'fedapay',
+                    payment_provider: CONFIG.TEST_MODE ? 'test' : 'feexpay',
                     promo_code_used: purchaseData.promo || null,
                     discount_amount: LandingApp.basePrice - purchaseData.amount,
                     affiliate_user_id: affiliateUserId,
@@ -1410,8 +1398,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-    <!-- FedaPay SDK -->
-    <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
+    <!-- FeexPay SDK -->
+    <script src="https://feexpay.me/api/cdn/feexpay.js"></script>
 
 </body>
 </html>
