@@ -526,7 +526,7 @@ var SectionDetail = {
         if (CONFIG.TEST_MODE) {
             SectionDetail.simulatePayment(purchaseData);
         } else {
-            SectionDetail.openFedaPay(purchaseData);
+            SectionDetail.openFeexPay(purchaseData);
         }
     },
 
@@ -551,56 +551,49 @@ var SectionDetail = {
         Utils.openBottomSheet(h);
     },
 
-    // ---- FEDAPAY REEL ----
-    openFedaPay: function(purchaseData) {
+    // ---- FEEXPAY REEL ----
+    openFeexPay: function(purchaseData) {
         var btn = document.getElementById('btn-buy-section');
-        var feePercent = 3;
-        var fees = Math.ceil(purchaseData.amount * feePercent / 100);
+        var fees = Math.ceil(purchaseData.amount * 3 / 100);
         var totalWithFees = purchaseData.amount + fees;
 
         SectionDetail._tempData = purchaseData;
 
         try {
-            console.log('[FedaPay] Ouverture du widget...');
-            
-            // On initialise sans cibler le bouton
-            var widget = FedaPay.init({
-                public_key: CONFIG.FEDAPAY_PUBLIC_KEY,
-                transaction: {
-                    amount: totalWithFees,
-                    description: 'AKOLABS - ' + purchaseData.sectionTitle
-                },
-                customer: {
-                    email: App.profile.email,
-                    firstname: (App.profile.full_name || '').split(' ')[0] || 'User',
-                    lastname: (App.profile.full_name || '').split(' ').slice(1).join(' ') || '-'
-                },
-                currency: { iso: CONFIG.FEDAPAY_CURRENCY },
-                environment: CONFIG.FEDAPAY_ENV,
-                onComplete: async function(resp) {
-                    var ok = resp.reason === 'CHECKOUT_COMPLETE' || 
-                             resp.reason === FedaPay.CHECKOUT_COMPLETED || 
-                             (resp.transaction && resp.transaction.status === 'approved');
-                             
+            console.log('[FeexPay] Ouverture du widget...');
+
+            var reference = 'AKO-SEC-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+
+            FeexPay.init({
+                token: CONFIG.FEEXPAY_TOKEN,
+                store: CONFIG.FEEXPAY_STORE,
+                amount: totalWithFees,
+                currency: CONFIG.FEEXPAY_CURRENCY,
+                description: 'AKOLABS - ' + purchaseData.sectionTitle,
+                firstname: (App.profile.full_name || '').split(' ')[0] || 'User',
+                lastname: (App.profile.full_name || '').split(' ').slice(1).join(' ') || '-',
+                email: App.profile.email || '',
+                phone: (App.profile.phone || '').replace(/[\s\-\+]/g, ''),
+                reference: reference,
+                callback: async function(response) {
+                    console.log('[FeexPay] Reponse:', response);
+                    var ok = response && (response.status === 'SUCCESS' || response.status === 'success' || response.code === '200');
                     if (ok) {
-                        var tid = (resp.transaction && resp.transaction.id) || resp.id || 'FDP-' + Date.now();
+                        var tid = response.reference || response.transaction_id || reference;
                         await SectionDetail.completePurchase(purchaseData, tid);
                     } else {
-                        Utils.showToast('Paiement non complete.', 'warning');
+                        Utils.showToast('Paiement non completé.', 'warning');
                         if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
                     }
                 },
                 onClose: function() {
-                    console.log('[FedaPay] Widget ferme');
+                    console.log('[FeexPay] Widget ferme');
                     if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
                 }
             });
 
-            // ON FORCE L'OUVERTURE ICI 👇
-            widget.open();
-
         } catch (e) {
-            console.error('[FedaPay] Erreur:', e);
+            console.error('[FeexPay] Erreur:', e);
             Utils.showToast('Erreur systeme de paiement.', 'error');
             if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
         }
@@ -628,7 +621,7 @@ var SectionDetail = {
                     fees: fees,
                     total_paid: purchaseData.amount + fees,
                     payment_ref: String(transactionId || ''),
-                    payment_provider: CONFIG.TEST_MODE ? 'test' : 'fedapay',
+                    payment_provider: CONFIG.TEST_MODE ? 'test' : 'feexpay',
                     promo_code_used: purchaseData.promoCode || null,
                     discount_amount: purchaseData.basePrice - purchaseData.amount,
                     affiliate_user_id: affiliateUserId,
