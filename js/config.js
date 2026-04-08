@@ -11,10 +11,12 @@ var CONFIG = {
     CLOUDINARY_CLOUD_NAME: 'dtowyvewa',
     CLOUDINARY_UPLOAD_PRESET: 'akolabs_uploads',
 
-    // ---- FEDAPAY ----
-    FEDAPAY_PUBLIC_KEY: 'pk_live_8ED9T2BTMV6yBgEc2X8K9YqS',
-    FEDAPAY_ENV: 'live',
-    FEDAPAY_CURRENCY: 'XOF',
+    // ---- FEEXPAY ----
+    // Remplace tes clés ici après avoir reçu ce fichier :
+    FEEXPAY_TOKEN: 'fp_Q0xDAmiPXr2By3u6ssdl7QEh57lbhDdpfahYKqzHjsl232IaxJJqECaaoGPjIs0w',   // Token API FeexPay (dashboard FeexPay)
+    FEEXPAY_STORE: '69d491975c79429d57e5ffa2', // Ton Store ID FeexPay
+    FEEXPAY_CALLBACK_URL: 'https://akolabs.store/',  // URL de redirection après paiement
+    FEEXPAY_CURRENCY: 'XOF',
     
         // ---- EMAILJS (Emails automatiques) ----
     EMAILJS_PUBLIC_KEY: 'Mq1BDoeRayGXaxxlE',
