@@ -589,6 +589,27 @@ const LandingApp = {
         this.setupSmoothScroll();
         this.trackVisit(); // Tracking visiteur
 
+        // Vérifier si c'est un retour de paiement FeexPay
+        const feexStatus = urlParams.get('feexpay');
+        const feexRef = urlParams.get('ref');
+        if (feexStatus === 'success' && feexRef) {
+            var savedData = localStorage.getItem('ako_feex_data');
+            var savedRef = localStorage.getItem('ako_feex_ref');
+            if (savedData && savedRef === feexRef) {
+                try {
+                    var pd = JSON.parse(savedData);
+                    localStorage.removeItem('ako_feex_ref');
+                    localStorage.removeItem('ako_feex_data');
+                    // Finaliser l'achat
+                    setTimeout(function() {
+                        LandingApp.completePurchase(pd, feexRef);
+                    }, 500);
+                } catch(e) {
+                    console.error('[FeexPay] Erreur récupération données:', e);
+                }
+            }
+        }
+
         // Vérifier si un code parrain est dans l'URL
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
@@ -1102,52 +1123,56 @@ const LandingApp = {
         this._tempPurchaseData = purchaseData;
     },
 
-    // ---- OUVRIR FEEXPAY ----
-    openFeexPay: function(purchaseData) {
+    // ---- OUVRIR FEEXPAY via API REST ----
+    openFeexPay: async function(purchaseData) {
         var btn = document.getElementById('btn-purchase');
         this._tempPurchaseData = purchaseData;
 
         try {
-            console.log('[FeexPay] Initialisation du paiement...');
+            console.log('[FeexPay] Initialisation du paiement via API...');
 
             var fees = Math.ceil(purchaseData.amount * 3 / 100);
             var totalWithFees = purchaseData.amount + fees;
-
-            // Référence unique pour ce paiement
             var reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
             LandingApp._feexReference = reference;
 
-            // Ouvrir le widget FeexPay
-            FeexPay.init({
-                token: CONFIG.FEEXPAY_TOKEN,
-                store: CONFIG.FEEXPAY_STORE,
-                amount: totalWithFees,
-                currency: CONFIG.FEEXPAY_CURRENCY,
-                description: 'Acces AKOLABS - Application Premium',
-                firstname: purchaseData.name.split(' ')[0] || purchaseData.name,
-                lastname: purchaseData.name.split(' ').slice(1).join(' ') || '-',
-                email: purchaseData.email,
-                phone: purchaseData.phone.replace(/[\s\-\+]/g, ''),
-                reference: reference,
-                callback: function(response) {
-                    console.log('[FeexPay] Reponse:', response);
-                    if (response && (response.status === 'SUCCESS' || response.status === 'success' || response.code === '200')) {
-                        var tid = response.reference || response.transaction_id || reference;
-                        LandingApp.completePurchase(purchaseData, tid);
-                    } else {
-                        Utils.showToast('Paiement non completé. Réessayez.', 'warning');
-                        if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
-                    }
+            // Sauvegarder reference pour vérification après retour
+            localStorage.setItem('ako_feex_ref', reference);
+            localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
+
+            // Appel API FeexPay pour obtenir le lien de paiement
+            var response = await fetch('https://feexpay.me/api/orders/v2/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + CONFIG.FEEXPAY_TOKEN
                 },
-                onClose: function() {
-                    console.log('[FeexPay] Widget fermé');
-                    if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
-                }
+                body: JSON.stringify({
+                    amount: totalWithFees,
+                    currency: CONFIG.FEEXPAY_CURRENCY,
+                    description: 'Acces AKOLABS - Application Premium',
+                    callback_info: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
+                    custom_id: reference,
+                    store: CONFIG.FEEXPAY_STORE
+                })
             });
 
+            var data = await response.json();
+            console.log('[FeexPay] Réponse API:', data);
+
+            if (data && (data.payment_url || data.url || data.link || data.checkout_url)) {
+                var payUrl = data.payment_url || data.url || data.link || data.checkout_url;
+                // Ouvrir la page de paiement FeexPay dans un nouvel onglet
+                window.location.href = payUrl;
+            } else {
+                console.error('[FeexPay] Pas d'URL de paiement:', data);
+                Utils.showToast('Erreur: ' + (data.message || 'Impossible d'initialiser le paiement'), 'error');
+                if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
+            }
+
         } catch (e) {
-            console.error('[FeexPay] Erreur init:', e);
-            Utils.showToast('Erreur avec le système de paiement.', 'error');
+            console.error('[FeexPay] Erreur:', e);
+            Utils.showToast('Erreur avec le système de paiement. Vérifiez votre connexion.', 'error');
             if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
         }
     },
@@ -1398,8 +1423,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-    <!-- FeexPay SDK -->
-    <script src="https://feexpay.me/api/cdn/feexpay.js"></script>
+    <!-- FeexPay : intégration via API REST -->
 
 </body>
 </html>
