@@ -68,7 +68,7 @@ self.addEventListener('fetch', (event) => {
     if (url.includes('supabase.co') ||
         url.includes('kkiapay.me') ||
         url.includes('cloudinary.com') ||
-        url.includes('fedapay.com')) {
+        url.includes('feexpay.me')) {
         return;
     }
 
