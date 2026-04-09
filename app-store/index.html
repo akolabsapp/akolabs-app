@@ -44,7 +44,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
 
     <!-- FeexPay : conteneur SDK (étape 3 doc officielle) + déclencheur caché -->
     <div id="render" style="display:none;"></div>
-    <button id="feexpay-hidden-trigger" style="display:none;position:absolute;" aria-hidden="true"></button>
+    <button id="feexpay-hidden-trigger" style="visibility:hidden;position:fixed;width:0;height:0;overflow:hidden;" aria-hidden="true"></button>
 
     <!-- ========== NAVBAR ========== -->
     <nav class="landing-nav">
@@ -1169,17 +1169,13 @@ const LandingApp = {
                 description: 'Acces AKOLABS - Application Premium'
             });
 
-            // Déclencher l'ouverture du modal FeexPay après init
-            setTimeout(function() {
-                var trigger = document.getElementById('feexpay-hidden-trigger');
-                if (trigger) {
-                    trigger.click();
-                } else {
-                    console.error('[FeexPay] Bouton déclencheur introuvable');
-                    Utils.showToast('Erreur ouverture paiement. Reessayez.', 'error');
-                    if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
-                }
-            }, 150);
+            // Déclencher IMMÉDIATEMENT (sans setTimeout — le contexte user gesture doit être préservé)
+            var trigger = document.getElementById('feexpay-hidden-trigger');
+            if (trigger) {
+                trigger.click();
+            } else {
+                throw new Error('Bouton déclencheur FeexPay introuvable');
+            }
 
         } catch (e) {
             console.error('[FeexPay] Erreur:', e);
