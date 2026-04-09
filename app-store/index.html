@@ -88,7 +88,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
         <div class="hero-price-tag">
             <span class="hero-price-old">15 000 F</span>
             <div>
-                <div class="hero-price-current">1000 F</div>
+                <div class="hero-price-current">1500 F</div>
                 <div class="hero-price-label">accès à vie</div>
             </div>
         </div>
@@ -354,7 +354,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="faq-answer">
-                <p>Oui, à 100%. Un seul paiement de 1000 FCFA, et c'est terminé. Pas de mensualité, pas de renouvellement, pas de frais cachés. Tu accèdes à AKOLABS pour toujours — y compris les nouvelles sections qu'on ajoutera dans le futur. C'est pour ça que le prix actuel ne durera pas.</p>
+                <p>Oui, à 100%. Un seul paiement de 1500 FCFA, et c'est terminé. Pas de mensualité, pas de renouvellement, pas de frais cachés. Tu accèdes à AKOLABS pour toujours — y compris les nouvelles sections qu'on ajoutera dans le futur. C'est pour ça que le prix actuel ne durera pas.</p>
             </div>
         </div>
 
@@ -390,7 +390,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
 
         <div class="faq-item">
             <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>Pourquoi le prix est à 1000 FCFA et pas plus ?</span>
+                <span>Pourquoi le prix est à 1500 FCFA et pas plus ?</span>
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="faq-answer">
@@ -414,7 +414,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                 <div style="text-decoration:line-through;color:var(--color-gray-500);font-size:var(--text-sm);">
                     15 000 FCFA
                 </div>
-                <div class="purchase-price-value">1000 FCFA</div>
+                <div class="purchase-price-value">1500 FCFA</div>
                 <div class="purchase-price-period">Paiement unique — Accès à vie</div>
             </div>
 
@@ -498,7 +498,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                 <div id="price-summary" style="display:none;margin:var(--space-base) 0;padding:var(--space-base);background:rgba(40,167,69,0.1);border:1px solid rgba(40,167,69,0.2);border-radius:var(--radius-md);">
                     <div style="display:flex;justify-content:space-between;font-size:var(--text-sm);color:var(--color-gray-400);margin-bottom:4px;">
                         <span>Prix de base</span>
-                        <span id="summary-base">1000 F</span>
+                        <span id="summary-base">1500 F</span>
                     </div>
                     <div id="summary-discount-row" style="display:none;justify-content:space-between;font-size:var(--text-sm);color:var(--color-success);margin-bottom:4px;">
                         <span>Réduction (<span id="summary-discount-percent">10</span>%)</span>
@@ -506,7 +506,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:var(--text-md);font-weight:var(--font-bold);color:var(--color-accent);border-top:1px solid var(--glass-border);padding-top:8px;margin-top:8px;">
                         <span>Total à payer</span>
-                        <span id="summary-total">1000 F</span>
+                        <span id="summary-total">1500 F</span>
                     </div>
                 </div>
 
@@ -554,7 +554,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
     <div class="floating-cta" id="floating-cta">
         <a href="#purchase" class="btn btn-primary">
             <i class="fas fa-bolt"></i>
-            Obtenir l'accès — 1000 F
+            Obtenir l'accès — 1500 F
         </a>
     </div>
 
@@ -1136,12 +1136,12 @@ const LandingApp = {
             var reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
             LandingApp._feexReference = reference;
 
-            // Sauvegarder reference pour vérification après retour
+            // Sauvegarder pour recuperation apres retour
             localStorage.setItem('ako_feex_ref', reference);
             localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
 
-            // Appel API FeexPay pour obtenir le lien de paiement
-            var response = await fetch('https://feexpay.me/api/orders/v2/create', {
+            // Appel API FeexPay — URL officielle production
+            var response = await fetch('https://api.feexpay.me/api/orders/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1151,28 +1151,32 @@ const LandingApp = {
                     amount: totalWithFees,
                     currency: CONFIG.FEEXPAY_CURRENCY,
                     description: 'Acces AKOLABS - Application Premium',
-                    callback_info: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
+                    redirect_url: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
+                    callback_url: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
                     custom_id: reference,
                     store: CONFIG.FEEXPAY_STORE
                 })
             });
 
             var data = await response.json();
-            console.log('[FeexPay] Réponse API:', data);
+            console.log('[FeexPay] Reponse API:', JSON.stringify(data));
 
-            if (data && (data.payment_url || data.url || data.link || data.checkout_url)) {
-                var payUrl = data.payment_url || data.url || data.link || data.checkout_url;
-                // Ouvrir la page de paiement FeexPay dans un nouvel onglet
+            // Chercher le lien de paiement dans la reponse
+            var payUrl = data.payment_url || data.url || data.link || data.checkout_url ||
+                         (data.data && (data.data.payment_url || data.data.url || data.data.link));
+
+            if (payUrl) {
+                console.log('[FeexPay] Redirection vers:', payUrl);
                 window.location.href = payUrl;
             } else {
-                console.error('[FeexPay] Pas d'URL de paiement:', data);
-                Utils.showToast('Erreur: ' + (data.message || 'Impossible d'initialiser le paiement'), 'error');
+                console.error('[FeexPay] Pas d'URL de paiement. Reponse:', JSON.stringify(data));
+                Utils.showToast('Erreur paiement: ' + (data.message || data.error || 'Reessayez'), 'error');
                 if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
             }
 
         } catch (e) {
             console.error('[FeexPay] Erreur:', e);
-            Utils.showToast('Erreur avec le système de paiement. Vérifiez votre connexion.', 'error');
+            Utils.showToast('Erreur avec le systeme de paiement. Verifiez votre connexion.', 'error');
             if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
         }
     },
@@ -1341,7 +1345,7 @@ const LandingApp = {
         // --- INTEGRATION META PIXEL ---
         if (typeof fbq === 'function') {
             fbq('track', 'Purchase', {
-                value: purchaseData.amount || 1000,
+                value: purchaseData.amount || 1500,
                 currency: 'XOF',
                 content_type: 'product',
                 content_ids: ['akolabs_access'],
