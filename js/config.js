@@ -15,6 +15,7 @@ var CONFIG = {
     // Remplace tes clés ici après avoir reçu ce fichier :
     FEEXPAY_TOKEN: 'fp_Q0xDAmiPXr2By3u6ssdl7QEh57lbhDdpfahYKqzHjsl232IaxJJqECaaoGPjIs0w',   // Token API FeexPay (dashboard FeexPay)
     FEEXPAY_STORE: '69d491975c79429d57e5ffa2', // Ton Store ID FeexPay
+  
     FEEXPAY_CALLBACK_URL: 'https://akolabs.store/',  // URL de redirection après paiement
     FEEXPAY_CURRENCY: 'XOF',
     
