@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/landing.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- FeexPay SDK (étape 2 doc officielle) -->
+    <script src="https://api.feexpay.me/feexpay-javascript-sdk/index.js"></script>
     <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -39,6 +41,10 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
 
 </head>
 <body class="landing-body">
+
+    <!-- FeexPay : conteneur SDK (étape 3 doc officielle) + déclencheur caché -->
+    <div id="render" style="display:none;"></div>
+    <button id="feexpay-hidden-trigger" style="display:none;position:absolute;" aria-hidden="true"></button>
 
     <!-- ========== NAVBAR ========== -->
     <nav class="landing-nav">
@@ -589,6 +595,9 @@ const LandingApp = {
         this.setupSmoothScroll();
         this.trackVisit(); // Tracking visiteur
 
+        // Déclarer urlParams en premier (utilisé dans les deux blocs ci-dessous)
+        const urlParams = new URLSearchParams(window.location.search);
+
         // Vérifier si c'est un retour de paiement FeexPay
         const feexStatus = urlParams.get('feexpay');
         const feexRef = urlParams.get('ref');
@@ -608,10 +617,11 @@ const LandingApp = {
                     console.error('[FeexPay] Erreur récupération données:', e);
                 }
             }
+            // Si c'est un retour FeexPay, ne pas traiter ref comme code parrain
+            return;
         }
 
         // Vérifier si un code parrain est dans l'URL
-        const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         if (refCode) {
             const promoInput = document.getElementById('pf-promo');
@@ -1123,56 +1133,53 @@ const LandingApp = {
         this._tempPurchaseData = purchaseData;
     },
 
-    // ---- OUVRIR FEEXPAY via API REST ----
-    openFeexPay: async function(purchaseData) {
+    // ---- OUVRIR FEEXPAY via SDK officiel ----
+    openFeexPay: function(purchaseData) {
         var btn = document.getElementById('btn-purchase');
         this._tempPurchaseData = purchaseData;
 
         try {
-            console.log('[FeexPay] Initialisation du paiement via API...');
+            console.log('[FeexPay] Initialisation du paiement via SDK...');
 
-            var fees = Math.ceil(purchaseData.amount * 3 / 100);
-            var totalWithFees = purchaseData.amount + fees;
             var reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
             LandingApp._feexReference = reference;
 
-            // Sauvegarder pour recuperation apres retour
+            // Sauvegarder pour recuperation apres retour (en cas de redirection)
             localStorage.setItem('ako_feex_ref', reference);
             localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
 
-            // Appel API FeexPay — URL officielle production
-            var response = await fetch('https://api.feexpay.me/api/orders/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + CONFIG.FEEXPAY_TOKEN
+            // Initialisation SDK FeexPay (doc officielle step 4)
+            FeexPayButton.init("render", {
+                id: CONFIG.FEEXPAY_STORE,
+                amount: purchaseData.amount,
+                token: CONFIG.FEEXPAY_TOKEN,
+                callback: function(response) {
+                    console.log('[FeexPay] Reponse callback:', response);
+                    var transactionId = (response && (response.reference || response.transaction_id)) || reference;
+                    localStorage.removeItem('ako_feex_ref');
+                    localStorage.removeItem('ako_feex_data');
+                    LandingApp.completePurchase(purchaseData, transactionId);
                 },
-                body: JSON.stringify({
-                    amount: totalWithFees,
-                    currency: CONFIG.FEEXPAY_CURRENCY,
-                    description: 'Acces AKOLABS - Application Premium',
-                    redirect_url: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
-                    callback_url: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
-                    custom_id: reference,
-                    store: CONFIG.FEEXPAY_STORE
-                })
+                callback_url: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
+                error_callback_url: window.location.origin + '/app-store/?feexpay=error&ref=' + reference,
+                mode: "LIVE",
+                custom_button: true,
+                id_custom_button: "feexpay-hidden-trigger",
+                custom_id: reference,
+                description: 'Acces AKOLABS - Application Premium'
             });
 
-            var data = await response.json();
-            console.log('[FeexPay] Reponse API:', JSON.stringify(data));
-
-            // Chercher le lien de paiement dans la reponse
-            var payUrl = data.payment_url || data.url || data.link || data.checkout_url ||
-                         (data.data && (data.data.payment_url || data.data.url || data.data.link));
-
-            if (payUrl) {
-                console.log('[FeexPay] Redirection vers:', payUrl);
-                window.location.href = payUrl;
-            } else {
-                console.error('[FeexPay] Pas d'URL de paiement. Reponse:', JSON.stringify(data));
-                Utils.showToast('Erreur paiement: ' + (data.message || data.error || 'Reessayez'), 'error');
-                if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
-            }
+            // Déclencher l'ouverture du modal FeexPay après init
+            setTimeout(function() {
+                var trigger = document.getElementById('feexpay-hidden-trigger');
+                if (trigger) {
+                    trigger.click();
+                } else {
+                    console.error('[FeexPay] Bouton déclencheur introuvable');
+                    Utils.showToast('Erreur ouverture paiement. Reessayez.', 'error');
+                    if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
+                }
+            }, 150);
 
         } catch (e) {
             console.error('[FeexPay] Erreur:', e);
@@ -1386,7 +1393,8 @@ const LandingApp = {
             // Avertissement Spam
             + '  <div style="background:#F0EDF8; border:1px solid rgba(75,0,130,0.2); border-radius:12px; padding:16px; text-align:left; margin-bottom:12px;">'            + '    <p style="color:#4A4767; font-size:12px; margin:0; line-height:1.5;">'            + '      <i class="fas fa-info-circle" style="color:#4B0082;"></i> '            + '      Si vous ne trouvez pas notre email d\'ici quelques minutes, pensez a verifier vos <strong style="color:#4B0082;">spams</strong> ou courriers indesirables.'            + '    </p>'            + '  </div>'
             // Contact support
-            + '  <div style="background:#4B0082; border:1px solid #C9A84C; border-radius:12px; padding:14px; text-align:left;">'            + '    <p style="color:#FFFFFF; font-size:12px; margin:0; line-height:1.7;">'            + '      <i class="fas fa-headset" style="color:#C9A84C; margin-right:6px;"></i>'            + '      Achat effectue mais pas de mail recu ? Contactez-nous :<br>'            + '      <a href="mailto:akolabs.app@gmail.com" style="color:#C9A84C; font-weight:700; text-decoration:none;">akolabs.app@gmail.com</a>'            + '    </p>'            + '  </div>'
+            + '  <div style="background:#4B0082; border:1px solid #C9A84C; border-radius:12px; padding:14px; text-align:left;">'            + '    <p style="color:#FFFFFF; font-size:12px; margin:0; line-height:1.7;">'            + '      <i class="fas fa-headset" style="color:#C9A84C; margin-right:6px;"></i>'            + '      Achat effectue mais pas de mail recu ? Contactez-nous :<br>'            + '      <a href="mailto:akolabs.app@gmail.com" style="color:#C9A84C; font-weight:700; text-decoration:none;">akolabs.app@gmail.com</a>'            + '    </p>'            + '  </div>'  // fermeture div contact support
+            + '</div>';  // fermeture div wrapper principal (text-align:center)
 
         section.scrollIntoView({ behavior: 'smooth' });
     },
