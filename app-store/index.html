@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/landing.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <!-- FeexPay SDK (étape 2 doc officielle) -->
+    <!-- FeexPay SDK -->
     <script src="https://api.feexpay.me/feexpay-javascript-sdk/index.js"></script>
     <!-- Meta Pixel Code -->
 <script>
@@ -41,10 +41,6 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
 
 </head>
 <body class="landing-body">
-
-    <!-- FeexPay : conteneur SDK (étape 3 doc officielle) + déclencheur caché -->
-    <div id="render" style="display:none;"></div>
-    <button id="feexpay-hidden-trigger" style="visibility:hidden;position:fixed;width:0;height:0;overflow:hidden;" aria-hidden="true"></button>
 
     <!-- ========== NAVBAR ========== -->
     <nav class="landing-nav">
@@ -497,7 +493,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                 <div class="input-group">
                     <label class="input-label">Code promo / Code parrain (optionnel)</label>
                     <input type="text" class="input-field" id="pf-promo" 
-                           placeholder="Ex: WELCOME" style="text-transform:uppercase;">
+                           placeholder="Ex: WELCOMES" style="text-transform:uppercase;">
                 </div>
 
                 <!-- Résumé du prix -->
@@ -532,6 +528,14 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
                     <span class="btn-text">Payer</span>
                 </button>
             </form>
+
+            <!-- FeexPay : bouton de paiement rendu par le SDK -->
+            <div id="feexpay-instruction" style="display:none;margin-top:16px;padding:16px;background:#F7F3FF;border:1px solid rgba(75,0,130,0.15);border-radius:14px;text-align:center;">
+                <p style="font-size:14px;color:#4B0082;font-weight:600;margin-bottom:4px;">👇 Cliquez sur le bouton ci-dessous pour payer</p>
+                <p style="font-size:12px;color:#888;margin-bottom:12px;">Vous serez redirigé vers la page de paiement sécurisée FeexPay</p>
+                <div id="feexpay-render"></div>
+                <button onclick="LandingApp.cancelFeexPay()" style="margin-top:10px;background:none;border:1px solid #ddd;border-radius:20px;padding:6px 18px;font-size:12px;color:#999;cursor:pointer;">← Annuler et revenir</button>
+            </div>
 
             <!-- Garantie -->
             <div class="guarantee-box">
@@ -593,35 +597,46 @@ const LandingApp = {
         this.setupPromoCheck();
         this.setupFloatingCTA();
         this.setupSmoothScroll();
-        this.trackVisit(); // Tracking visiteur
+        this.trackVisit();
 
-        // Déclarer urlParams en premier (utilisé dans les deux blocs ci-dessous)
         const urlParams = new URLSearchParams(window.location.search);
-
-        // Vérifier si c'est un retour de paiement FeexPay
         const feexStatus = urlParams.get('feexpay');
-        const feexRef = urlParams.get('ref');
-        if (feexStatus === 'success' && feexRef) {
-            var savedData = localStorage.getItem('ako_feex_data');
-            var savedRef = localStorage.getItem('ako_feex_ref');
-            if (savedData && savedRef === feexRef) {
+
+        // --- Retour après paiement FeexPay ---
+        if (feexStatus === 'success') {
+            const ref = urlParams.get('ref');
+            const savedData = localStorage.getItem('ako_feex_data');
+            const savedRef = localStorage.getItem('ako_feex_ref');
+
+            // Nettoyer l'URL sans recharger la page
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            if (savedData && savedRef === ref) {
                 try {
-                    var pd = JSON.parse(savedData);
+                    const pd = JSON.parse(savedData);
                     localStorage.removeItem('ako_feex_ref');
                     localStorage.removeItem('ako_feex_data');
-                    // Finaliser l'achat
+                    // Scroll vers la section achat puis afficher le succès
+                    document.getElementById('purchase')?.scrollIntoView({ behavior: 'smooth' });
                     setTimeout(function() {
-                        LandingApp.completePurchase(pd, feexRef);
-                    }, 500);
+                        LandingApp.completePurchase(pd, ref);
+                    }, 700);
                 } catch(e) {
                     console.error('[FeexPay] Erreur récupération données:', e);
+                    Utils.showToast('Erreur lors de la finalisation. Contactez le support.', 'error');
                 }
+            } else {
+                Utils.showToast('Paiement reçu mais données introuvables. Contactez le support.', 'warning');
             }
-            // Si c'est un retour FeexPay, ne pas traiter ref comme code parrain
-            return;
+            return; // Ne pas traiter comme code parrain
         }
 
-        // Vérifier si un code parrain est dans l'URL
+        if (feexStatus === 'error') {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            Utils.showToast('Paiement annulé ou échoué. Vous pouvez réessayer.', 'error');
+        }
+
+        // --- Code parrain dans l'URL ---
         const refCode = urlParams.get('ref');
         if (refCode) {
             const promoInput = document.getElementById('pf-promo');
@@ -1133,58 +1148,67 @@ const LandingApp = {
         this._tempPurchaseData = purchaseData;
     },
 
-    // ---- OUVRIR FEEXPAY via SDK officiel ----
+    // ---- OUVRIR FEEXPAY — SDK + redirection après paiement ----
     openFeexPay: function(purchaseData) {
         var btn = document.getElementById('btn-purchase');
-        this._tempPurchaseData = purchaseData;
+
+        // Générer une référence unique pour cette transaction
+        var reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
+
+        // Sauvegarder dans localStorage pour récupération après retour
+        localStorage.setItem('ako_feex_ref', reference);
+        localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
 
         try {
-            console.log('[FeexPay] Initialisation du paiement via SDK...');
-
-            var reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
-            LandingApp._feexReference = reference;
-
-            // Sauvegarder pour recuperation apres retour (en cas de redirection)
-            localStorage.setItem('ako_feex_ref', reference);
-            localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
-
-            // Initialisation SDK FeexPay (doc officielle step 4)
-            FeexPayButton.init("render", {
+            // Initialiser le SDK FeexPay en mode redirect (callback_url sans callback JS)
+            FeexPayButton.init("feexpay-render", {
                 id: CONFIG.FEEXPAY_STORE,
                 amount: purchaseData.amount,
                 token: CONFIG.FEEXPAY_TOKEN,
-                callback: function(response) {
-                    console.log('[FeexPay] Reponse callback:', response);
-                    var transactionId = (response && (response.reference || response.transaction_id)) || reference;
-                    localStorage.removeItem('ako_feex_ref');
-                    localStorage.removeItem('ako_feex_data');
-                    LandingApp.completePurchase(purchaseData, transactionId);
-                },
-                callback_url: window.location.origin + '/app-store/?feexpay=success&ref=' + reference,
-                error_callback_url: window.location.origin + '/app-store/?feexpay=error&ref=' + reference,
+                callback_url: window.location.origin + window.location.pathname + '?feexpay=success&ref=' + reference,
+                error_callback_url: window.location.origin + window.location.pathname + '?feexpay=error',
                 mode: "LIVE",
-                custom_button: true,
-                id_custom_button: "feexpay-hidden-trigger",
                 custom_id: reference,
-                description: 'Acces AKOLABS - Application Premium'
+                description: 'Acces AKOLABS Application Premium'
             });
 
-            // Déclencher IMMÉDIATEMENT (sans setTimeout — le contexte user gesture doit être préservé)
-            var trigger = document.getElementById('feexpay-hidden-trigger');
-            if (trigger) {
-                trigger.click();
-            } else {
-                throw new Error('Bouton déclencheur FeexPay introuvable');
+            // Masquer le formulaire, afficher le bouton FeexPay
+            var form = document.getElementById('purchase-form');
+            if (form) form.style.display = 'none';
+            if (btn) { btn.classList.remove('btn-loading'); btn.style.display = 'none'; }
+
+            var instruction = document.getElementById('feexpay-instruction');
+            if (instruction) {
+                instruction.style.display = 'block';
+                setTimeout(function() {
+                    instruction.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 150);
             }
 
-        } catch (e) {
-            console.error('[FeexPay] Erreur:', e);
-            Utils.showToast('Erreur avec le systeme de paiement. Verifiez votre connexion.', 'error');
-            if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
+        } catch(e) {
+            console.error('[FeexPay] Erreur init SDK:', e);
+            localStorage.removeItem('ako_feex_ref');
+            localStorage.removeItem('ako_feex_data');
+            Utils.showToast('Erreur initialisation paiement. Réessayez.', 'error');
+            if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; btn.style.display = ''; }
         }
     },
 
-    // ---- FINALISER L'ACHAT ----
+    // ---- ANNULER ET REVENIR AU FORMULAIRE ----
+    cancelFeexPay: function() {
+        localStorage.removeItem('ako_feex_ref');
+        localStorage.removeItem('ako_feex_data');
+
+        var instruction = document.getElementById('feexpay-instruction');
+        if (instruction) instruction.style.display = 'none';
+
+        var form = document.getElementById('purchase-form');
+        if (form) form.style.display = '';
+
+        var btn = document.getElementById('btn-purchase');
+        if (btn) { btn.disabled = false; btn.style.display = ''; }
+    },
+
     // ---- FINALISER L'ACHAT ----
     async completePurchase(purchaseData, transactionId) {
         var btn = document.getElementById('btn-purchase');
