@@ -53,6 +53,9 @@ var HomePage = {
         // Main content
         html += '<div id="home-main-content">';
 
+        // Bannière abonnement (expiration / renouvellement)
+        html += '<div id="subscription-banner"></div>';
+
         // Bannière offre flash
         html += '<div id="flash-sale-banner"></div>';
 
@@ -104,6 +107,7 @@ var HomePage = {
         HomePage.renderAllSections();
         HomePage.updateProgress();
         HomePage.updateStats();
+        HomePage.renderSubscriptionBanner();
 
         try {
             await db.from('app_analytics').insert({
@@ -156,7 +160,32 @@ var HomePage = {
     },
 
     hasAccess: function(sectionId) {
-        return HomePage.userAccess.indexOf(sectionId) !== -1;
+        // Sections toujours accessibles depuis user_sections
+        var inUserAccess = HomePage.userAccess.indexOf(sectionId) !== -1;
+        if (!inUserAccess) return false;
+
+        // Vérifier si l'abonnement est expiré
+        var plan = App.profile ? (App.profile.subscription_plan || 'lifetime') : 'lifetime';
+        var isExpired = plan && plan.indexOf('expired_') === 0;
+
+        if (isExpired) {
+            // Plan expiré → accès Starter uniquement
+            // Chercher la section dans la liste pour savoir son titre
+            var allSecs = HomePage.sections.concat(HomePage.formations).concat(HomePage.apkSections);
+            var sec = null;
+            for (var i = 0; i < allSecs.length; i++) {
+                if (allSecs[i].id === sectionId) { sec = allSecs[i]; break; }
+            }
+            if (!sec) return true; // Section inconnue, laisser passer
+            // Sections exclues du Starter
+            var starterExcluded = ['akolabs app prime', 'akolabs ia 2', 'akolabs ebook', 'akolabs learning'];
+            var titleLower = (sec.title || '').toLowerCase();
+            for (var j = 0; j < starterExcluded.length; j++) {
+                if (titleLower.indexOf(starterExcluded[j]) !== -1) return false;
+            }
+        }
+
+        return true;
     },
 
     renderAllSections: function() {
@@ -203,7 +232,7 @@ var HomePage = {
         var tag = featured.promo_price ? '🔥 PROMO EN COURS' : '⭐ RECOMMANDE';
 
         var h = '';
-        h += '<div class="featured-banner" onclick="Router.navigate(\'/section/' + featured.id + '\')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;">';
+        h += '<div class="featured-banner" onclick="Router.navigate(\'/section/' + featured.id + '\')">';
         h += '<div class="featured-banner-icon"><i class="fas ' + icon + '"></i></div>';
         h += '<div class="featured-banner-content">';
         h += '<div class="featured-banner-tag">' + tag + '</div>';
@@ -459,7 +488,7 @@ var HomePage = {
         }
 
         var h = '';
-        h += '<div class="section-card" onclick="Router.navigate(\'' + route + '\')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;">';
+        h += '<div class="section-card" onclick="Router.navigate(\'' + route + '\')">';
         h += '<div style="position:relative;">';
         h += bannerHTML;
         h += '<div class="section-card-badges">' + badgesHTML + '</div>';
@@ -529,7 +558,7 @@ var HomePage = {
         var route = (hasAccess || isFree) ? '/formation/' + formation.id : '/section/' + formation.id;
 
         var h = '';
-        h += '<div class="formation-card" onclick="Router.navigate(\'' + route + '\')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;">';
+        h += '<div class="formation-card" onclick="Router.navigate(\'' + route + '\')">';
         h += thumbHTML;
         h += '<div class="formation-info">';
         h += '<div class="formation-badges">' + badgesHTML + '</div>';
@@ -658,5 +687,89 @@ var HomePage = {
         if (clearBtn) clearBtn.classList.remove('visible');
         if (resultsDiv) resultsDiv.style.display = 'none';
         if (mainDiv) mainDiv.style.display = 'block';
+    },
+
+    // ── BANNIÈRE ABONNEMENT ──
+    renderSubscriptionBanner: function() {
+        var container = document.getElementById('subscription-banner');
+        if (!container) return;
+
+        var profile = App.profile;
+        if (!profile) return;
+
+        var plan = profile.subscription_plan || 'lifetime';
+        var expiresAt = profile.subscription_expires_at ? new Date(profile.subscription_expires_at) : null;
+        var now = new Date();
+        var daysLeft = App.subscriptionDaysLeft;
+        var isExpired = plan && plan.indexOf('expired_') === 0;
+        var landingUrl = CONFIG.LANDING_URL || '/app-store/';
+
+        // Fonction de renouvellement globale (évite les conflits de quotes)
+        window._akoRenew = function(p) { window.open(landingUrl + '?plan=' + p, '_blank'); };
+
+        // ── Cas 1 : Abonnement expiré ──
+        if (isExpired) {
+            var expiredPlan = plan.replace('expired_', '');
+            var expLabel = expiredPlan.charAt(0).toUpperCase() + expiredPlan.slice(1);
+            var div = document.createElement('div');
+            div.style.cssText = 'background:linear-gradient(135deg,#D93B3B,#C0392B);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;';
+            div.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#fff;font-size:22px;flex-shrink:0;margin-top:2px;"></i>'
+                + '<div style="flex:1;">'
+                + '<div style="color:#fff;font-weight:700;font-size:14px;margin-bottom:4px;">Votre abonnement a expiré</div>'
+                + '<div style="color:rgba(255,255,255,0.85);font-size:12px;margin-bottom:12px;">Ton plan <strong>' + expLabel + '</strong> est terminé. Renouvelle pour récupérer ton accès complet.</div>'
+                + '</div>';
+            var btn = document.createElement('button');
+            btn.style.cssText = 'background:#fff;color:#D93B3B;border:none;border-radius:20px;padding:8px 16px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;';
+            btn.innerHTML = '<i class="fas fa-redo"></i> Renouveler maintenant';
+            btn.addEventListener('click', function() { window._akoRenew(expiredPlan); });
+            div.querySelector('div[style*="flex:1"]').appendChild(btn);
+            container.innerHTML = '';
+            container.appendChild(div);
+            return;
+        }
+
+        // ── Cas 2 : Bientôt expiré (≤ 7 jours) ──
+        if (daysLeft !== null && daysLeft <= 7 && daysLeft > 0) {
+            var color = daysLeft <= 2 ? '#E67E22' : '#F39C12';
+            var jLabel = daysLeft + ' jour' + (daysLeft > 1 ? 's' : '');
+            var div2 = document.createElement('div');
+            div2.style.cssText = 'background:linear-gradient(135deg,' + color + ',#D35400);border-radius:16px;padding:14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;';
+            div2.innerHTML = '<i class="fas fa-clock" style="color:#fff;font-size:20px;flex-shrink:0;margin-top:2px;"></i>'
+                + '<div style="flex:1;">'
+                + '<div style="color:#fff;font-weight:700;font-size:13px;margin-bottom:3px;">⚡ Abonnement bientôt expiré</div>'
+                + '<div style="color:rgba(255,255,255,0.9);font-size:12px;margin-bottom:10px;">Il te reste <strong>' + jLabel + '</strong>. Renouvelle avant expiration.</div>'
+                + '</div>';
+            var currentPlan = plan;
+            var btn2 = document.createElement('button');
+            btn2.style.cssText = 'background:#fff;color:' + color + ';border:none;border-radius:20px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;';
+            btn2.innerHTML = '<i class="fas fa-redo"></i> Renouveler (' + jLabel + ' restants)';
+            btn2.addEventListener('click', function() { window._akoRenew(currentPlan); });
+            div2.querySelector('div[style*="flex:1"]').appendChild(btn2);
+            container.innerHTML = '';
+            container.appendChild(div2);
+            return;
+        }
+
+        // ── Cas 3 : Plan Starter ──
+        if (plan === 'starter') {
+            var div3 = document.createElement('div');
+            div3.style.cssText = 'background:linear-gradient(135deg,#4B0082,#5D1494);border-radius:16px;padding:14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;';
+            div3.innerHTML = '<i class="fas fa-star" style="color:#D4AF37;font-size:20px;flex-shrink:0;margin-top:2px;"></i>'
+                + '<div style="flex:1;">'
+                + '<div style="color:#D4AF37;font-weight:700;font-size:13px;margin-bottom:3px;">Plan Starter actif</div>'
+                + '<div style="color:rgba(255,255,255,0.8);font-size:12px;margin-bottom:10px;">Passe au plan Pro pour debloquer <strong style="color:#D4AF37;">App Prime, IA 2, Ebook et Learning complet</strong>.</div>'
+                + '</div>';
+            var btn3 = document.createElement('button');
+            btn3.style.cssText = 'background:linear-gradient(135deg,#D4AF37,#C9A84C);color:#1A0A00;border:none;border-radius:20px;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;';
+            btn3.innerHTML = '<i class="fas fa-arrow-up"></i> Passer au Pro — 1 500 F';
+            btn3.addEventListener('click', function() { window._akoRenew('pro'); });
+            div3.querySelector('div[style*="flex:1"]').appendChild(btn3);
+            container.innerHTML = '';
+            container.appendChild(div3);
+            return;
+        }
+
+        // Lifetime ou Pro actif >7 jours : pas de bannière
+        container.innerHTML = '';
     }
 };
