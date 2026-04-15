@@ -155,22 +155,6 @@ var App = {
 
     init: async function() {
         console.log('[AKOLABS] v' + CONFIG.APP_VERSION + ' - Initialisation...');
-
-        // Fix iOS Safari : les divs onclick ne répondent pas au touch sans ce fix
-        // Injecter un style global pour tous les éléments cliquables
-        (function() {
-            var style = document.createElement('style');
-            style.textContent = [
-                '* { -webkit-tap-highlight-color: transparent; }',
-                '[onclick], .section-card, .formation-card, .featured-banner,',
-                '.apk-card, .nav-item, .btn, button, a {',
-                '  cursor: pointer;',
-                '  touch-action: manipulation;',
-                '}'
-            ].join('\n');
-            document.head.appendChild(style);
-        })();
-
         PWA.init();
 
         // Initialiser EmailJS
@@ -263,6 +247,33 @@ var App = {
                 App.showLoginPage('Votre acces n\'est pas encore active.');
                 return;
             }
+
+            // ── VÉRIFICATION ABONNEMENT ──
+            // Les anciens membres (lifetime) ont subscription_plan = 'lifetime' ou null
+            // Pro/Premium : vérifier expiration
+            var plan = profile.subscription_plan || 'lifetime';
+            var expiresAt = profile.subscription_expires_at ? new Date(profile.subscription_expires_at) : null;
+            var now = new Date();
+
+            if ((plan === 'pro' || plan === 'premium') && expiresAt && expiresAt < now) {
+                // Abonnement expiré → rétrograder en starter
+                console.log('[App] Abonnement', plan, 'expiré le', expiresAt);
+                try {
+                    await db.from('users')
+                        .update({ subscription_plan: 'expired_' + plan })
+                        .eq('id', profile.id);
+                    profile.subscription_plan = 'expired_' + plan;
+                    profile._subscription_expired = true;
+                    profile._expired_plan = plan;
+                } catch(e) { console.warn('[App] Update expiration:', e); }
+            }
+
+            // Calculer jours restants et exposer globalement
+            App.subscriptionDaysLeft = null;
+            if (expiresAt && expiresAt > now) {
+                App.subscriptionDaysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+            }
+            App.subscriptionPlan = plan;
 
             await App.handleDeviceBinding(profile);
 
