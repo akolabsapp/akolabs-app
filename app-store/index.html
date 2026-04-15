@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#4B0082">
-    <meta name="description" content="AKOLABS - Votre arsenal digital premium. Outils IA, formations, ressources exclusives. Accès à vie.">
-    
+    <meta name="description" content="AKOLABS - Apps premium, IA, formations. Accès complet dès 1000F.">
     <title>AKOLABS - Votre Arsenal Digital Premium</title>
-
     <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/components.css">
@@ -21,722 +18,2132 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <!-- FeexPay SDK -->
     <script src="https://api.feexpay.me/feexpay-javascript-sdk/index.js"></script>
-    <!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '978376714855213');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+    <!-- Meta Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','978376714855213');fbq('track','PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"/></noscript>
 
+<style>
+/* ===== VARIABLES LANDING ===== */
+:root {
+    --ako-violet: #4B0082;
+    --ako-violet-light: #6A1B9A;
+    --ako-gold: #C9A84C;
+    --ako-gold-light: #D4AF37;
+    --ako-bg: #F5F4F8;
+    --ako-bg-white: #FFFFFF;
+    --ako-card: #FFFFFF;
+    --ako-border: rgba(75,0,130,0.12);
+    --ako-border-light: #E2E0EC;
+    --ako-text: #1A0A2E;
+    --ako-text-sec: #4A4767;
+    --ako-muted: #8A87A0;
+    --ako-success: #2E9E5B;
+    --font-head: 'Cinzel', serif;
+    --font-body: 'Poppins', sans-serif;
+    --font-deco: 'Cinzel', serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { scroll-behavior: smooth; }
+
+body.landing-body {
+    background: var(--ako-bg);
+    color: var(--ako-text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ===== NAVBAR ===== */
+.lnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #4B0082, #3A006B);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 2px 20px rgba(75,0,130,0.25);
+}
+.lnav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-deco); font-size: 18px; color: var(--ako-gold);
+    font-weight: 700;
+}
+.lnav-logo img { height: 28px; width: auto; }
+.lnav-cta {
+    background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
+    color: #1A0A00; font-weight: 700; font-size: 13px;
+    padding: 9px 18px; border-radius: 50px; text-decoration: none;
+    font-family: var(--font-head);
+    box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+}
+
+/* ===== HERO ===== */
+.hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 100px 20px 60px;
+    text-align: center;
+    position: relative;
+    background: linear-gradient(180deg, #4B0082 0%, #5D1494 60%, #4B0082 100%);
+}
+.hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(201,168,76,0.08) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(106,27,154,0.15) 0%, transparent 40%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    color: #FFFFFF; font-size: 12px; font-weight: 600;
+    padding: 6px 14px; border-radius: 50px; margin-bottom: 24px;
+    font-family: var(--font-head);
+}
+.hero-logo {
+    width: 70px; height: 70px; object-fit: contain; margin-bottom: 20px;
+}
+.hero h1 {
+    font-family: var(--font-head); font-size: clamp(24px, 6vw, 46px);
+    font-weight: 700; line-height: 1.15; margin-bottom: 16px;
+    letter-spacing: -0.3px; color: #FFFFFF;
+}
+.hero h1 .accent { color: var(--ako-gold-light); }
+.hero-sub {
+    font-size: 15px; color: rgba(255,255,255,0.85);
+    max-width: 480px; margin: 0 auto 28px; line-height: 1.7;
+}
+.hero-proof {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-bottom: 32px; flex-wrap: wrap;
+}
+.proof-avatars {
+    display: flex;
+}
+.proof-avatars span {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--ako-violet), var(--ako-violet-light));
+    border: 2px solid var(--ako-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--ako-gold);
+    margin-left: -8px;
+}
+.proof-avatars span:first-child { margin-left: 0; }
+.hero-proof span { color: rgba(255,255,255,0.85); font-size: 13px; }
+.hero-proof strong { color: var(--ako-gold-light) !important; }
+.proof-dot { width: 8px; height: 8px; border-radius: 50%; background: #3DDB7D; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.2)} }
+.hero-cta-group { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
+.btn-hero-primary {
+    background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
+    color: #1A0A00; font-weight: 700; font-size: 15px;
+    padding: 16px 24px; border-radius: 50px; text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--font-head); border: none; cursor: pointer;
+    box-shadow: 0 6px 30px rgba(201,168,76,0.4);
+    transition: transform .2s, box-shadow .2s;
+}
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(201,168,76,0.5); }
+.btn-hero-secondary {
+    background: rgba(255,255,255,0.05); color: var(--ako-text);
+    border: 1px solid rgba(255,255,255,0.15); font-size: 14px;
+    padding: 13px 24px; border-radius: 50px; text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--font-head); transition: background .2s;
+}
+.btn-hero-secondary:hover { background: rgba(255,255,255,0.1); }
+
+.hero-stats {
+    display: flex; gap: 24px; justify-content: center;
+    margin-top: 40px; flex-wrap: wrap;
+}
+.hero-stat { text-align: center; }
+.hero-stat-val { font-family: var(--font-deco); font-size: 26px; color: var(--ako-gold-light); font-weight: 700; }
+.hero-stat-lbl { font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ===== SECTIONS COMMUNES ===== */
+.lsec {
+    padding: 60px 20px;
+    max-width: 680px; margin: 0 auto;
+    background: transparent;
+}
+.lsec:nth-child(even) { background: #FFFFFF; }
+.lsec-title {
+    font-family: var(--font-head); font-size: clamp(20px,5vw,30px);
+    font-weight: 700; text-align: center; margin-bottom: 10px;
+    color: var(--ako-text);
+}
+.lsec-title .accent { color: var(--ako-violet); }
+.lsec-sub {
+    text-align: center; color: var(--ako-text-sec);
+    font-size: 14px; margin-bottom: 36px; line-height: 1.7;
+}
+
+/* ===== DOULEUR / PROBLÈME ===== */
+.pain-section {
+    background: #FFFFFF;
+    border-top: 1px solid var(--ako-border-light);
+    border-bottom: 1px solid var(--ako-border-light);
+}
+.pain-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 28px;
+}
+.pain-item {
+    background: var(--ako-bg); border: 1px solid var(--ako-border-light);
+    border-radius: 14px; padding: 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+}
+.pain-icon { font-size: 20px; flex-shrink: 0; }
+.pain-text { font-size: 13px; color: var(--ako-text-sec); line-height: 1.5; }
+.pain-price-table {
+    background: #FFFFFF; border: 1px solid var(--ako-border-light);
+    border-radius: 16px; padding: 20px; margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(75,0,130,0.06);
+}
+.pain-price-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--ako-border-light);
+    font-size: 13px;
+}
+.pain-price-row:last-child { border-bottom: none; }
+.pain-price-name { color: var(--ako-text-sec); }
+.pain-price-val { color: #FF6B6B; font-weight: 600; }
+.pain-price-total {
+    display: flex; justify-content: space-between;
+    padding: 14px 20px;
+    background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.2);
+    border-radius: 10px; margin-top: 12px;
+    font-size: 15px; font-weight: 700;
+}
+.pain-price-total span:last-child { color: #FF6B6B; }
+.pain-vs {
+    text-align: center; font-size: 14px; color: var(--ako-text-sec); margin: 20px 0 8px;
+}
+.pain-ako-price {
+    text-align: center; font-family: var(--font-deco);
+    font-size: 32px; color: var(--ako-violet); font-weight: 700;
+}
+.pain-ako-label { text-align: center; font-size: 12px; color: var(--ako-muted); margin-top: 4px; }
+
+/* ===== FEATURES ===== */
+.features-grid {
+    display: grid; grid-template-columns: 1fr; gap: 14px;
+}
+.feature-card {
+    background: #FFFFFF; border: 1px solid var(--ako-border-light);
+    border-radius: 16px; padding: 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+    transition: border-color .2s, transform .2s;
+    box-shadow: 0 2px 12px rgba(75,0,130,0.06);
+}
+.feature-card:hover { border-color: var(--ako-violet); transform: translateY(-2px); }
+.feature-icon {
+    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+    background: rgba(75,0,130,0.08); border: 1px solid rgba(75,0,130,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--ako-violet);
+}
+.feature-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 5px; color: var(--ako-text); }
+.feature-desc { font-size: 12px; color: var(--ako-text-sec); line-height: 1.6; }
+
+/* ===== PLANS D'ABONNEMENT ===== */
+.plans-section { background: transparent; }
+.plans-intro {
+    background: rgba(75,0,130,0.04); border: 1px solid rgba(75,0,130,0.12);
+    border-radius: 16px; padding: 20px; margin-bottom: 28px;
+    text-align: center;
+}
+.plans-intro-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--ako-violet); }
+.plans-intro-text { font-size: 13px; color: var(--ako-text-sec); line-height: 1.6; }
+
+.plans-grid {
+    display: flex; flex-direction: column; gap: 16px;
+}
+.plan-card {
+    background: #FFFFFF; border: 1.5px solid var(--ako-border-light);
+    border-radius: 20px; padding: 24px; position: relative;
+    overflow: hidden; transition: border-color .2s, transform .2s;
+    box-shadow: 0 4px 20px rgba(75,0,130,0.08);
+}
+.plan-card:hover { transform: translateY(-3px); border-color: var(--ako-violet); }
+.plan-card.plan-featured {
+    border-color: var(--ako-violet);
+    background: linear-gradient(145deg, #4B0082, #5D1494);
+    box-shadow: 0 8px 40px rgba(75,0,130,0.25);
+}
+.plan-badge {
+    position: absolute; top: 16px; right: 16px;
+    background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
+    color: #1A0A00; font-size: 10px; font-weight: 800;
+    padding: 4px 10px; border-radius: 50px;
+    font-family: var(--font-head); text-transform: uppercase; letter-spacing: .5px;
+}
+.plan-card:not(.plan-featured) .plan-name {
+    font-family: var(--font-deco); font-size: 20px; color: var(--ako-violet);
+    font-weight: 700; margin-bottom: 4px;
+}
+.plan-card.plan-featured .plan-name {
+    font-family: var(--font-deco); font-size: 20px; color: var(--ako-gold-light);
+    font-weight: 700; margin-bottom: 4px;
+}
+.plan-name { font-family: var(--font-deco); font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.plan-card:not(.plan-featured) .plan-duration { font-size: 12px; color: var(--ako-muted); margin-bottom: 16px; }
+.plan-card.plan-featured .plan-duration { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px; }
+.plan-duration { font-size: 12px; margin-bottom: 16px; }
+.plan-price-wrap { margin-bottom: 18px; }
+.plan-price-old { font-size: 13px; color: #FF6B6B; text-decoration: line-through; margin-bottom: 2px; }
+.plan-card:not(.plan-featured) .plan-price {
+    font-family: var(--font-deco); font-size: 36px; color: var(--ako-violet); font-weight: 700; line-height: 1;
+}
+.plan-card.plan-featured .plan-price {
+    font-family: var(--font-deco); font-size: 36px; color: #FFFFFF; font-weight: 700; line-height: 1;
+}
+.plan-price { font-family: var(--font-deco); font-size: 36px; font-weight: 700; line-height: 1; }
+.plan-card:not(.plan-featured) .plan-price span { font-size: 14px; color: var(--ako-muted); font-family: var(--font-body); }
+.plan-card.plan-featured .plan-price span { font-size: 14px; color: rgba(255,255,255,0.6); font-family: var(--font-body); }
+.plan-price span { font-size: 14px; font-family: var(--font-body); }
+.plan-features { list-style: none; margin-bottom: 20px; }
+.plan-features li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; padding: 5px 0; line-height: 1.4;
+}
+.plan-card:not(.plan-featured) .plan-features li { color: var(--ako-text-sec); }
+.plan-card.plan-featured .plan-features li { color: rgba(255,255,255,0.85); }
+.plan-features li .pf-check { color: #2E9E5B; flex-shrink: 0; margin-top: 2px; }
+.plan-features li .pf-x { color: #CC4444; flex-shrink: 0; margin-top: 2px; }
+.plan-features li.excluded { opacity: .5; text-decoration: line-through; }
+
+.btn-plan {
+    width: 100%; padding: 14px; border-radius: 50px;
+    font-family: var(--font-head); font-size: 14px; font-weight: 700;
+    cursor: pointer; border: none; transition: transform .2s, box-shadow .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-plan-primary {
+    background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
+    color: #1A0A00;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+}
+.btn-plan-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.5); }
+.btn-plan-secondary {
+    background: rgba(75,0,130,0.05); color: var(--ako-violet);
+    border: 2px solid var(--ako-violet);
+    box-shadow: 0 2px 10px rgba(75,0,130,0.12);
+}
+.btn-plan-secondary:hover { background: rgba(75,0,130,0.1); box-shadow: 0 4px 18px rgba(75,0,130,0.2); transform: translateY(-2px); }
+
+/* ===== CONTENU APP ===== */
+.sections-carousel {
+    display: flex; gap: 12px;
+    overflow-x: auto; padding: 4px 16px 16px;
+    margin: 0 -16px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.sections-carousel::-webkit-scrollbar { display: none; }
+.preview-card {
+    width: 82vw; max-width: 300px; background: #FFFFFF;
+    border: 1px solid var(--ako-border-light); border-radius: 16px;
+    overflow: hidden; cursor: pointer; flex-shrink: 0;
+    scroll-snap-align: start;
+    transition: transform .2s, border-color .2s;
+    box-shadow: 0 4px 16px rgba(75,0,130,0.08);
+}
+.preview-card:hover { transform: translateY(-4px); border-color: var(--ako-violet); }
+.preview-card-img {
+    width: 100%; aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #4B0082, #5D1494);
+    position: relative;
+}
+.preview-card-body { padding: 12px; }
+.preview-card-type { font-size: 10px; color: var(--ako-gold); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.preview-card-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.preview-card-desc { font-size: 11px; color: var(--ako-muted); line-height: 1.5; margin-bottom: 10px; }
+.preview-card-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; font-family: var(--font-head);
+    color: var(--ako-violet); background: rgba(75,0,130,0.07);
+    border: 1.5px solid rgba(75,0,130,0.25); border-radius: 50px;
+    padding: 6px 12px; cursor: pointer; transition: background .2s, border-color .2s;
+    pointer-events: none;
+}
+.preview-card:hover .preview-card-btn { background: rgba(75,0,130,0.13); border-color: var(--ako-violet); }
+.scroll-hint { display: flex; justify-content: center; gap: 6px; margin-bottom: 12px; }
+.scroll-hint-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: background .3s; }
+.scroll-hint-dot.active { background: var(--ako-gold); }
+
+/* ===== SECTION MODAL ===== */
+.section-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    overflow-y: auto; padding: 20px;
+}
+.section-modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+.section-modal-box {
+    background: var(--ako-card); border: 1px solid var(--ako-border);
+    border-radius: 20px; max-width: 500px; width: 100%;
+    margin: auto; position: relative;
+    max-height: 88vh; display: flex; flex-direction: column;
+    overflow: hidden;
+}
+#section-modal-content {
+    display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;
+}
+.section-modal-close {
+    position: absolute; top: 14px; right: 14px; z-index: 10;
+    background: rgba(0,0,0,0.35); border: none; border-radius: 50%;
+    width: 32px; height: 32px; color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.modal-banner { width: 100%; height: 180px; background-size: cover; background-position: center; flex-shrink: 0; }
+.modal-body { padding: 20px; overflow-y: auto; flex: 1; min-height: 0; -webkit-overflow-scrolling: touch; }
+.modal-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin: 8px 0; }
+.modal-desc { font-size: 13px; color: var(--ako-muted); line-height: 1.7; margin-bottom: 16px; }
+.modal-adv-title { font-size: 13px; font-weight: 600; color: var(--ako-gold); margin-bottom: 10px; }
+.modal-adv-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; margin-bottom: 6px; }
+.modal-adv-item i { color: #3DDB7D; flex-shrink: 0; margin-top: 2px; }
+.modal-cta {
+    margin-top: 20px; width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
+    color: #1A0A00; font-weight: 700; font-family: var(--font-head);
+    border: none; border-radius: 50px; cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+/* ===== TÉMOIGNAGES - CAROUSEL IMAGES ===== */
+.testimonials-wrap { position: relative; }
+.testi-carousel {
+    display: flex; gap: 12px;
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none; padding-bottom: 4px;
+}
+.testi-carousel::-webkit-scrollbar { display: none; }
+.testi-slide {
+    min-width: 160px; max-width: 160px; flex-shrink: 0;
+    scroll-snap-align: start;
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--ako-border-light);
+    background: #FFFFFF;
+    box-shadow: 0 4px 16px rgba(75,0,130,0.1);
+}
+.testi-slide img {
+    width: 100%; aspect-ratio: 1/1; object-fit: cover;
+    display: block;
+}
+.testi-slide.testi-placeholder {
+    background: linear-gradient(145deg, #4B0082, #5D1494);
+    min-height: 320px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 24px;
+}
+.testi-stars { color: var(--ako-gold); font-size: 14px; margin-bottom: 12px; }
+.testi-text { font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.7; margin-bottom: 16px; text-align: center; font-style: italic; }
+.testi-name { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--ako-gold); }
+.testi-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+.testi-nav {
+    display: flex; justify-content: center; gap: 8px; margin-top: 14px;
+}
+.testi-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.2); cursor: pointer; transition: background .3s; }
+.testi-dot.active { background: var(--ako-gold); }
+
+/* ===== MOYENS DE PAIEMENT ===== */
+.payment-section { text-align: center; }
+.payment-logos-wrap { position: relative; overflow: hidden; margin-bottom: 20px; }
+.payment-logos-track {
+    display: flex; gap: 16px; align-items: center;
+    animation: scrollLogos 20s linear infinite;
+    width: max-content;
+}
+.payment-logos-track:hover { animation-play-state: paused; }
+@keyframes scrollLogos {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.payment-logo-item {
+    width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+    background: #FFFFFF; border: 1.5px solid var(--ako-border-light);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; box-shadow: 0 2px 8px rgba(75,0,130,0.1);
+}
+.payment-logo-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.payment-logo-item .pm-placeholder {
+    font-size: 10px; color: var(--ako-gold); font-weight: 600;
+    text-align: center; line-height: 1.2; padding: 4px;
+}
+.payment-wa-box {
+    background: rgba(46,158,91,0.06); border: 1px solid rgba(46,158,91,0.2);
+    border-radius: 16px; padding: 16px 20px; margin-top: 16px;
+    display: flex; flex-direction: column; gap: 10px; align-items: center;
+    text-align: center;
+}
+.payment-wa-text { font-size: 13px; color: var(--ako-text-sec); line-height: 1.6; }
+.btn-wa {
+    background: #25D366; color: #fff;
+    padding: 11px 22px; border-radius: 50px; border: none; cursor: pointer;
+    font-family: var(--font-head); font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    transition: transform .2s, box-shadow .2s;
+}
+.btn-wa:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37,211,102,0.35); }
+
+/* ===== FAQ ===== */
+.faq-item { border-bottom: 1px solid var(--ako-border-light); }
+.faq-question {
+    width: 100%; background: none; border: none; color: var(--ako-text);
+    padding: 16px 0; text-align: left; cursor: pointer;
+    font-family: var(--font-head); font-size: 13px; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.faq-question i { color: var(--ako-violet); flex-shrink: 0; transition: transform .3s; }
+.faq-item.active .faq-question i { transform: rotate(180deg); }
+.faq-answer { display: none; padding: 0 0 16px; }
+.faq-item.active .faq-answer { display: block; }
+.faq-answer p { font-size: 13px; color: var(--ako-text-sec); line-height: 1.7; }
+
+/* ===== MODAL PAIEMENT ===== */
+.payment-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+    overflow-y: auto; padding: 20px;
+}
+.payment-modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+.payment-modal-box {
+    background: #FFFFFF; border: 1px solid var(--ako-border-light);
+    border-radius: 24px; max-width: 460px; width: 100%; margin: auto;
+    overflow: hidden; box-shadow: 0 20px 60px rgba(75,0,130,0.2);
+}
+.pmodal-header {
+    background: linear-gradient(135deg, var(--ako-violet), var(--ako-violet-light));
+    padding: 20px; position: relative;
+}
+.pmodal-close {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
+    width: 30px; height: 30px; color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.pmodal-plan-name { font-family: var(--font-deco); font-size: 22px; color: var(--ako-gold); font-weight: 700; }
+.pmodal-plan-desc { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+.pmodal-price { font-family: var(--font-deco); font-size: 30px; color: #fff; font-weight: 700; margin-top: 8px; }
+.pmodal-body { padding: 20px; background: #FFFFFF; }
+.pmodal-includes {
+    background: rgba(75,0,130,0.04); border: 1px solid rgba(75,0,130,0.1);
+    border-radius: 12px; padding: 14px; margin-bottom: 20px;
+}
+.pmodal-includes-title { font-size: 12px; font-weight: 700; color: var(--ako-violet); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+.pmodal-includes-item { font-size: 12px; color: var(--ako-text-sec); padding: 3px 0; display: flex; gap: 8px; align-items: flex-start; }
+.pmodal-includes-item i { color: var(--ako-success); flex-shrink: 0; margin-top: 2px; }
+
+.pmodal-form-divider {
+    text-align: center; font-size: 11px; color: var(--ako-muted);
+    text-transform: uppercase; letter-spacing: 1px; margin: 16px 0;
+    position: relative;
+}
+.pmodal-form-divider::before, .pmodal-form-divider::after {
+    content: ''; position: absolute; top: 50%; width: 35%; height: 1px;
+    background: var(--ako-border);
+}
+.pmodal-form-divider::before { left: 0; }
+.pmodal-form-divider::after { right: 0; }
+
+.pmodal-input-group { margin-bottom: 14px; }
+.pmodal-input-label { font-size: 11px; color: var(--ako-text-sec); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: .3px; font-weight: 500; }
+.pmodal-input {
+    width: 100%; background: #FFFFFF;
+    border: 2px solid #C8C4DC; border-radius: 10px;
+    padding: 12px 14px; color: var(--ako-text); font-size: 14px;
+    font-family: var(--font-body); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    box-shadow: 0 1px 4px rgba(75,0,130,0.06);
+}
+.pmodal-input:focus { border-color: var(--ako-violet); box-shadow: 0 0 0 3px rgba(75,0,130,0.1); }
+.pmodal-input::placeholder { color: #8A87A0; font-size: 13px; }
+
+.pmodal-promo-row { display: flex; gap: 8px; }
+.pmodal-promo-row .pmodal-input { flex: 1; text-transform: uppercase; }
+.btn-promo-check {
+    background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3);
+    color: var(--ako-gold); padding: 0 14px; border-radius: 10px;
+    font-size: 12px; cursor: pointer; font-weight: 600; white-space: nowrap;
+}
+
+#pmodal-price-summary {
+    display: none; background: rgba(61,219,125,0.07); border: 1px solid rgba(61,219,125,0.15);
+    border-radius: 10px; padding: 12px; margin-bottom: 14px;
+}
+.psum-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--ako-muted); padding: 2px 0; }
+.psum-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: var(--ako-gold); border-top: 1px solid var(--ako-border); padding-top: 8px; margin-top: 8px; }
+
+.pmodal-terms {
+    display: flex; gap: 8px; align-items: flex-start; margin: 14px 0;
+}
+.pmodal-terms input { margin-top: 3px; accent-color: var(--ako-violet); }
+.pmodal-terms span { font-size: 11px; color: var(--ako-text-sec); line-height: 1.6; }
+.pmodal-terms a { color: var(--ako-violet); }
+
+.btn-pmodal-pay {
+    width: 100%; padding: 15px; border-radius: 50px;
+    background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
+    color: #1A0A00; font-weight: 700; font-size: 15px;
+    font-family: var(--font-head); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 6px 25px rgba(201,168,76,0.35);
+    transition: transform .2s, box-shadow .2s;
+}
+.btn-pmodal-pay:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(201,168,76,0.5); }
+.btn-pmodal-pay:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* FeexPay dans modal */
+#feexpay-instruction {
+    display: none; margin-top: 16px; padding: 16px;
+    background: rgba(75,0,130,0.2); border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 14px; text-align: center;
+}
+#feexpay-instruction p { font-size: 13px; color: var(--ako-text); margin-bottom: 8px; }
+#feexpay-render { margin: 10px 0; }
+
+.pmodal-secure {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(46,158,91,0.06); border: 1px solid rgba(46,158,91,0.2);
+    border-radius: 12px; padding: 12px; margin-top: 14px;
+}
+.pmodal-secure i { color: var(--ako-success); font-size: 18px; flex-shrink: 0; }
+.pmodal-secure span { font-size: 11px; color: var(--ako-text-sec); line-height: 1.5; }
+.pmodal-secure strong { color: var(--ako-text); }
+
+/* ===== MODAL WHATSAPP FLOTTANT ===== */
+.wa-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+    padding: 20px; overflow-y: auto;
+}
+.wa-modal-overlay.open { display: flex; align-items: flex-end; justify-content: center; }
+.wa-modal-box {
+    background: #FFFFFF; border: 1px solid var(--ako-border-light);
+    border-radius: 24px 24px 0 0; max-width: 480px; width: 100%;
+    padding: 24px;
+}
+.wa-modal-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--ako-text); }
+.wa-modal-sub { font-size: 13px; color: var(--ako-text-sec); margin-bottom: 20px; }
+.wa-input-group { margin-bottom: 14px; }
+.wa-label { font-size: 11px; color: var(--ako-muted); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: .3px; }
+.wa-input {
+    width: 100%; background: #FFFFFF;
+    border: 2px solid #C8C4DC; border-radius: 10px;
+    padding: 11px 14px; color: var(--ako-text); font-size: 14px;
+    font-family: var(--font-body); outline: none;
+}
+.wa-input:focus { border-color: #25D366; }
+.wa-select {
+    width: 100%; background: #FFFFFF;
+    border: 2px solid #C8C4DC; border-radius: 10px;
+    padding: 11px 14px; color: var(--ako-text); font-size: 13px;
+    font-family: var(--font-body); outline: none;
+}
+.wa-textarea {
+    width: 100%; background: #FFFFFF;
+    border: 2px solid #C8C4DC; border-radius: 10px;
+    padding: 11px 14px; color: var(--ako-text); font-size: 13px;
+    font-family: var(--font-body); outline: none; resize: vertical; min-height: 80px;
+}
+.btn-wa-send {
+    width: 100%; padding: 14px; background: #25D366;
+    color: #fff; border: none; border-radius: 50px; cursor: pointer;
+    font-family: var(--font-head); font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 4px;
+}
+.btn-wa-cancel {
+    width: 100%; padding: 12px; background: transparent;
+    color: var(--ako-muted); border: 1px solid var(--ako-border);
+    border-radius: 50px; cursor: pointer; font-size: 13px;
+    margin-top: 8px;
+}
+
+/* ===== UPSELL MODAL ===== */
+.upsell-overlay {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+    padding: 20px;
+}
+.upsell-overlay.open { display: flex; align-items: center; justify-content: center; }
+.upsell-box {
+    background: var(--ako-card); border: 1.5px solid var(--ako-gold);
+    border-radius: 24px; max-width: 400px; width: 100%; padding: 28px;
+    text-align: center; position: relative;
+    box-shadow: 0 0 60px rgba(201,168,76,0.25);
+    animation: upsellIn .3s ease;
+}
+@keyframes upsellIn { from{transform:scale(.9);opacity:0} to{transform:scale(1);opacity:1} }
+.upsell-icon { font-size: 48px; margin-bottom: 12px; }
+.upsell-title { font-family: var(--font-head); font-size: 20px; font-weight: 800; margin-bottom: 8px; color: var(--ako-gold); }
+.upsell-text { font-size: 13px; color: var(--ako-muted); line-height: 1.7; margin-bottom: 20px; }
+.upsell-actions { display: flex; flex-direction: column; gap: 10px; }
+.btn-upsell {
+    padding: 13px; border-radius: 50px; font-family: var(--font-head);
+    font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+}
+.btn-upsell-primary { background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light)); color: #1A0A00; }
+.btn-upsell-secondary { background: transparent; color: var(--ako-muted); border: 1px solid var(--ako-border); }
+
+/* ===== FLASH BANNER ===== */
+#landing-flash-banner { display: none; }
+.landing-flash-bar {
+    background: linear-gradient(135deg, #1A0A00, rgba(75,0,130,0.9));
+    border: 1px solid var(--ako-gold); border-radius: 16px;
+    padding: 16px 20px; margin: 0 20px 20px; text-align: center;
+    position: relative; z-index: 10;
+}
+.landing-flash-top { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px; }
+.landing-flash-title { font-family: var(--font-head); font-size: 15px; font-weight: 800; color: var(--ako-gold); }
+.landing-flash-desc { font-size: 12px; color: var(--ako-muted); margin-bottom: 10px; }
+.landing-flash-countdown { display: flex; justify-content: center; gap: 8px; margin: 8px 0; }
+.lf-cd-block { text-align: center; }
+.lf-cd-block span { font-family: var(--font-deco); font-size: 22px; color: var(--ako-gold); font-weight: 700; }
+.lf-cd-block small { display: block; font-size: 10px; color: var(--ako-muted); text-transform: uppercase; }
+.lf-cd-sep { font-size: 20px; color: var(--ako-gold); line-height: 1.2; padding-top: 4px; }
+.landing-flash-cta {
+    display: inline-block; margin-top: 10px;
+    background: var(--ako-gold); color: #1A0A00; padding: 8px 20px;
+    border-radius: 50px; font-size: 13px; font-weight: 700;
+    text-decoration: none; font-family: var(--font-head);
+}
+
+/* ===== SCREENSHOTS ===== */
+.screenshots-scroll {
+    display: flex; gap: 12px; overflow-x: auto;
+    scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 4px;
+}
+.screenshots-scroll::-webkit-scrollbar { display: none; }
+.screenshot-item {
+    min-width: 140px; border-radius: 16px; overflow: hidden;
+    border: 2px solid rgba(75,0,130,0.15); scroll-snap-align: start;
+    background: #1A0030; flex-shrink: 0;
+    display: flex; flex-direction: column;
+    box-shadow: 0 8px 24px rgba(75,0,130,0.12);
+}
+.screenshot-item img { width: 100%; height: auto; object-fit: contain; display: block; opacity: 0; transition: opacity .4s; background: #0D001A; }
+.screenshot-item img.loaded { opacity: 1; }
+.screenshot-label { font-size: 11px; text-align: center; padding: 6px; color: var(--ako-muted); }
+.screenshot-skeleton { min-width: 160px; height: 280px; border-radius: 16px; background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 400% 100%; animation: shimmer 1.5s infinite; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ===== FOOTER ===== */
+.lfooter {
+    text-align: center; padding: 32px 20px;
+    border-top: 1px solid var(--ako-border-light);
+    font-size: 12px; color: var(--ako-muted);
+    background: #FFFFFF;
+}
+.lfooter a { color: var(--ako-violet); text-decoration: none; }
+
+/* ===== FLOATING CTA ===== */
+.floating-cta {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 90; opacity: 0; pointer-events: none; transition: opacity .3s;
+    white-space: nowrap;
+}
+.floating-cta.visible { opacity: 1; pointer-events: all; }
+.floating-cta a {
+    background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
+    color: #1A0A00; font-weight: 700; font-size: 13px;
+    padding: 13px 24px; border-radius: 50px; text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-head);
+    box-shadow: 0 6px 30px rgba(201,168,76,0.45);
+}
+
+/* ===== BOUTON WHATSAPP FLOTTANT ===== */
+.wa-float-btn {
+    position: fixed; bottom: 80px; right: 20px; z-index: 89;
+    width: 52px; height: 52px; border-radius: 50%; border: none;
+    background: #25D366; color: #fff; cursor: pointer; font-size: 22px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+    animation: waFloat 3s ease-in-out infinite;
+}
+@keyframes waFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+/* ===== TRUST SECTION ===== */
+.trust-section {
+    background: linear-gradient(180deg, #FFFFFF, #F5F4F8, #FFFFFF);
+}
+.trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.trust-item {
+    background: #FFFFFF; border: 1px solid var(--ako-border-light);
+    border-radius: 14px; padding: 16px; text-align: center;
+    box-shadow: 0 2px 8px rgba(75,0,130,0.06);
+}
+.trust-item-icon { font-size: 24px; margin-bottom: 8px; }
+.trust-item-val { font-family: var(--font-head); font-size: 20px; font-weight: 800; color: var(--ako-violet); }
+.trust-item-lbl { font-size: 11px; color: var(--ako-muted); margin-top: 2px; }
+
+/* ===== TOAST ===== */
+.ako-toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: #1A0A2E; border: 1px solid var(--ako-border-light);
+    padding: 12px 20px; border-radius: 50px; font-size: 13px;
+    z-index: 9999; opacity: 0; transition: opacity .3s; pointer-events: none;
+    white-space: nowrap; max-width: 90vw; text-align: center; color: #fff;
+}
+.ako-toast.show { opacity: 1; }
+.ako-toast.success { border-color: #3DDB7D; color: #3DDB7D; }
+.ako-toast.error { border-color: #FF6B6B; color: #FF6B6B; }
+.ako-toast.warning { border-color: var(--ako-gold); color: var(--ako-gold); }
+.ako-toast.info { border-color: #6BB5FF; color: #6BB5FF; }
+
+/* Spinner */
+.ak-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: currentColor; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
 </head>
 <body class="landing-body">
 
-    <!-- ========== NAVBAR ========== -->
-    <nav class="landing-nav">
-        <div class="landing-nav-logo">
-            <img src="../assets/images/logo.png" alt="AKOLABS" 
-                 onerror="this.style.display='none'">
-            <span>AKOLABS</span>
+<!-- NAVBAR -->
+<nav class="lnav">
+    <div class="lnav-logo">
+        <img src="../assets/images/logo.png" alt="AKOLABS" onerror="this.style.display='none'">
+        AKOLABS
+    </div>
+    <button onclick="LandingApp.openPlanModal('pro')" class="lnav-cta">
+        <i class="fas fa-bolt"></i> Obtenir l'accès
+    </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <span class="hero-badge">
+        <i class="fas fa-fire"></i> 1387+ membres actifs — Offre limitée
+    </span>
+    <img src="../assets/images/logo.png" alt="AKOLABS" class="hero-logo"
+         onerror="this.outerHTML='<div style=\'font-family:Cinzel;font-size:48px;color:#C9A84C;font-weight:700;margin-bottom:20px;\'>A</div>'">
+    <h1>Tout ce dont tu as besoin<br>pour <span class="accent">dominer le digital</span></h1>
+    <p class="hero-sub">
+        Apps premium débloquées, outils IA de pointe, formations complètes — 
+        tout en une seule application. Dès <strong style="color:#C9A84C">1 000 F</strong>.
+    </p>
+    <div class="hero-proof">
+        <div class="proof-avatars">
+            <span>A</span><span>K</span><span>O</span><span>+</span>
         </div>
-        <a href="#purchase" class="landing-nav-cta">
-            <i class="fas fa-bolt"></i> Obtenir l'accès
+        <span class="proof-dot"></span>
+        <span style="font-size:13px;color:#9B97B5;"><strong style="color:#C9A84C">1387+</strong> utilisateurs actifs</span>
+    </div>
+    <div class="hero-cta-group">
+        <button onclick="LandingApp.scrollToPlans()" class="btn-hero-primary">
+            <i class="fas fa-rocket"></i> Choisir mon plan maintenant
+        </button>
+        <a href="#features" class="btn-hero-secondary">
+            <i class="fas fa-info-circle"></i> Voir ce que contient l'app
         </a>
-    </nav>
-
-    <!-- ========== HERO ========== -->
-    <section class="hero-section">
-        <span class="hero-badge">
-            <i class="fas fa-sparkles"></i>
-            ✨ Lancement 2026 — Offre limitée
-        </span>
-
-        <img src="../assets/images/logo.png" alt="AKOLABS" class="hero-logo"
-             onerror="this.outerHTML='<div style=\'font-family:Cinzel;font-size:48px;color:#D4AF37;font-weight:700;margin-bottom:24px;\'>AKOLABS</div>'">
-
-        <h1 class="hero-title">
-            Votre Arsenal
-            <span class="accent">Digital Premium</span>
-        </h1>
-
-        <p class="hero-subtitle">
-            Accédez à des outils IA puissants, des formations exclusives et des ressources 
-            premium — le tout dans une seule application sécurisée.
-        </p>
-
-        <!-- Social proof -->
-        <div class="social-proof">
-            <div class="social-proof-avatars">
-                <span>A</span>
-                <span>K</span>
-                <span>O</span>
-                <span>+</span>
-            </div>
-            <span class="dot-live"></span>
-            <span><strong style="color:var(--color-secondary)">1387+</strong> utilisateurs actifs</span>
+    </div>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-val">21+</div>
+            <div class="hero-stat-lbl">Outils Premium</div>
         </div>
-
-        <!-- Prix -->
-        <div class="hero-price-tag">
-            <span class="hero-price-old">15 000 F</span>
-            <div>
-                <div class="hero-price-current">1500 F</div>
-                <div class="hero-price-label">accès à vie</div>
-            </div>
+        <div class="hero-stat">
+            <div class="hero-stat-val">50+</div>
+            <div class="hero-stat-lbl">Formations</div>
         </div>
-
-        <!-- CTA -->
-        <div class="hero-cta-group">
-            <a href="#purchase" class="btn btn-primary btn-lg btn-block">
-                <i class="fas fa-rocket"></i>
-                <span>Obtenir mon accès maintenant</span>
-            </a>
-            <a href="#features" class="btn btn-secondary btn-block">
-                <i class="fas fa-info-circle"></i>
-                <span>En savoir plus</span>
-            </a>
+        <div class="hero-stat">
+            <div class="hero-stat-val">3</div>
+            <div class="hero-stat-lbl">Plans disponibles</div>
         </div>
+    </div>
+</section>
 
-        <!-- Stats -->
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <div class="hero-stat-value">21+</div>
-                <div class="hero-stat-label">Outils Premium</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">15+</div>
-                <div class="hero-stat-label">Formations</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">∞</div>
-                <div class="hero-stat-label">Accès à vie</div>
-            </div>
+<!-- FLASH BANNER -->
+<div id="landing-flash-banner">
+    <div class="landing-flash-bar">
+        <div class="landing-flash-top">
+            <span class="landing-flash-fire">🔥</span>
+            <span class="landing-flash-title" id="lf-title">OFFRE LIMITÉE</span>
+            <span class="landing-flash-fire">🔥</span>
         </div>
-    </section>
+        <div class="landing-flash-desc" id="lf-desc"></div>
+        <div style="font-size:11px;color:#9B97B5;">L'offre se termine dans</div>
+        <div class="landing-flash-countdown">
+            <div class="lf-cd-block"><span id="lf-d">00</span><small>Jours</small></div>
+            <div class="lf-cd-sep">:</div>
+            <div class="lf-cd-block"><span id="lf-h">00</span><small>H</small></div>
+            <div class="lf-cd-sep">:</div>
+            <div class="lf-cd-block"><span id="lf-m">00</span><small>Min</small></div>
+            <div class="lf-cd-sep">:</div>
+            <div class="lf-cd-block"><span id="lf-s">00</span><small>Sec</small></div>
+        </div>
+        <a href="#plans" class="landing-flash-cta">Profiter maintenant →</a>
+    </div>
+</div>
 
-    <!-- ========== OFFRE FLASH LANDING ========== -->
-    <div id="landing-flash-banner" style="display:none;">
-        <div class="landing-flash-bar">
-            <div class="landing-flash-top">
-                <span class="landing-flash-fire">🔥</span>
-                <span class="landing-flash-title" id="lf-title">OFFRE LIMITÉE</span>
-                <span class="landing-flash-fire">🔥</span>
-            </div>
-            <div class="landing-flash-desc" id="lf-desc">Prix promotionnel disponible pour une durée limitée</div>
-            <div class="landing-flash-timer-label">L'offre se termine dans</div>
-            <div class="landing-flash-countdown">
-                <div class="lf-cd-block"><span id="lf-d">00</span><small>Jours</small></div>
-                <div class="lf-cd-sep">:</div>
-                <div class="lf-cd-block"><span id="lf-h">00</span><small>Heures</small></div>
-                <div class="lf-cd-sep">:</div>
-                <div class="lf-cd-block"><span id="lf-m">00</span><small>Minutes</small></div>
-                <div class="lf-cd-sep">:</div>
-                <div class="lf-cd-block"><span id="lf-s">00</span><small>Secondes</small></div>
-            </div>
-            <a href="#purchase" class="landing-flash-cta">Profiter de l'offre →</a>
+<!-- DOULEUR - LE PROBLÈME -->
+<section class="lsec pain-section">
+    <h2 class="lsec-title">Tu paies encore <span class="accent">séparément</span> chaque mois ?</h2>
+    <p class="lsec-sub">Additionne ce que tu dépenses déjà — tu vas être surpris.</p>
+
+    <div class="pain-grid">
+        <div class="pain-item">
+            <span class="pain-icon">😤</span>
+            <div class="pain-text">ChatGPT bloqué après quelques messages</div>
+        </div>
+        <div class="pain-item">
+            <span class="pain-icon">💸</span>
+            <div class="pain-text">Spotify, Netflix, chaque app coûte cher</div>
+        </div>
+        <div class="pain-item">
+            <span class="pain-icon">📚</span>
+            <div class="pain-text">Formations trop chères ou introuvables en français</div>
+        </div>
+        <div class="pain-item">
+            <span class="pain-icon">⏰</span>
+            <div class="pain-text">Tu perds du temps à chercher des alternatives gratuites</div>
         </div>
     </div>
 
-    <!-- ========== FEATURES ========== -->
-    <section class="landing-section" id="features">
-        <h2 class="landing-section-title">
-            Pourquoi <span class="accent">AKOLABS</span> ?
-        </h2>
-        <p class="landing-section-subtitle">
-            Pendant que tout le monde paye des abonnements séparés pour chaque outil, toi tu as tout — une seule fois.
-        </p>
+    <div class="pain-price-table">
+        <div class="pain-price-row">
+            <span class="pain-price-name">ChatGPT Plus</span>
+            <span class="pain-price-val">11 000 F/mois</span>
+        </div>
+        <div class="pain-price-row">
+            <span class="pain-price-name">Canva Pro</span>
+            <span class="pain-price-val">7 500 F/mois</span>
+        </div>
+        <div class="pain-price-row">
+            <span class="pain-price-name">Spotify Premium</span>
+            <span class="pain-price-val">4 000 F/mois</span>
+        </div>
+        <div class="pain-price-row">
+            <span class="pain-price-name">CapCut Pro</span>
+            <span class="pain-price-val">5 000 F/mois</span>
+        </div>
+        <div class="pain-price-row">
+            <span class="pain-price-name">1 formation sérieuse</span>
+            <span class="pain-price-val">25 000 F+</span>
+        </div>
+    </div>
+    <div class="pain-price-total">
+        <span>Total mensuel réel</span>
+        <span>52 500 F+</span>
+    </div>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+    <div class="pain-vs">avec AKOLABS, tu peux avoir tout ça pour</div>
+    <div class="pain-ako-price">1 000 F seulement</div>
+    <div class="pain-ako-label">par mois — ou 3 500 F pour 3 mois complets</div>
+</section>
+
+<!-- FEATURES -->
+<section class="lsec" id="features">
+    <h2 class="lsec-title">Pourquoi <span class="accent">AKOLABS</span> ?</h2>
+    <p class="lsec-sub">Ce n'est pas juste une app. C'est ton avantage compétitif sur le digital.</p>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+            <div>
                 <div class="feature-title">Tout en un seul endroit</div>
-                <div class="feature-desc">Apps premium, outils IA, formations, ebooks, streaming — une app unique remplace des dizaines d'abonnements.</div>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
-                <div class="feature-title">Formations Drive exclusives</div>
-                <div class="feature-desc">Des formations vidéo complètes hébergées sur Google Drive. Marketing, tech, business — des compétences qui se monnayent directement.</div>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-robot"></i></div>
-                <div class="feature-title">IA de pointe, gratuite</div>
-                <div class="feature-desc">Accède à GPT-4, Claude, Gemini et tous les grands modèles IA sans payer d'abonnement. Compare, génère, automatise.</div>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-infinity"></i></div>
-                <div class="feature-title">Accès à vie — 1 seul paiement</div>
-                <div class="feature-desc">Pas d'abonnement mensuel. Pas de renouvellement. Tu paies une fois, tu accèdes pour toujours. Même les nouvelles sections ajoutées.</div>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-download"></i></div>
-                <div class="feature-title">Fichiers sauvegardés dans l'app</div>
-                <div class="feature-desc">Télécharge PDFs, APKs, vidéos directement dans l'app. Accessibles hors ligne, classés automatiquement dans "Mes Fichiers".</div>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                <div class="feature-title">Gagne de l'argent en partageant</div>
-                <div class="feature-desc">Ton lien d'affiliation unique te rapporte 10% sur chaque vente. Certains membres ont déjà rentabilisé leur achat en 48h.</div>
+                <div class="feature-desc">Apps premium, IA, formations, ebooks — une seule app remplace des dizaines d'abonnements.</div>
             </div>
         </div>
-    </section>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-robot"></i></div>
+            <div>
+                <div class="feature-title">Tous les grands modèles IA</div>
+                <div class="feature-desc">ChatGPT, Claude, Gemini, Grok, Perplexity — accède à tous sans abonnement. Compare et génère.</div>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+            <div>
+                <div class="feature-title">Apps Android Premium débloquées</div>
+                <div class="feature-desc">Spotify, CapCut Pro, Canva Premium, jeux Android premium — tout disponible sans payer.</div>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div>
+                <div class="feature-title">50+ Formations complètes</div>
+                <div class="feature-desc">Marketing, e-commerce, création de contenu, business en ligne. Des compétences qui se monnayent directement.</div>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-hand-holding-usd"></i></div>
+            <div>
+                <div class="feature-title">Gagne en partageant</div>
+                <div class="feature-desc">10% de commission sur chaque vente via ton lien. Certains membres ont rentabilisé leur accès en 48h.</div>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <div>
+                <div class="feature-title">Accès instantané et sécurisé</div>
+                <div class="feature-desc">Dès ton paiement, ton compte est créé automatiquement. Disponible sur Android, iPhone et PC.</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <!-- ========== CONTENU DE L'APP ========== -->
-    <section class="landing-section" id="content">
-        <h2 class="landing-section-title">
-            Ce qui vous attend <span class="accent">à l'intérieur</span>
-        </h2>
-        <p class="landing-section-subtitle">
-            Tout est inclus dans votre accès AKOLABS — glissez pour tout voir
-        </p>
+<!-- CONTENU APP -->
+<section class="lsec">
+    <h2 class="lsec-title">Ce qui t'attend <span class="accent">à l'intérieur</span></h2>
+    <p class="lsec-sub">Glisse pour tout voir</p>
+    <div class="scroll-hint" id="preview-dots">
+        <span class="scroll-hint-dot active"></span>
+        <span class="scroll-hint-dot"></span>
+        <span class="scroll-hint-dot"></span>
+    </div>
+    <div class="sections-carousel" id="preview-scroll"></div>
+    <div style="text-align:center;margin-top:10px;font-size:12px;color:#9B97B5;">
+        <i class="fas fa-chevron-right"></i> Glisse pour voir plus
+    </div>
+</section>
 
-        <!-- Indicateur de défilement -->
-        <div class="scroll-hint">
-            <span class="scroll-hint-dot active"></span>
-            <span class="scroll-hint-dot"></span>
-            <span class="scroll-hint-dot"></span>
-            <span class="scroll-hint-dot"></span>
+<!-- MODAL DÉTAIL SECTION -->
+<div id="section-modal" class="section-modal-overlay" onclick="LandingApp.closeModal(event)">
+    <div class="section-modal-box">
+        <button class="section-modal-close" onclick="LandingApp.closeModal(null)">
+            <i class="fas fa-times"></i>
+        </button>
+        <div id="section-modal-content"></div>
+    </div>
+</div>
+
+<!-- SCREENSHOTS -->
+<section class="lsec" id="screenshots">
+    <h2 class="lsec-title"><span class="accent">Aperçu</span> de l'application</h2>
+    <p class="lsec-sub">Interface moderne, intuitive et premium</p>
+    <div class="screenshots-scroll" id="screenshots-scroll">
+        <div class="screenshot-skeleton"></div>
+        <div class="screenshot-skeleton"></div>
+        <div class="screenshot-skeleton"></div>
+    </div>
+</section>
+
+<!-- TRUST SECTION -->
+<section class="lsec trust-section">
+    <h2 class="lsec-title">Ils nous font <span class="accent">confiance</span></h2>
+    <p class="lsec-sub">Des chiffres réels. Une communauté qui grandit chaque jour.</p>
+    <div class="trust-grid">
+        <div class="trust-item">
+            <div class="trust-item-icon">👥</div>
+            <div class="trust-item-val">1387+</div>
+            <div class="trust-item-lbl">Membres actifs</div>
+        </div>
+        <div class="trust-item">
+            <div class="trust-item-icon">🌍</div>
+            <div class="trust-item-val">8+</div>
+            <div class="trust-item-lbl">Pays africains</div>
+        </div>
+        <div class="trust-item">
+            <div class="trust-item-icon">⭐</div>
+            <div class="trust-item-val">4.8/5</div>
+            <div class="trust-item-lbl">Note moyenne</div>
+        </div>
+        <div class="trust-item">
+            <div class="trust-item-icon">📱</div>
+            <div class="trust-item-val">21+</div>
+            <div class="trust-item-lbl">Outils disponibles</div>
+        </div>
+    </div>
+</section>
+
+<!-- TÉMOIGNAGES - CAROUSEL IMAGES -->
+<section class="lsec" id="testimonials">
+    <h2 class="lsec-title">Ils ont <span class="accent">sauté le pas</span></h2>
+    <p class="lsec-sub">Des vraies personnes. Des vrais résultats.</p>
+    <div class="testimonials-wrap">
+        <div class="testi-carousel" id="testi-carousel">
+            <!-- Témoignages par défaut - seront remplacés si images uploadées -->
+            <div class="testi-slide testi-placeholder">
+                <div class="testi-stars">★★★★★</div>
+                <div class="testi-text">"J'avais des doutes. Mais franchement c'est une mine d'or. Les apps débloquées seules valent 10x le prix. Et les formations m'ont permis de lancer mon service en ligne en moins d'un mois."</div>
+                <div class="testi-name">Kofi A.</div>
+                <div class="testi-role">Freelance — Accra, Ghana</div>
+            </div>
+            <div class="testi-slide testi-placeholder">
+                <div class="testi-stars">★★★★★</div>
+                <div class="testi-text">"L'affiliation c'est sérieux. J'ai partagé mon lien, 6 personnes ont acheté en 3 jours. J'ai récupéré mon investissement 3 fois. Maintenant c'est une vraie source de revenus passifs."</div>
+                <div class="testi-name">Amina K.</div>
+                <div class="testi-role">Community Manager — Abidjan</div>
+            </div>
+            <div class="testi-slide testi-placeholder">
+                <div class="testi-stars">★★★★★</div>
+                <div class="testi-text">"Les formations m'ont ouvert les yeux. Des tutos en français, du débutant au senior. J'ai commencé il y a 3 semaines et aujourd'hui je facture des projets. L'accès vaut tellement plus que ce qu'on paye."</div>
+                <div class="testi-name">Moussa T.</div>
+                <div class="testi-role">Développeur — Dakar</div>
+            </div>
+            <div class="testi-slide testi-placeholder">
+                <div class="testi-stars">★★★★½</div>
+                <div class="testi-text">"NotebookLM m'a changé la vie pour mes révisions. Je charge mes cours en PDF et l'IA me génère des résumés automatiques. Ce truc existe vraiment et c'est dans AKOLABS. Mes collègues n'en revenaient pas."</div>
+                <div class="testi-name">Fatou N.</div>
+                <div class="testi-role">Étudiante — Lomé</div>
+            </div>
+        </div>
+        <div class="testi-nav" id="testi-nav"></div>
+    </div>
+</section>
+
+<!-- MOYENS DE PAIEMENT -->
+<section class="lsec payment-section">
+    <h2 class="lsec-title">Paye avec <span class="accent">ton moyen habituel</span></h2>
+    <p class="lsec-sub">Mobile Money, cartes bancaires et plus — tout est accepté.</p>
+
+    <div class="payment-logos-wrap">
+        <div class="payment-logos-track" id="payment-logos-track">
+            <!-- Logos ajoutés dynamiquement depuis admin + duplication pour boucle infinie -->
+        </div>
+    </div>
+
+    <div class="payment-wa-box">
+        <div class="payment-wa-text">
+            Tu ne trouves pas ton moyen de paiement dans la liste ? 
+            Écris-nous directement — on trouvera une solution pour toi ! 🤝
+        </div>
+        <button class="btn-wa" onclick="LandingApp.openWaModal()">
+            <i class="fab fa-whatsapp"></i> Nous contacter sur WhatsApp
+        </button>
+    </div>
+</section>
+
+
+<!-- PLANS D'ABONNEMENT -->
+<section class="lsec plans-section" id="plans">
+    <h2 class="lsec-title">Choisis ton <span class="accent">plan</span></h2>
+    <p class="lsec-sub">Commence avec ce qui te convient. Upgrade quand tu veux.</p>
+
+    <div class="plans-grid">
+        <!-- STARTER -->
+        <div class="plan-card">
+            <div class="plan-name">Starter</div>
+            <div class="plan-duration">Accès limité — Sans durée</div>
+            <div class="plan-price-wrap">
+                <div class="plan-price-old">5 000 F</div>
+                <div class="plan-price">1 000 F <span>paiement unique</span></div>
+            </div>
+            <ul class="plan-features">
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Universe (outils IA)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Learning (formations)</li>
+                <li><i class="fas fa-check pf-check"></i> Système d'affiliation</li>
+                <li><i class="fas fa-check pf-check"></i> Accès à vie aux contenus inclus</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS App Prime</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS IA 2</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Ebook</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Learning Premium</li>
+            </ul>
+            <button onclick="LandingApp.openPlanModal('starter')" class="btn-plan btn-plan-secondary">
+                <i class="fas fa-arrow-right"></i> Commencer avec Starter
+            </button>
         </div>
 
-        <div class="sections-carousel" id="preview-scroll">
-            <!-- Les cartes seront remplies dynamiquement -->
+        <!-- PRO -->
+        <div class="plan-card plan-featured">
+            <div class="plan-badge">⚡ Populaire</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-duration">Accès complet — 1 mois</div>
+            <div class="plan-price-wrap">
+                <div class="plan-price-old">15 000 F</div>
+                <div class="plan-price">1 500 F <span>/ mois</span></div>
+            </div>
+            <ul class="plan-features">
+                <li><i class="fas fa-check pf-check"></i> <strong>Tout le catalogue AKOLABS</strong></li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS App Prime (APKs premium)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS IA 2 (modèles avancés)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Ebook (10 000+ livres)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Learning complet</li>
+                <li><i class="fas fa-check pf-check"></i> Affiliation 10% de commission</li>
+                <li><i class="fas fa-check pf-check"></i> Nouvelles sections incluses</li>
+            </ul>
+            <button onclick="LandingApp.openPlanModal('pro')" class="btn-plan btn-plan-primary">
+                <i class="fas fa-rocket"></i> Obtenir l'accès Pro
+            </button>
         </div>
 
-        <!-- Flèche droite indicateur -->
-        <div class="carousel-arrow-hint">
-            <i class="fas fa-chevron-right"></i> Glissez pour voir plus
+        <!-- PREMIUM -->
+        <div class="plan-card">
+            <div class="plan-badge" style="background:linear-gradient(135deg,#6A1B9A,#4B0082);color:#C9A84C;border:1px solid #C9A84C;">💎 Best value</div>
+            <div class="plan-name">Premium</div>
+            <div class="plan-duration">Accès complet — 3 mois</div>
+            <div class="plan-price-wrap">
+                <div class="plan-price-old">45 000 F</div>
+                <div class="plan-price">3 500 F <span>/ 3 mois</span></div>
+            </div>
+            <div style="background:rgba(61,219,125,0.08);border:1px solid rgba(61,219,125,0.2);border-radius:10px;padding:10px;margin-bottom:14px;text-align:center;">
+                <span style="font-size:12px;color:#3DDB7D;font-weight:600;">🎁 Économise 1 000 F vs 3× Pro</span>
+            </div>
+            <ul class="plan-features">
+                <li><i class="fas fa-check pf-check"></i> <strong>Tout ce que contient Pro</strong></li>
+                <li><i class="fas fa-check pf-check"></i> 3 mois d'accès complet garanti</li>
+                <li><i class="fas fa-check pf-check"></i> Économie de 1 000 F sur le Pro</li>
+                <li><i class="fas fa-check pf-check"></i> Priorité sur les nouveautés</li>
+                <li><i class="fas fa-check pf-check"></i> Support prioritaire WhatsApp</li>
+            </ul>
+            <button onclick="LandingApp.openPlanModal('premium')" class="btn-plan btn-plan-secondary">
+                <i class="fas fa-gem"></i> Choisir Premium
+            </button>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Modal détail section -->
-    <div id="section-modal" class="section-modal-overlay" onclick="LandingApp.closeModal(event)">
-        <div class="section-modal-box">
-            <button class="section-modal-close" onclick="LandingApp.closeModal(null)">
+<!-- FAQ -->
+<section class="lsec" id="faq">
+    <h2 class="lsec-title">Questions <span class="accent">fréquentes</span></h2>
+
+    <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>C'est quoi exactement AKOLABS ?</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+            <p>AKOLABS est une application web progressive qui regroupe en un seul endroit : des apps Android premium débloquées, les meilleurs outils IA (ChatGPT, Claude, Gemini...), des formations vidéo complètes, des milliers d'ebooks, et bien plus. Tout ça accessible depuis ton téléphone ou PC.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>Quelle différence entre Starter, Pro et Premium ?</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+            <p>Le <strong>Starter à 1 000F</strong> donne accès à la majorité du catalogue (Universe + Learning de base) sans durée limite. Le <strong>Pro à 1 500F/mois</strong> débloque tout le catalogue pendant 1 mois. Le <strong>Premium à 3 500F</strong> donne accès complet pendant 3 mois avec une économie de 1 000F par rapport à 3 mois de Pro.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>Je suis ancien membre — mon accès change ?</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+            <p>Non. Si tu avais déjà accès à AKOLABS avant cette mise à jour, ton accès à vie reste intact à 100%. Rien ne change pour toi — tu continues à accéder à tout ce que tu avais, pour toujours.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>Que se passe-t-il quand mon abonnement Pro/Premium expire ?</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+            <p>Quand ton abonnement expire, tu passes automatiquement sur le niveau Starter — tu gardes l'accès à ton compte et aux contenus Starter. Tu peux renouveler à tout moment depuis l'app pour retrouver l'accès complet.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>Comment fonctionne le système d'affiliation ?</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+            <p>Dès ton inscription, tu reçois un lien d'affiliation unique. Chaque personne qui achète AKOLABS via ton lien te rapporte 10% de commission. Certains membres ont déjà rentabilisé leur accès en 48h simplement en partageant dans leurs groupes WhatsApp.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>Sur quels appareils ça fonctionne ?</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+            <p>AKOLABS est une PWA (Progressive Web App). Elle fonctionne sur Android, iPhone et PC — directement depuis le navigateur. Tu peux l'installer sur ton écran d'accueil comme une vraie app. Un seul compte, sur tous tes appareils.</p>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+            <span>Comment puis-je accéder à AKOLABS après l'achat ?</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="faq-answer">
+            <p>Dès que ton paiement est confirmé, ton compte est créé automatiquement. Tu reçois un email avec tes identifiants et le lien d'accès. Ouvre le lien sur ton téléphone, connecte-toi, et installe l'app sur ton écran d'accueil.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="lfooter">
+    <p>© 2026 AKOLABS — Tous droits réservés.</p>
+    <p style="margin-top:8px;">
+        <a href="#">Conditions d'utilisation</a> · 
+        <a href="#">Confidentialité</a> · 
+        <a href="mailto:akolabs.app@gmail.com">Contact</a>
+    </p>
+</footer>
+
+<!-- FLOATING CTA -->
+<div class="floating-cta" id="floating-cta">
+    <a href="#plans">
+        <i class="fas fa-bolt"></i> Voir les plans — dès 1 000 F
+    </a>
+</div>
+
+<!-- BOUTON WA FLOTTANT -->
+<button class="wa-float-btn" onclick="LandingApp.openWaModal()" title="Nous contacter">
+    <i class="fab fa-whatsapp"></i>
+</button>
+
+<!-- ===== MODAL PAIEMENT ===== -->
+<div id="payment-modal" class="payment-modal-overlay" onclick="LandingApp.closePlanModal(event)">
+    <div class="payment-modal-box">
+        <div class="pmodal-header">
+            <button class="pmodal-close" onclick="LandingApp.closePlanModal(null)">
                 <i class="fas fa-times"></i>
             </button>
-            <div id="section-modal-content"></div>
+            <div class="pmodal-plan-name" id="pmodal-plan-name">Plan Pro</div>
+            <div class="pmodal-plan-desc" id="pmodal-plan-desc">Accès complet — 1 mois</div>
+            <div class="pmodal-price" id="pmodal-price">1 500 F</div>
         </div>
-    </div>
-
-    <!-- ========== CAPTURES D'ÉCRAN ========== -->
-    <section class="landing-section" id="screenshots">
-        <h2 class="landing-section-title">
-            <span class="accent">Aperçu</span> de l'application
-        </h2>
-        <p class="landing-section-subtitle">
-            Une interface moderne, intuitive et premium
-        </p>
-
-        <div class="screenshots-scroll" id="screenshots-scroll">
-            <!-- Skeletons affichés pendant le chargement -->
-            <div class="screenshot-skeleton"></div>
-            <div class="screenshot-skeleton"></div>
-            <div class="screenshot-skeleton"></div>
-            <div class="screenshot-skeleton"></div>
-        </div>
-    </section>
-
-    <!-- ========== TÉMOIGNAGES ========== -->
-    <section class="landing-section" id="testimonials">
-        <h2 class="landing-section-title">
-            Ils ont <span class="accent">sauté le pas</span>
-        </h2>
-        <p class="landing-section-subtitle">
-            Des vrais utilisateurs. Des vrais résultats.
-        </p>
-
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        <div class="pmodal-body">
+            <div class="pmodal-includes" id="pmodal-includes">
+                <div class="pmodal-includes-title"><i class="fas fa-check-circle"></i> Ce qui est inclus</div>
+                <div id="pmodal-includes-list"></div>
             </div>
-            <p class="testimonial-text">
-                "J'avais des doutes au départ mais franchement c'est une mine d'or. Les apps premium débloquées seules valent 10x le prix. Et les formations Drive sur le marketing digital m'ont permis de lancer mon premier service en ligne en moins d'un mois."
-            </p>
-            <div class="testimonial-author">
-                <div class="testimonial-avatar">K</div>
-                <div>
-                    <div class="testimonial-name">Kofi A.</div>
-                    <div class="testimonial-role">Freelance — Accra, Ghana</div>
+
+            <div class="pmodal-form-divider">Créer votre compte</div>
+
+            <div id="pmodal-form-area">
+                <div class="pmodal-input-group">
+                    <label class="pmodal-input-label">Nom complet *</label>
+                    <input type="text" class="pmodal-input" id="pm-name" placeholder="Ex: Jean Dupont">
                 </div>
-            </div>
-        </div>
-
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-            <p class="testimonial-text">
-                "L'affiliation c'est du sérieux. J'ai partagé mon lien dans mon groupe WhatsApp, 6 personnes ont acheté en 3 jours. J'ai récupéré mon investissement 3 fois. Maintenant c'est une vraie source de revenus passifs."
-            </p>
-            <div class="testimonial-author">
-                <div class="testimonial-avatar">A</div>
-                <div>
-                    <div class="testimonial-name">Amina K.</div>
-                    <div class="testimonial-role">Community Manager — Abidjan</div>
+                <div class="pmodal-input-group">
+                    <label class="pmodal-input-label">Email *</label>
+                    <input type="email" class="pmodal-input" id="pm-email" placeholder="votre@email.com">
                 </div>
-            </div>
-        </div>
-
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-            <p class="testimonial-text">
-                "AKOLABS Coding m'a ouvert les yeux. Des centaines de tutos en français, du débutant au senior. J'ai commencé React il y a 3 semaines et aujourd'hui je facture des projets. L'accès à vie c'est une blague tellement c'est avantageux."
-            </p>
-            <div class="testimonial-author">
-                <div class="testimonial-avatar">M</div>
-                <div>
-                    <div class="testimonial-name">Moussa T.</div>
-                    <div class="testimonial-role">Développeur web junior — Dakar</div>
+                <div class="pmodal-input-group">
+                    <label class="pmodal-input-label">Téléphone *</label>
+                    <input type="tel" class="pmodal-input" id="pm-phone" placeholder="+229 XX XX XX XX">
                 </div>
-            </div>
-        </div>
-
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-            </div>
-            <p class="testimonial-text">
-                "NotebookLM m'a changé la vie pour mes révisions. Je charge mes cours en PDF et l'IA me génère des résumés et des podcasts automatiques. Ce truc existe vraiment et c'est gratuit dans AKOLABS. Mes collègues n'en revenaient pas."
-            </p>
-            <div class="testimonial-author">
-                <div class="testimonial-avatar">F</div>
-                <div>
-                    <div class="testimonial-name">Fatou N.</div>
-                    <div class="testimonial-role">Étudiante en master — Lomé</div>
+                <div class="pmodal-input-group">
+                    <label class="pmodal-input-label">Mot de passe *</label>
+                    <input type="password" class="pmodal-input" id="pm-pass" placeholder="Minimum 6 caractères">
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ========== FAQ ========== -->
-    <section class="landing-section" id="faq">
-        <h2 class="landing-section-title">
-            Questions <span class="accent">fréquentes</span>
-        </h2>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>C'est quoi exactement AKOLABS ?</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">
-                <p>AKOLABS est une application web premium qui regroupe en un seul endroit : des apps Android premium débloquées, les meilleurs outils IA gratuits, des formations complètes sur Google Drive, des milliers d'ebooks PDF, un outil de téléchargement Scribd, un installateur de logiciels PC, et du streaming de films. Tout ça accessible depuis une interface unique, sécurisée, disponible sur mobile et PC.</p>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>Les formations Drive, c'est quoi concrètement ?</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">
-                <p>Ce sont des formations vidéo complètes hébergées sur Google Drive — marketing digital, réseaux sociaux, création de contenu, business en ligne et plus encore. Tu regardes directement depuis l'app, sans quitter AKOLABS. Des compétences concrètes, immédiatement applicables, qui peuvent devenir une vraie source de revenus.</p>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>L'accès est-il vraiment à vie, sans abonnement ?</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">
-                <p>Oui, à 100%. Un seul paiement de 1500 FCFA, et c'est terminé. Pas de mensualité, pas de renouvellement, pas de frais cachés. Tu accèdes à AKOLABS pour toujours — y compris les nouvelles sections qu'on ajoutera dans le futur. C'est pour ça que le prix actuel ne durera pas.</p>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>Comment puis-je gagner de l'argent avec AKOLABS ?</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">
-                <p>Dès ton inscription, tu reçois un lien d'affiliation unique. Chaque personne qui achète AKOLABS via ton lien te rapporte 10% de commission — et elle bénéficie elle-même de 10% de réduction. En partageant à 10 personnes, tu as déjà largement rentabilisé ton investissement. Certains membres en ont fait une vraie source de revenus passifs.</p>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>Sur quels appareils ça fonctionne ?</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">
-                <p>AKOLABS est une application web progressive (PWA). Elle fonctionne sur Android, iPhone, et PC — directement depuis le navigateur. Tu peux l'installer sur ton écran d'accueil comme une vraie app. Un seul compte, utilisable sur tous tes appareils.</p>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>Puis-je télécharger les contenus pour y accéder hors ligne ?</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">
-                <p>Oui. AKOLABS intègre un système de stockage interne. Tu peux télécharger des PDFs, APKs, vidéos et fichiers directement dans l'app — ils s'enregistrent dans la section "Mes Fichiers" et restent accessibles même sans connexion internet.</p>
-            </div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-                <span>Pourquoi le prix est à 1500 FCFA et pas plus ?</span>
-                <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">
-                <p>Parce que nous sommes en phase de lancement et nous voulons que le maximum de personnes puisse accéder à AKOLABS. Ce tarif est temporaire. À mesure que la communauté grandit et que de nouvelles sections sont ajoutées, le prix augmentera. Ceux qui achètent aujourd'hui gardent leur accès au même tarif, à vie.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ========== SECTION ACHAT ========== -->
-    <section class="landing-section" id="purchase">
-        <div class="purchase-section">
-            <h2 class="purchase-title">
-                <i class="fas fa-crown"></i> Obtenez votre accès
-            </h2>
-            <p class="purchase-subtitle">
-                Créez votre compte et accédez à AKOLABS instantanément
-            </p>
-
-            <!-- Prix -->
-            <div class="purchase-price-box">
-                <div style="text-decoration:line-through;color:var(--color-gray-500);font-size:var(--text-sm);">
-                    15 000 FCFA
+                <div class="pmodal-input-group">
+                    <label class="pmodal-input-label">Confirmer le mot de passe *</label>
+                    <input type="password" class="pmodal-input" id="pm-pass2" placeholder="Retapez votre mot de passe">
                 </div>
-                <div class="purchase-price-value">1500 FCFA</div>
-                <div class="purchase-price-period">Paiement unique — Accès à vie</div>
-            </div>
-
-            <!-- Moyens de paiement -->
-            <div class="payment-methods">
-                <i class="fas fa-lock"></i>
-                Paiement sécurisé — <strong>Tous les moyens de paiement acceptés</strong>
-                <br><small>Mobile Money, cartes, virement et plus via FeexPay</small>
-            </div>
-
-            <!-- Ce qui est inclus -->
-            <div class="purchase-includes">
-                <div class="purchase-includes-title">Ce qui est inclus :</div>
-                <div class="purchase-includes-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Accès complet à l'application AKOLABS</span>
-                </div>
-                <div class="purchase-includes-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Accès aux contenus gratuits illimités</span>
-                </div>
-                <div class="purchase-includes-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Système d'affiliation pour gagner de l'argent</span>
-                </div>
-                <div class="purchase-includes-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Stockage sécurisé des fichiers dans l'app</span>
-                </div>
-                <div class="purchase-includes-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Mises à jour et nouveaux contenus réguliers</span>
-                </div>
-                <div class="purchase-includes-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Support et assistance prioritaire</span>
-                </div>
-            </div>
-
-            <!-- Formulaire de création de compte -->
-            <div class="purchase-form-divider">Créez votre compte</div>
-
-            <form id="purchase-form" onsubmit="return false;">
-                <div class="input-group">
-                    <label class="input-label">Nom complet *</label>
-                    <input type="text" class="input-field" id="pf-name" 
-                           placeholder="Ex: Jean Dupont" required>
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Email *</label>
-                    <input type="email" class="input-field" id="pf-email" 
-                           placeholder="votre@email.com" required>
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Numéro de téléphone *</label>
-                    <input type="tel" class="input-field" id="pf-phone" 
-                           placeholder="+229 XX XX XX XX" required>
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Mot de passe *</label>
-                    <input type="password" class="input-field" id="pf-password" 
-                           placeholder="Minimum 6 caractères" required minlength="6">
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Confirmer le mot de passe *</label>
-                    <input type="password" class="input-field" id="pf-password2" 
-                           placeholder="Retapez votre mot de passe" required>
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Code promo / Code parrain (optionnel)</label>
-                    <input type="text" class="input-field" id="pf-promo" 
-                           placeholder="Ex: WELCOMES" style="text-transform:uppercase;">
-                </div>
-
-                <!-- Résumé du prix -->
-                <div id="price-summary" style="display:none;margin:var(--space-base) 0;padding:var(--space-base);background:rgba(40,167,69,0.1);border:1px solid rgba(40,167,69,0.2);border-radius:var(--radius-md);">
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-sm);color:var(--color-gray-400);margin-bottom:4px;">
-                        <span>Prix de base</span>
-                        <span id="summary-base">1500 F</span>
-                    </div>
-                    <div id="summary-discount-row" style="display:none;justify-content:space-between;font-size:var(--text-sm);color:var(--color-success);margin-bottom:4px;">
-                        <span>Réduction (<span id="summary-discount-percent">10</span>%)</span>
-                        <span>-<span id="summary-discount-amount">500</span> F</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;font-size:var(--text-md);font-weight:var(--font-bold);color:var(--color-accent);border-top:1px solid var(--glass-border);padding-top:8px;margin-top:8px;">
-                        <span>Total à payer</span>
-                        <span id="summary-total">1500 F</span>
+                <div class="pmodal-input-group">
+                    <label class="pmodal-input-label">Code promo / Parrain (optionnel)</label>
+                    <div class="pmodal-promo-row">
+                        <input type="text" class="pmodal-input" id="pm-promo" placeholder="Ex: WELCOME" style="text-transform:uppercase">
+                        <button class="btn-promo-check" onclick="LandingApp.checkPromo()">Appliquer</button>
                     </div>
                 </div>
 
-                <!-- Conditions -->
-                <label style="display:flex;align-items:flex-start;gap:var(--space-sm);margin:var(--space-lg) 0;cursor:pointer;">
-                    <input type="checkbox" id="pf-terms" style="margin-top:3px;accent-color:var(--color-accent);">
-                    <span style="font-size:var(--text-xs);color:var(--color-gray-500);line-height:var(--line-height-relaxed);">
-                        J'accepte les <a href="#" style="color:var(--color-accent);">conditions d'utilisation</a> 
-                        et la <a href="#" style="color:var(--color-accent);">politique de confidentialité</a> d'AKOLABS.
-                    </span>
-                </label>
+                <div id="pmodal-price-summary">
+                    <div class="psum-row"><span>Prix de base</span><span id="psum-base">—</span></div>
+                    <div class="psum-row" id="psum-discount-row" style="display:none;color:#3DDB7D;"><span>Réduction (<span id="psum-pct">0</span>%)</span><span>-<span id="psum-disc">0</span> F</span></div>
+                    <div class="psum-total"><span>Total à payer</span><span id="psum-total">—</span></div>
+                </div>
 
-                <!-- Bouton d'achat -->
-                <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-purchase"
-                        onclick="LandingApp.handlePurchase()">
+                <div class="pmodal-terms">
+                    <input type="checkbox" id="pm-terms">
+                    <span>J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'AKOLABS.</span>
+                </div>
+
+                <button id="btn-pmodal-pay" class="btn-pmodal-pay" onclick="LandingApp.handlePurchase()">
                     <i class="fas fa-lock"></i>
-                    <span class="btn-text">Payer</span>
+                    <span id="btn-pay-text">Payer maintenant</span>
                 </button>
-            </form>
 
-            <!-- FeexPay : bouton de paiement rendu par le SDK -->
-            <div id="feexpay-instruction" style="display:none;margin-top:16px;padding:16px;background:#F7F3FF;border:1px solid rgba(75,0,130,0.15);border-radius:14px;text-align:center;">
-                <p style="font-size:14px;color:#4B0082;font-weight:600;margin-bottom:4px;">👇 Cliquez sur le bouton ci-dessous pour payer</p>
-                <p style="font-size:12px;color:#888;margin-bottom:12px;">Vous serez redirigé vers la page de paiement sécurisée FeexPay</p>
-                <div id="feexpay-render"></div>
-                <button onclick="LandingApp.cancelFeexPay()" style="margin-top:10px;background:none;border:1px solid #ddd;border-radius:20px;padding:6px 18px;font-size:12px;color:#999;cursor:pointer;">← Annuler et revenir</button>
-            </div>
-
-            <!-- Garantie -->
-            <div class="guarantee-box">
-                <div class="guarantee-icon">
-                    <i class="fas fa-shield-alt"></i>
+                <!-- FeexPay render -->
+                <div id="feexpay-instruction" style="display:none;margin-top:16px;padding:16px;background:rgba(75,0,130,0.2);border:1px solid rgba(201,168,76,0.2);border-radius:14px;text-align:center;">
+                    <p style="font-size:13px;color:#F0EDF8;font-weight:600;margin-bottom:4px;">👇 Cliquez sur le bouton ci-dessous pour payer</p>
+                    <p style="font-size:11px;color:#9B97B5;margin-bottom:10px;">Vous serez redirigé vers la page de paiement sécurisée FeexPay</p>
+                    <div id="feexpay-render"></div>
+                    <button onclick="LandingApp.cancelFeexPay()" style="margin-top:10px;background:none;border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:6px 16px;font-size:12px;color:#9B97B5;cursor:pointer;">← Annuler</button>
                 </div>
-                <div class="guarantee-text">
-                    <strong>Paiement 100% sécurisé</strong> via Mobile Money et Carte bancaire. 
-                    Vos données sont chiffrées et protégées.
+
+                <div class="pmodal-secure">
+                    <i class="fas fa-shield-alt"></i>
+                    <span><strong>Paiement 100% sécurisé</strong> via Mobile Money et Carte bancaire via FeexPay. Données chiffrées et protégées.</span>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- ========== FOOTER ========== -->
-    <footer class="landing-footer">
-        <p>&copy; 2026 AKOLABS — Tous droits réservés.</p>
-        <p style="margin-top:var(--space-sm);">
-            <a href="#">Conditions d'utilisation</a> · 
-            <a href="#">Confidentialité</a> · 
-            <a href="#">Contact</a>
-        </p>
-    </footer>
-
-    <!-- ========== FLOATING CTA ========== -->
-    <div class="floating-cta" id="floating-cta">
-        <a href="#purchase" class="btn btn-primary">
-            <i class="fas fa-bolt"></i>
-            Obtenir l'accès — 1500 F
-        </a>
     </div>
+</div>
 
-    <!-- ========== SCRIPTS ========== -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/config.js"></script>
-    <script src="../js/utils.js"></script>
+<!-- MODAL WHATSAPP -->
+<div id="wa-modal" class="wa-modal-overlay" onclick="LandingApp.closeWaModal(event)">
+    <div class="wa-modal-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div class="wa-modal-title">💬 Nous contacter</div>
+            <button onclick="LandingApp.closeWaModal(null)" style="background:none;border:none;color:#9B97B5;cursor:pointer;font-size:18px;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="wa-modal-sub">Notre équipe répond dans la journée. N'hésite pas !</div>
+
+        <div class="wa-input-group">
+            <label class="wa-label">Ton prénom</label>
+            <input type="text" class="wa-input" id="wa-name" placeholder="Ex: Kofi">
+        </div>
+        <div class="wa-input-group">
+            <label class="wa-label">Sujet de ton message</label>
+            <select class="wa-select" id="wa-subject">
+                <option value="">— Choisir un sujet —</option>
+                <option value="Question sur les plans">Question sur les plans</option>
+                <option value="Moyen de paiement indisponible">Moyen de paiement indisponible</option>
+                <option value="Problème d'accès après achat">Problème d'accès après achat</option>
+                <option value="Information sur le contenu">Information sur le contenu</option>
+                <option value="Affiliation et commissions">Affiliation et commissions</option>
+                <option value="Autre question">Autre question</option>
+            </select>
+        </div>
+        <div class="wa-input-group">
+            <label class="wa-label">Ton message (optionnel)</label>
+            <textarea class="wa-textarea" id="wa-message" placeholder="Décris ton besoin..."></textarea>
+        </div>
+
+        <button class="btn-wa-send" onclick="LandingApp.sendWaMessage()">
+            <i class="fab fa-whatsapp"></i> Envoyer sur WhatsApp
+        </button>
+        <button class="btn-wa-cancel" onclick="LandingApp.closeWaModal(null)">Annuler</button>
+    </div>
+</div>
+
+<!-- MODAL UPSELL -->
+<div id="upsell-modal" class="upsell-overlay" onclick="LandingApp.closeUpsell(event)">
+    <div class="upsell-box">
+        <div class="upsell-icon">🔓</div>
+        <div class="upsell-title" id="upsell-title">Cette section est réservée au plan Pro</div>
+        <div class="upsell-text" id="upsell-text">Passe au plan Pro pour débloquer tout le catalogue AKOLABS — dès 1 500F/mois.</div>
+        <div class="upsell-actions">
+            <button class="btn-upsell btn-upsell-primary" onclick="LandingApp.closeUpsell(null);LandingApp.openPlanModal('pro')">
+                <i class="fas fa-rocket"></i> Passer au plan Pro — 1 500 F
+            </button>
+            <button class="btn-upsell btn-upsell-secondary" onclick="LandingApp.closeUpsell(null)">
+                Rester sur Starter
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="ako-toast" class="ako-toast"></div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/utils.js"></script>
 
 <script>
-// ============================================
-// AKOLABS - Landing Page Logic
-// ============================================
+// =============================================
+// AKOLABS LANDING — Système d'abonnements v2
+// =============================================
+
+const PLANS = {
+    starter: {
+        id: 'starter',
+        name: 'Starter',
+        price: 1000,
+        duration: null, // pas de durée — accès permanent aux sections incluses
+        durationLabel: 'Accès à vie (sections incluses)',
+        includes: [
+            'AKOLABS Universe (outils IA)',
+            'AKOLABS Learning (formations de base)',
+            'Système d\'affiliation (10% commission)',
+            'Stockage de fichiers dans l\'app'
+        ],
+        excludedSlugs: ['akolabs-app-prime', 'akolabs-ia-2', 'akolabs-ebook', 'akolabs-learning'],
+        excludedTitles: ['AKOLABS App Prime', 'AKOLABS IA 2', 'AKOLABS Ebook', 'AKOLABS Learning'],
+        subscriptionMonths: null
+    },
+    pro: {
+        id: 'pro',
+        name: 'Pro',
+        price: 1500,
+        duration: 1,
+        durationLabel: 'Accès complet — 1 mois',
+        includes: [
+            'Tout le catalogue AKOLABS',
+            'AKOLABS App Prime (APKs premium)',
+            'AKOLABS IA 2 (modèles avancés)',
+            'AKOLABS Ebook (10 000+ livres)',
+            'AKOLABS Learning complet',
+            'Affiliation 10% de commission',
+            'Nouvelles sections incluses'
+        ],
+        excludedSlugs: [],
+        excludedTitles: [],
+        subscriptionMonths: 1
+    },
+    premium: {
+        id: 'premium',
+        name: 'Premium',
+        price: 3500,
+        duration: 3,
+        durationLabel: 'Accès complet — 3 mois',
+        includes: [
+            'Tout ce que contient Pro',
+            '3 mois d\'accès complet garanti',
+            'Économie de 1 000 F vs 3×Pro',
+            'Priorité sur les nouveautés',
+            'Support prioritaire WhatsApp'
+        ],
+        excludedSlugs: [],
+        excludedTitles: [],
+        subscriptionMonths: 3
+    }
+};
 
 const LandingApp = {
-    basePrice: CONFIG.APP_PRICE,
-    finalPrice: CONFIG.APP_PRICE,
+    currentPlan: null,
+    finalPrice: 0,
     promoData: null,
+    basePrice: 0,
+    _sections: [],
+    _visitStart: null,
+    _visitId: null,
+    _feexReference: null,
+    _tempPurchaseData: null,
 
-    // ---- Compression Cloudinary ----
-    cloudinaryUrl: function(url, transforms) {
-        if (!url || url.indexOf('res.cloudinary.com') === -1) return url;
-        return url.replace('/upload/', '/upload/' + transforms + '/');
-    },
-
+    // =====================
+    // INIT
+    // =====================
     init() {
-        console.log('[Landing] Initialisé');
+        console.log('[Landing] Initialisé v2');
         this.loadSections();
         this.loadScreenshots();
         this.loadFlash();
-        this.setupPromoCheck();
+        this.loadPaymentMethods();
+        this.loadTestimonials();
         this.setupFloatingCTA();
         this.setupSmoothScroll();
         this.trackVisit();
+        this.initPromoInput();
 
         const urlParams = new URLSearchParams(window.location.search);
         const feexStatus = urlParams.get('feexpay');
 
-        // --- Retour après paiement FeexPay ---
         if (feexStatus === 'success') {
             const ref = urlParams.get('ref');
             const savedData = localStorage.getItem('ako_feex_data');
             const savedRef = localStorage.getItem('ako_feex_ref');
-
-            // Nettoyer l'URL sans recharger la page
             window.history.replaceState({}, document.title, window.location.pathname);
-
             if (savedData && savedRef === ref) {
                 try {
                     const pd = JSON.parse(savedData);
                     localStorage.removeItem('ako_feex_ref');
                     localStorage.removeItem('ako_feex_data');
-                    // Scroll vers la section achat puis afficher le succès
-                    document.getElementById('purchase')?.scrollIntoView({ behavior: 'smooth' });
-                    setTimeout(function() {
-                        LandingApp.completePurchase(pd, ref);
-                    }, 700);
+                    // Rouvrir le modal pour afficher succès
+                    this.currentPlan = PLANS[pd.planId] || PLANS['pro'];
+                    setTimeout(() => LandingApp.completePurchase(pd, ref), 800);
                 } catch(e) {
-                    console.error('[FeexPay] Erreur récupération données:', e);
-                    Utils.showToast('Erreur lors de la finalisation. Contactez le support.', 'error');
+                    console.error('[FeexPay] Erreur récup:', e);
+                    this.showToast('Erreur lors de la finalisation. Contactez le support.', 'error');
                 }
-            } else {
-                Utils.showToast('Paiement reçu mais données introuvables. Contactez le support.', 'warning');
             }
-            return; // Ne pas traiter comme code parrain
-        }
-
-        if (feexStatus === 'error') {
+        } else if (feexStatus === 'error') {
             window.history.replaceState({}, document.title, window.location.pathname);
-            Utils.showToast('Paiement annulé ou échoué. Vous pouvez réessayer.', 'error');
+            this.showToast('Paiement annulé. Tu peux réessayer.', 'error');
         }
 
-        // --- Code parrain dans l'URL ---
         const refCode = urlParams.get('ref');
-        if (refCode) {
-            const promoInput = document.getElementById('pf-promo');
+        if (refCode && feexStatus !== 'success') {
+            const promoInput = document.getElementById('pm-promo');
             if (promoInput) {
                 promoInput.value = refCode.toUpperCase();
-                this.checkPromoCode(refCode.toUpperCase());
             }
         }
     },
 
-    // ---- Charger les sections pour l'aperçu ----
+    scrollToPlans() {
+        document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' });
+    },
+
+    // =====================
+    // MODAL PLAN
+    // =====================
+    openPlanModal(planId) {
+        const plan = PLANS[planId];
+        if (!plan) return;
+        this.currentPlan = plan;
+        this.basePrice = plan.price;
+        this.finalPrice = plan.price;
+        this.promoData = null;
+
+        document.getElementById('pmodal-plan-name').textContent = 'Plan ' + plan.name;
+        document.getElementById('pmodal-plan-desc').textContent = plan.durationLabel;
+        document.getElementById('pmodal-price').textContent = new Intl.NumberFormat('fr-FR').format(plan.price) + ' F';
+
+        // Includes
+        const list = document.getElementById('pmodal-includes-list');
+        list.innerHTML = plan.includes.map(i =>
+            '<div class="pmodal-includes-item"><i class="fas fa-check-circle"></i> ' + i + '</div>'
+        ).join('');
+
+        // Bouton
+        document.getElementById('btn-pay-text').textContent = 'Payer ' + new Intl.NumberFormat('fr-FR').format(plan.price) + ' F';
+
+        // Reset form
+        document.getElementById('pmodal-form-area').style.display = '';
+        document.getElementById('feexpay-instruction').style.display = 'none';
+        document.getElementById('pmodal-price-summary').style.display = 'none';
+        ['pm-name','pm-email','pm-phone','pm-pass','pm-pass2','pm-promo'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const terms = document.getElementById('pm-terms');
+        if (terms) terms.checked = false;
+
+        // Pré-remplir code promo si dans URL
+        const urlRef = new URLSearchParams(window.location.search).get('ref');
+        if (urlRef) {
+            const pi = document.getElementById('pm-promo');
+            if (pi) pi.value = urlRef.toUpperCase();
+        }
+
+        document.getElementById('payment-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    },
+
+    closePlanModal(event) {
+        if (event && event.target !== document.getElementById('payment-modal')) return;
+        document.getElementById('payment-modal').classList.remove('open');
+        document.body.style.overflow = '';
+    },
+
+    // =====================
+    // UPSELL
+    // =====================
+    showUpsell(sectionTitle) {
+        const t = document.getElementById('upsell-title');
+        const txt = document.getElementById('upsell-text');
+        if (t) t.textContent = '"' + (sectionTitle || 'Cette section') + '" est réservée au plan Pro';
+        if (txt) txt.textContent = 'Passe au plan Pro pour débloquer tout le catalogue AKOLABS — dès 1 500F/mois.';
+        document.getElementById('upsell-modal').classList.add('open');
+    },
+
+    closeUpsell(event) {
+        if (event && event.target !== document.getElementById('upsell-modal')) return;
+        document.getElementById('upsell-modal').classList.remove('open');
+    },
+
+    // =====================
+    // WHATSAPP MODAL
+    // =====================
+    openWaModal() {
+        document.getElementById('wa-modal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    },
+
+    closeWaModal(event) {
+        if (event && event.target !== document.getElementById('wa-modal')) return;
+        document.getElementById('wa-modal').classList.remove('open');
+        document.body.style.overflow = '';
+    },
+
+    sendWaMessage() {
+        const name = (document.getElementById('wa-name')?.value || '').trim();
+        const subject = document.getElementById('wa-subject')?.value || '';
+        const message = (document.getElementById('wa-message')?.value || '').trim();
+
+        if (!subject) { this.showToast('Choisis un sujet', 'warning'); return; }
+
+        let text = 'Bonjour AKOLABS ! 👋\n';
+        if (name) text += 'Je suis ' + name + '.\n';
+        text += 'Sujet : ' + subject + '\n';
+        if (message) text += '\n' + message;
+        text += '\n\n(Via akolabs.store)';
+
+        const waUrl = 'https://wa.me/2290155956693?text=' + encodeURIComponent(text);
+        window.open(waUrl, '_blank');
+        this.closeWaModal(null);
+    },
+
+    // =====================
+    // PROMO CODE
+    // =====================
+    initPromoInput() {
+        const input = document.getElementById('pm-promo');
+        if (!input) return;
+        let t;
+        input.addEventListener('input', e => {
+            clearTimeout(t);
+            const code = e.target.value.trim().toUpperCase();
+            e.target.value = code;
+            if (code.length >= 3) t = setTimeout(() => this.checkPromo(), 700);
+            else this.resetPromo();
+        });
+    },
+
+    async checkPromo() {
+        if (!this.currentPlan) return;
+        const code = document.getElementById('pm-promo')?.value?.trim().toUpperCase();
+        if (!code || code.length < 3) return;
+        try {
+            const { data, error } = await db.rpc('verify_promo_code', { p_code: code, p_section_id: null });
+            if (error) throw error;
+            if (data && data.valid) {
+                this.promoData = data;
+                const pct = data.discount_percent || 0;
+                const disc = Math.round(this.basePrice * pct / 100);
+                this.finalPrice = this.basePrice - disc;
+                document.getElementById('pmodal-price-summary').style.display = 'block';
+                document.getElementById('psum-base').textContent = new Intl.NumberFormat('fr-FR').format(this.basePrice) + ' F';
+                document.getElementById('psum-discount-row').style.display = pct > 0 ? 'flex' : 'none';
+                document.getElementById('psum-pct').textContent = pct;
+                document.getElementById('psum-disc').textContent = new Intl.NumberFormat('fr-FR').format(disc);
+                document.getElementById('psum-total').textContent = new Intl.NumberFormat('fr-FR').format(this.finalPrice) + ' F';
+                document.getElementById('btn-pay-text').textContent = 'Payer ' + new Intl.NumberFormat('fr-FR').format(this.finalPrice) + ' F';
+                this.showToast('✅ Code valide ! -' + pct + '% de réduction', 'success');
+            } else {
+                this.resetPromo();
+                if (code.length >= 3) this.showToast(data?.error || 'Code invalide', 'error');
+            }
+        } catch(e) {
+            console.log('[Landing] Erreur promo:', e);
+            this.resetPromo();
+        }
+    },
+
+    resetPromo() {
+        if (!this.currentPlan) return;
+        this.finalPrice = this.basePrice;
+        this.promoData = null;
+        document.getElementById('pmodal-price-summary').style.display = 'none';
+        document.getElementById('btn-pay-text').textContent = 'Payer ' + new Intl.NumberFormat('fr-FR').format(this.basePrice) + ' F';
+    },
+
+    // =====================
+    // HANDLE PURCHASE
+    // =====================
+    async handlePurchase() {
+        const plan = this.currentPlan;
+        if (!plan) { this.showToast('Sélectionne un plan', 'warning'); return; }
+
+        const name = document.getElementById('pm-name')?.value?.trim();
+        const email = document.getElementById('pm-email')?.value?.trim();
+        const phone = document.getElementById('pm-phone')?.value?.trim();
+        const password = document.getElementById('pm-pass')?.value;
+        const password2 = document.getElementById('pm-pass2')?.value;
+        const promo = document.getElementById('pm-promo')?.value?.trim().toUpperCase();
+        const terms = document.getElementById('pm-terms')?.checked;
+        const btn = document.getElementById('btn-pmodal-pay');
+
+        if (!name || name.length < 2) { this.showToast('Entrez votre nom complet', 'warning'); return; }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { this.showToast('Email invalide', 'warning'); return; }
+        if (!phone || phone.length < 8) { this.showToast('Numéro de téléphone invalide', 'warning'); return; }
+        if (!password || password.length < 6) { this.showToast('Mot de passe: minimum 6 caractères', 'warning'); return; }
+        if (password !== password2) { this.showToast('Les mots de passe ne correspondent pas', 'error'); return; }
+        if (!terms) { this.showToast('Accepte les conditions d\'utilisation', 'warning'); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="ak-spinner"></span> Vérification...';
+
+        try {
+            const { data: existingUser } = await db.from('users').select('id').eq('email', email).maybeSingle();
+            if (existingUser) {
+                this.showToast('Cet email est déjà utilisé. Connectez-vous dans l\'app.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> <span id="btn-pay-text">Payer ' + new Intl.NumberFormat('fr-FR').format(this.finalPrice) + ' F</span>';
+                return;
+            }
+
+            const purchaseData = {
+                name, email, phone, password, promo,
+                amount: this.finalPrice,
+                planId: plan.id,
+                planName: plan.name,
+                subscriptionMonths: plan.subscriptionMonths,
+                promoData: this.promoData
+            };
+
+            if (CONFIG.TEST_MODE) {
+                this.simulatePayment(purchaseData);
+            } else {
+                this.openFeexPay(purchaseData);
+            }
+        } catch(error) {
+            console.error('[Landing] Erreur:', error);
+            this.showToast('Une erreur est survenue. Réessayez.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>';
+        }
+    },
+
+    simulatePayment(purchaseData) {
+        this._tempPurchaseData = purchaseData;
+        if (confirm('MODE TEST — Simuler un paiement réussi de ' + new Intl.NumberFormat('fr-FR').format(purchaseData.amount) + ' F ?')) {
+            this.completePurchase(purchaseData, 'TEST-' + Date.now());
+        } else {
+            const btn = document.getElementById('btn-pmodal-pay');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
+        }
+    },
+
+    // =====================
+    // FEEXPAY
+    // =====================
+    openFeexPay(purchaseData) {
+        const btn = document.getElementById('btn-pmodal-pay');
+        this._tempPurchaseData = purchaseData;
+
+        const reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2,7).toUpperCase();
+        localStorage.setItem('ako_feex_ref', reference);
+        localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
+
+        try {
+            FeexPayButton.init('feexpay-render', {
+                id: CONFIG.FEEXPAY_STORE,
+                amount: purchaseData.amount,
+                token: CONFIG.FEEXPAY_TOKEN,
+                callback_url: window.location.origin + window.location.pathname + '?feexpay=success&ref=' + reference,
+                error_callback_url: window.location.origin + window.location.pathname + '?feexpay=error',
+                mode: 'LIVE',
+                custom_id: reference,
+                description: 'AKOLABS Plan ' + purchaseData.planName
+            });
+
+            document.getElementById('pmodal-form-area').querySelector('button').style.display = 'none';
+            if (btn) btn.style.display = 'none';
+            const instr = document.getElementById('feexpay-instruction');
+            if (instr) {
+                instr.style.display = 'block';
+                setTimeout(() => instr.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+            }
+        } catch(e) {
+            console.error('[FeexPay] Erreur:', e);
+            localStorage.removeItem('ako_feex_ref');
+            localStorage.removeItem('ako_feex_data');
+            this.showToast('Erreur initialisation paiement. Réessayez.', 'error');
+            if (btn) { btn.disabled = false; btn.style.display = ''; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
+        }
+    },
+
+    cancelFeexPay() {
+        localStorage.removeItem('ako_feex_ref');
+        localStorage.removeItem('ako_feex_data');
+        document.getElementById('feexpay-instruction').style.display = 'none';
+        const btn = document.getElementById('btn-pmodal-pay');
+        if (btn) { btn.disabled = false; btn.style.display = ''; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
+    },
+
+    // =====================
+    // COMPLETE PURCHASE
+    // =====================
+    async completePurchase(purchaseData, transactionId) {
+        const btn = document.getElementById('btn-pmodal-pay');
+        const plan = PLANS[purchaseData.planId] || PLANS['pro'];
+
+        try {
+            this.showToast('Paiement reçu ! Création du compte...', 'success', 2500);
+
+            // 1. Créer compte
+            const signUpResult = await db.auth.signUp({
+                email: purchaseData.email,
+                password: purchaseData.password,
+                options: {
+                    emailRedirectTo: null,
+                    data: {
+                        full_name: purchaseData.name,
+                        phone: purchaseData.phone,
+                        is_app_purchased: true,
+                        subscription_plan: plan.id,
+                        referred_by: (purchaseData.promoData && purchaseData.promoData.is_affiliate_code) ? purchaseData.promo : null
+                    }
+                }
+            });
+
+            if (signUpResult.error) {
+                if (signUpResult.error.message && signUpResult.error.message.toLowerCase().includes('already')) {
+                    const existR = await db.from('users').select('id').eq('email', purchaseData.email).single();
+                    if (!existR.data) {
+                        this.showToast('Email déjà utilisé. Connectez-vous dans l\'app.', 'error');
+                        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
+                        return;
+                    }
+                    signUpResult.data = { user: { id: existR.data.id } };
+                    signUpResult.error = null;
+                } else {
+                    this.showToast('Erreur: ' + signUpResult.error.message, 'error');
+                    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
+                    return;
+                }
+            }
+
+            const userId = signUpResult.data.user.id;
+            console.log('[Landing] Compte créé:', userId);
+
+            // 2. Attendre trigger
+            await new Promise(r => setTimeout(r, 2500));
+
+            // 3. Sign in
+            const signInResult = await db.auth.signInWithPassword({ email: purchaseData.email, password: purchaseData.password });
+            if (signInResult.error) console.warn('[Landing] Auto-login:', signInResult.error.message);
+            else console.log('[Landing] Auto-login OK');
+
+            // 4. Calculer expiration abonnement
+            let subscriptionExpiresAt = null;
+            if (plan.subscriptionMonths) {
+                const expDate = new Date();
+                expDate.setMonth(expDate.getMonth() + plan.subscriptionMonths);
+                subscriptionExpiresAt = expDate.toISOString();
+            }
+
+            // 5. Mettre à jour profil avec plan
+            try {
+                await db.from('users').update({
+                    is_app_purchased: true,
+                    phone: purchaseData.phone || null,
+                    subscription_plan: plan.id,
+                    subscription_expires_at: subscriptionExpiresAt
+                }).eq('id', userId);
+                console.log('[Landing] Profil mis à jour avec plan:', plan.id);
+            } catch(e) { console.warn('[Landing] Update profil:', e); }
+
+            // 6. Enregistrer achat
+            try {
+                const affiliateUserId = (purchaseData.promoData && purchaseData.promoData.affiliate_user_id) ? purchaseData.promoData.affiliate_user_id : null;
+                const commission = affiliateUserId ? Math.round(purchaseData.amount * CONFIG.AFFILIATE_COMMISSION_PERCENT / 100) : 0;
+                const fees = Math.ceil(purchaseData.amount * 3 / 100);
+
+                const purchaseResult = await db.from('purchases').insert({
+                    user_id: userId,
+                    purchase_type: plan.id + '_access',
+                    amount: purchaseData.amount,
+                    fees: fees,
+                    total_paid: purchaseData.amount + fees,
+                    payment_ref: String(transactionId || ''),
+                    payment_provider: CONFIG.TEST_MODE ? 'test' : 'feexpay',
+                    promo_code_used: purchaseData.promo || null,
+                    discount_amount: plan.price - purchaseData.amount,
+                    affiliate_user_id: affiliateUserId,
+                    affiliate_commission: commission,
+                    status: 'confirmed',
+                    confirmed_at: new Date().toISOString()
+                });
+
+                if (purchaseResult.error) console.error('[Landing] Erreur insert achat:', purchaseResult.error);
+                else { LandingApp.trackConversion(); console.log('[Landing] Achat enregistré'); }
+            } catch(e) { console.error('[Landing] Insert achat exception:', e); }
+
+            // 7. Accès sections pour Starter (sections exclues bloquées)
+            if (plan.id === 'starter') {
+                // Donner accès à toutes les sections SAUF les exclues
+                try {
+                    const { data: allSections } = await db.from('sections').select('id, title').eq('is_active', true);
+                    if (allSections) {
+                        const allowedSections = allSections.filter(s => 
+                            !plan.excludedTitles.some(excl => s.title.toLowerCase().includes(excl.toLowerCase()))
+                        );
+                        for (const sec of allowedSections) {
+                            await db.from('user_sections').insert({
+                                user_id: userId, section_id: sec.id,
+                                access_type: 'lifetime', granted_by: 'purchase', is_active: true
+                            }).catch(() => {});
+                        }
+                    }
+                } catch(e) { console.warn('[Landing] Sections starter:', e); }
+            }
+
+            // 8. Promo
+            if (purchaseData.promo) {
+                try { await db.rpc('increment_promo_usage', { p_code: purchaseData.promo }); } catch(e) {}
+            }
+
+            // 9. Analytics
+            try {
+                await db.from('app_analytics').insert({
+                    event_type: 'purchase', user_id: userId,
+                    metadata: { plan: plan.id, amount: purchaseData.amount, transaction_id: transactionId }
+                });
+            } catch(e) {}
+
+            // 10. Email AVANT signOut
+            try {
+                const loginUrl = window.location.origin + '/';
+                await Utils.sendEmail(CONFIG.EMAILJS_TEMPLATE_WELCOME, {
+                    to_email: purchaseData.email,
+                    to_name: purchaseData.name,
+                    amount_paid: new Intl.NumberFormat('fr-FR').format(purchaseData.amount) + ' F',
+                    app_link: loginUrl,
+                    install_guide: 'Plan ' + plan.name + ' — ' + plan.durationLabel
+                });
+                console.log('[Landing] Email bienvenue envoyé');
+            } catch(e) { console.error('[Landing] Erreur email:', e); }
+
+            // 11. SignOut
+            await db.auth.signOut().catch(() => {});
+
+            // 12. Confetti + succès
+            try { Utils.showConfetti(); Utils.vibrate([100,50,100,50,200]); } catch(e) {}
+            this.showSuccessScreen(purchaseData, plan);
+
+            // Meta Pixel
+            if (typeof fbq === 'function') {
+                fbq('track', 'Purchase', {
+                    value: purchaseData.amount,
+                    currency: 'XOF',
+                    content_type: 'product',
+                    content_ids: ['akolabs_' + plan.id],
+                    content_name: 'AKOLABS Plan ' + plan.name
+                });
+            }
+
+        } catch(error) {
+            console.error('[Landing] Erreur finalisation:', error);
+            const checkUser = await db.from('users').select('id').eq('email', purchaseData.email).single().catch(() => ({ data: null }));
+            if (checkUser.data) {
+                this.showSuccessScreen(purchaseData, plan);
+            } else {
+                this.showToast('Erreur lors de la finalisation. Contactez: akolabs.app@gmail.com', 'error', 8000);
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
+            }
+        }
+    },
+
+    // =====================
+    // ÉCRAN SUCCÈS
+    // =====================
+    showSuccessScreen(purchaseData, plan) {
+        const modal = document.getElementById('payment-modal');
+        const box = modal.querySelector('.payment-modal-box');
+        if (!box) return;
+
+        box.innerHTML = `
+        <div style="padding:28px;text-align:center;background:var(--ako-bg);border-radius:24px;">
+            <div style="font-size:56px;margin-bottom:12px;">🎉</div>
+            <h2 style="font-family:'Syne',sans-serif;color:#3DDB7D;font-size:24px;margin-bottom:8px;">Paiement Réussi !</h2>
+            <p style="color:#F0EDF8;font-size:14px;margin-bottom:4px;">Félicitations <strong>${purchaseData.name.split(' ')[0]}</strong> !</p>
+            <p style="color:#9B97B5;font-size:13px;margin-bottom:24px;">Plan <strong style="color:#C9A84C">${plan ? plan.name : ''}</strong> activé avec succès.</p>
+
+            <div style="background:#FFF8E8;border:2px dashed #C9A84C;border-radius:16px;padding:20px;margin-bottom:14px;">
+                <i class="fas fa-envelope-open-text" style="font-size:36px;color:#4B0082;margin-bottom:10px;display:block;"></i>
+                <h3 style="color:#4B0082;font-family:'Syne',sans-serif;font-size:16px;margin-bottom:8px;">Consultez votre boite mail</h3>
+                <p style="color:#1A1A2E;font-size:12px;margin-bottom:10px;">Nous venons de vous envoyer un email important à :</p>
+                <div style="background:#4B0082;border-radius:8px;padding:8px 12px;margin-bottom:12px;">
+                    <strong style="color:#C9A84C;font-size:12px;word-break:break-all;">${purchaseData.email}</strong>
+                </div>
+                <p style="color:#1A1A2E;font-size:12px;font-weight:600;line-height:1.9;text-align:left;">
+                    ✅ Vos identifiants de connexion<br>
+                    ✅ Votre reçu de paiement<br>
+                    ✅ Le lien d'accès pour installer l'application
+                </p>
+            </div>
+
+            <div style="background:#F0EDF8;border:1px solid rgba(75,0,130,0.2);border-radius:10px;padding:12px;margin-bottom:12px;text-align:left;">
+                <p style="color:#4A4767;font-size:11px;margin:0;line-height:1.5;">
+                    <i class="fas fa-info-circle" style="color:#4B0082;"></i>
+                    Si vous ne trouvez pas notre email, vérifiez vos <strong style="color:#4B0082;">spams</strong>.
+                </p>
+            </div>
+
+            <div style="background:#4B0082;border:1px solid #C9A84C;border-radius:10px;padding:12px;text-align:left;">
+                <p style="color:#fff;font-size:11px;margin:0;line-height:1.7;">
+                    <i class="fas fa-headset" style="color:#C9A84C;margin-right:6px;"></i>
+                    Achat effectué mais pas de mail ? Contactez-nous :<br>
+                    <a href="mailto:akolabs.app@gmail.com" style="color:#C9A84C;font-weight:700;text-decoration:none;">akolabs.app@gmail.com</a>
+                </p>
+            </div>
+        </div>`;
+    },
+
+    // =====================
+    // TRACKING
+    // =====================
+    trackConversion() {
+        try {
+            if (LandingApp._visitId) {
+                db.from('landing_visits').update({ converted: true }).eq('id', LandingApp._visitId).then(() => {}).catch(() => {});
+            }
+        } catch(e) {}
+    },
+
+    trackVisit() {
+        try {
+            const getVisitorId = () => {
+                const key = 'ako_vid';
+                let vid = localStorage.getItem(key);
+                if (!vid) { vid = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2,9); localStorage.setItem(key, vid); }
+                return vid;
+            };
+            const getSource = () => {
+                const p = new URLSearchParams(window.location.search);
+                const utm = p.get('utm_source') || p.get('utm_medium') || p.get('ref');
+                if (utm) {
+                    if (utm.toLowerCase().includes('facebook') || utm.toLowerCase().includes('fb')) return 'Facebook';
+                    if (utm.toLowerCase().includes('instagram') || utm.toLowerCase().includes('ig')) return 'Instagram';
+                    if (utm.toLowerCase().includes('tiktok')) return 'TikTok';
+                    if (utm.toLowerCase().includes('whatsapp') || utm.toLowerCase().includes('wa')) return 'WhatsApp';
+                    return utm;
+                }
+                const ref = document.referrer || '';
+                if (ref.includes('facebook.com')) return 'Facebook';
+                if (ref.includes('instagram.com')) return 'Instagram';
+                if (ref.includes('tiktok.com')) return 'TikTok';
+                if (ref === '') return 'Direct';
+                return 'Autre';
+            };
+            const visitorId = getVisitorId();
+            const visitStart = Date.now();
+            LandingApp._visitStart = visitStart;
+            db.from('landing_visits').insert({ visitor_id: visitorId, source: getSource(), referrer: document.referrer || null, user_agent: navigator.userAgent, device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop', landed_at: new Date().toISOString(), duration_seconds: 0, converted: false }).then(() => {}).catch(() => {});
+            setTimeout(async () => {
+                try {
+                    const r = await db.from('landing_visits').select('id').eq('visitor_id', visitorId).order('landed_at', { ascending: false }).limit(1).single();
+                    if (r.data) LandingApp._visitId = r.data.id;
+                } catch(e) {}
+            }, 1500);
+            window.addEventListener('beforeunload', () => {
+                const duration = Math.round((Date.now() - visitStart) / 1000);
+                if (LandingApp._visitId) db.from('landing_visits').update({ duration_seconds: duration }).eq('id', LandingApp._visitId).then(() => {}).catch(() => {});
+            });
+        } catch(e) { console.warn('[Tracking]:', e); }
+    },
+
+    // =====================
+    // CHARGEMENT DONNÉES
+    // =====================
     async loadSections() {
         try {
-            const { data: sections, error } = await db
-                .from('sections')
-                .select('title, slug, description, long_description, type, banner_url, custom_logo_url, preview_video_url, advantages, is_coming_soon, order_index')
-                .eq('is_active', true)
-                .order('order_index');
-            if (error) throw error;
-
-            const container = document.getElementById('preview-scroll');
-            if (!container || !sections || sections.length === 0) return;
-
-            // Stocker pour le modal
+            const { data: sections, error } = await db.from('sections').select('title, slug, description, long_description, type, banner_url, custom_logo_url, preview_video_url, advantages, is_coming_soon, order_index').eq('is_active', true).order('order_index');
+            if (error || !sections || !sections.length) return;
             LandingApp._sections = sections;
-
+            const container = document.getElementById('preview-scroll');
+            if (!container) return;
             container.innerHTML = sections.map((s, idx) => {
-            const typeLabel = s.type === 'webview' ? '🌐 Universe' : s.type === 'apk' ? '📱 App Prime' : '📚 Learning';
-                const bannerOptUrl = LandingApp.cloudinaryUrl(s.banner_url, 'f_auto,q_auto:good,w_400,h_200,c_fill');
-                const bannerStyle = bannerOptUrl
-                    ? `background-image:url(${bannerOptUrl});background-size:cover;background-position:center;`
-                    : 'background:linear-gradient(135deg,#4B0082,#5D1494);';
-
-                return `
-                <div class="preview-card" onclick="LandingApp.openModal(${idx})">
-                    <div class="preview-card-img" style="${bannerStyle}">
-                        ${s.preview_video_url ? '<div class="preview-play-dot"><i class="fas fa-play"></i></div>' : ''}
-                    </div>
+                const typeLabel = s.type === 'webview' ? '🌐 Universe' : s.type === 'apk' ? '📱 App Prime' : '📚 Learning';
+                const bannerUrl = s.banner_url ? s.banner_url.replace('/upload/', '/upload/f_auto,q_auto:good,w_400,h_200,c_fill/') : '';
+                const bannerStyle = bannerUrl ? `background-image:url(${bannerUrl});background-size:cover;background-position:center;` : 'background:linear-gradient(135deg,#4B0082,#6A1B9A);';
+                return `<div class="preview-card" onclick="LandingApp.openModal(${idx})">
+                    <div class="preview-card-img" style="${bannerStyle}"></div>
                     <div class="preview-card-body">
                         <div class="preview-card-type">${typeLabel}</div>
                         <div class="preview-card-title">${s.title}</div>
-                        <div class="preview-card-desc">${s.description || ''}</div>
-                        <button class="preview-card-btn">
-                            En savoir plus <i class="fas fa-arrow-right"></i>
-                        </button>
+                        <div class="preview-card-desc">${(s.description||'').substring(0,70)}${s.description && s.description.length>70?'...':''}</div>
+                        <span class="preview-card-btn"><i class="fas fa-eye"></i> En savoir plus</span>
                     </div>
                 </div>`;
             }).join('');
-
-            // Mettre à jour les dots au scroll
             container.addEventListener('scroll', () => {
-                const cardW = container.querySelector('.preview-card')?.offsetWidth + 16 || 260;
+                const cardW = (container.querySelector('.preview-card')?.offsetWidth || 200) + 14;
                 const idx = Math.round(container.scrollLeft / cardW);
-                document.querySelectorAll('.scroll-hint-dot').forEach((d, i) => {
-                    d.classList.toggle('active', i === idx % document.querySelectorAll('.scroll-hint-dot').length);
-                });
+                document.querySelectorAll('#preview-dots .scroll-hint-dot').forEach((d,i) => d.classList.toggle('active', i === idx % 3));
             });
-
-        } catch (e) {
-            console.log('[Landing] Erreur chargement sections:', e);
-        }
+        } catch(e) { console.log('[Landing] Sections:', e); }
     },
 
-    // ---- Ouvrir modal détail section ----
     openModal(idx) {
         const s = LandingApp._sections && LandingApp._sections[idx];
         if (!s) return;
-
-        const advantages = Array.isArray(s.advantages) ? s.advantages : [];
-
-        const bannerModalUrl = LandingApp.cloudinaryUrl(s.banner_url, 'f_auto,q_auto:good,w_600,h_300,c_fill');
-
-        const videoBlock = s.preview_video_url ? `
-            <div class="modal-media-wrap" onclick="LandingApp.playModalVideo(this,'${s.preview_video_url}')">
-                <div class="modal-media-thumb" style="${bannerModalUrl ? 'background-image:url('+bannerModalUrl+');background-size:cover;background-position:center;' : 'background:#1a1a2e;'}"></div>
-                <div class="showcase-play-btn"><i class="fas fa-play"></i></div>
-            </div>` : (bannerModalUrl ? `<div class="modal-banner" style="background-image:url(${bannerModalUrl})"></div>` : '');
-
-        const advBlock = advantages.length > 0 ? `
-            <div class="modal-advantages">
-                <div class="modal-adv-title"><i class="fas fa-gift"></i> Ce que tu obtiens</div>
-                ${advantages.map(a => `
-                    <div class="showcase-adv-item">
-                        <i class="fas fa-check-circle showcase-adv-icon"></i>
-                        <span>${a}</span>
-                    </div>`).join('')}
-            </div>` : '';
-
+        const adv = Array.isArray(s.advantages) ? s.advantages : [];
+        const bannerUrl = s.banner_url ? s.banner_url.replace('/upload/', '/upload/f_auto,q_auto:good,w_600,h_300,c_fill/') : '';
         document.getElementById('section-modal-content').innerHTML = `
-            ${videoBlock}
+            ${bannerUrl ? `<div class="modal-banner" style="background-image:url(${bannerUrl})"></div>` : ''}
             <div class="modal-body">
-                <div class="showcase-type">${s.type === 'webview' ? '🌐 AKOLABS Universe' : s.type === 'apk' ? '📱 AKOLABS App Prime' : '📚 AKOLABS Learning'}</div>
+                <div style="font-size:11px;color:#C9A84C;text-transform:uppercase;letter-spacing:.5px;">${s.type==='webview'?'🌐 Universe':s.type==='apk'?'📱 App Prime':'📚 Learning'}</div>
                 <div class="modal-title">${s.title}</div>
-                <div class="modal-desc">${s.long_description || s.description || ''}</div>
-                ${advBlock}
-                <a href="#purchase" class="btn btn-primary btn-block modal-cta" onclick="LandingApp.closeModal(null)">
+                <div class="modal-desc">${s.long_description||s.description||''}</div>
+                ${adv.length>0?`<div class="modal-adv-title"><i class="fas fa-gift"></i> Ce que tu obtiens</div>${adv.map(a=>`<div class="modal-adv-item"><i class="fas fa-check-circle"></i><span>${a}</span></div>`).join('')}`:''}
+                <button class="modal-cta" onclick="LandingApp.closeModal(null);LandingApp.openPlanModal('pro')">
                     <i class="fas fa-rocket"></i> Obtenir l'accès AKOLABS
-                </a>
+                </button>
             </div>`;
-
         document.getElementById('section-modal').classList.add('open');
         document.body.style.overflow = 'hidden';
     },
@@ -747,715 +2154,170 @@ const LandingApp = {
         document.body.style.overflow = '';
     },
 
-    playModalVideo(wrapper, src) {
-        wrapper.innerHTML = `<video src="${src}" autoplay controls playsinline
-            style="width:100%;max-height:240px;object-fit:cover;background:#000;display:block;">
-        </video>`;
-    },
-
-    // ---- Charger les captures d'écran depuis Supabase ----
     async loadScreenshots() {
         const container = document.getElementById('screenshots-scroll');
         if (!container) return;
         try {
-            const { data, error } = await db
-                .from('app_screenshots')
-                .select('id, url, label, order_index')
-                .order('order_index');
-
-            if (error || !data || data.length === 0) {
-                // Pas encore de screenshots : masquer la section
-                const section = document.getElementById('screenshots');
-                if (section) section.style.display = 'none';
+            const { data, error } = await db.from('app_screenshots').select('id, url, label, order_index').order('order_index');
+            if (error || !data || !data.length) {
+                document.getElementById('screenshots')?.style && (document.getElementById('screenshots').style.display = 'none');
                 return;
             }
-
             container.innerHTML = data.map(s => {
-                // URL Cloudinary optimisée : WebP/AVIF auto, qualité auto, max 360px de large
-                var src = s.url;
-                if (src && src.indexOf('res.cloudinary.com') !== -1) {
-                    src = src.replace('/upload/', '/upload/f_auto,q_auto:good,w_360/');
-                }
+                let src = s.url;
+                if (src && src.includes('res.cloudinary.com')) src = src.replace('/upload/', '/upload/f_auto,q_auto:good,w_360/');
                 return `<div class="screenshot-item">
-                    <img
-                        src="${src}"
-                        alt="${s.label || 'AKOLABS'}"
-                        decoding="async"
-                        onload="this.classList.add('loaded')"
-                        onerror="this.closest('.screenshot-item').style.display='none'"
-                    >
-                    ${s.label ? `<div class="screenshot-label">${s.label}</div>` : ''}
+                    <img src="${src}" alt="${s.label||'AKOLABS'}" decoding="async" onload="this.classList.add('loaded')" onerror="this.closest('.screenshot-item').style.display='none'">
+                    ${s.label?`<div class="screenshot-label">${s.label}</div>`:''}
                 </div>`;
             }).join('');
-
         } catch(e) {
-            console.warn('[Screenshots] Erreur chargement:', e);
-            const section = document.getElementById('screenshots');
-            if (section) section.style.display = 'none';
+            document.getElementById('screenshots')?.style && (document.getElementById('screenshots').style.display = 'none');
         }
     },
 
-    // ---- Offre Flash avec countdown ----
     async loadFlash() {
         try {
             const now = new Date().toISOString();
-            const { data, error } = await db
-                .from('flash_sales')
-                .select('title, description, discount_percent, ends_at, is_active')
-                .eq('is_active', true)
-                .gt('ends_at', now)
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle();
-
-            if (error || !data) return;
-
+            const { data } = await db.from('flash_sales').select('title, description, discount_percent, ends_at').eq('is_active', true).gt('ends_at', now).order('created_at', { ascending: false }).limit(1).maybeSingle();
+            if (!data) return;
             const banner = document.getElementById('landing-flash-banner');
             if (!banner) return;
-
             document.getElementById('lf-title').textContent = data.title || 'Offre Flash';
-            const pct = data.discount_percent || 0;
-            document.getElementById('lf-desc').textContent = data.description ||
-                (pct > 0 ? `-${pct}% sur l\u2019acc\u00e8s AKOLABS` : 'Prix sp\u00e9cial disponible');
-
-            // Appliquer la réduction sur le prix affiché
-            if (pct > 0) {
-                const discounted = Math.round(this.basePrice * (1 - pct / 100));
-                this.finalPrice = discounted;
-                const priceEl = document.querySelector('.purchase-price-value');
-                if (priceEl) priceEl.textContent = discounted.toLocaleString('fr-FR') + ' FCFA';
-                const flash_badge = document.getElementById('hero-flash-price');
-                if (flash_badge) flash_badge.textContent = discounted.toLocaleString('fr-FR') + ' FCFA';
-            }
-
+            document.getElementById('lf-desc').textContent = data.description || (data.discount_percent > 0 ? '-' + data.discount_percent + '% sur les plans AKOLABS' : '');
             banner.style.display = 'block';
-
-            // Countdown temps réel
             const endDate = new Date(data.ends_at);
             const tick = () => {
                 const diff = endDate - new Date();
-                if (diff <= 0) {
-                    banner.style.display = 'none';
-                    return;
-                }
-                const days = Math.floor(diff / 86400000);
-                const h = Math.floor((diff % 86400000) / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                const pad = n => String(n).padStart(2, '0');
-                const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = pad(v); };
-                set('lf-d', days); set('lf-h', h); set('lf-m', m); set('lf-s', s);
+                if (diff <= 0) { banner.style.display = 'none'; return; }
+                const pad = n => String(n).padStart(2,'0');
+                const set = (id,v) => { const e = document.getElementById(id); if(e) e.textContent = pad(v); };
+                set('lf-d', Math.floor(diff/86400000));
+                set('lf-h', Math.floor((diff%86400000)/3600000));
+                set('lf-m', Math.floor((diff%3600000)/60000));
+                set('lf-s', Math.floor((diff%60000)/1000));
             };
-            tick();
-            setInterval(tick, 1000);
-
-        } catch (e) {
-            console.log('[Landing] Flash:', e);
-        }
-    },
-
-    // ---- TRACKING VISITEURS ----
-    trackVisit() {
-        try {
-            // Générer ou récupérer visitor_id unique (cookie 1 an)
-            const getVisitorId = () => {
-                const key = 'ako_vid';
-                let vid = localStorage.getItem(key);
-                if (!vid) {
-                    vid = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
-                    localStorage.setItem(key, vid);
-                }
-                return vid;
-            };
-
-            // Détecter la source UTM
-            const getSource = () => {
-                const p = new URLSearchParams(window.location.search);
-                const utm = p.get('utm_source') || p.get('utm_medium') || p.get('ref');
-                if (utm) {
-                    if (utm.toLowerCase().includes('facebook') || utm.toLowerCase().includes('fb')) return 'Facebook';
-                    if (utm.toLowerCase().includes('instagram') || utm.toLowerCase().includes('ig')) return 'Instagram';
-                    if (utm.toLowerCase().includes('tiktok')) return 'TikTok';
-                    if (utm.toLowerCase().includes('whatsapp') || utm.toLowerCase().includes('wa')) return 'WhatsApp';
-                    if (utm.toLowerCase().includes('google')) return 'Google';
-                    return utm;
-                }
-                const ref = document.referrer || '';
-                if (ref.includes('facebook.com') || ref.includes('fb.com')) return 'Facebook';
-                if (ref.includes('instagram.com')) return 'Instagram';
-                if (ref.includes('tiktok.com')) return 'TikTok';
-                if (ref.includes('google.com')) return 'Google';
-                if (ref.includes('wa.me') || ref.includes('whatsapp')) return 'WhatsApp';
-                if (ref === '') return 'Direct';
-                return 'Autre';
-            };
-
-            const visitorId = getVisitorId();
-            const source = getSource();
-            const visitStart = Date.now();
-            const sessionKey = 'ako_session_' + new Date().toDateString();
-
-            // Enregistrer la visite dans Supabase
-            const visitData = {
-                visitor_id: visitorId,
-                source: source,
-                referrer: document.referrer || null,
-                user_agent: navigator.userAgent,
-                device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-                landed_at: new Date().toISOString(),
-                duration_seconds: 0,
-                converted: false
-            };
-
-            let visitId = null;
-
-            db.from('landing_visits').insert(visitData).then(r => {
-                if (r.data && r.data[0]) visitId = r.data[0].id;
-            }).catch(() => {});
-
-            // Stocker visit_id pour conversion plus tard
-            LandingApp._visitStart = visitStart;
-            LandingApp._visitId = null;
-
-            // Re-fetch visit_id après insert
-            setTimeout(async () => {
-                try {
-                    const r = await db.from('landing_visits')
-                        .select('id')
-                        .eq('visitor_id', visitorId)
-                        .order('landed_at', { ascending: false })
-                        .limit(1)
-                        .single();
-                    if (r.data) LandingApp._visitId = r.data.id;
-                } catch(e) {}
-            }, 1000);
-
-            // Mettre à jour la durée au départ de la page
-            window.addEventListener('beforeunload', () => {
-                const duration = Math.round((Date.now() - visitStart) / 1000);
-                if (LandingApp._visitId) {
-                    // Utiliser sendBeacon pour fiabilité
-                    const payload = JSON.stringify({
-                        duration_seconds: duration
-                    });
-                    // Mise à jour via fetch synchrone de secours
-                    db.from('landing_visits')
-                        .update({ duration_seconds: duration })
-                        .eq('id', LandingApp._visitId)
-                        .then(() => {}).catch(() => {});
-                }
-            });
-
-        } catch(e) {
-            console.warn('[Tracking] Erreur:', e);
-        }
-    },
-
-    // Appeler après achat confirmé
-    trackConversion() {
-        try {
-            if (LandingApp._visitId) {
-                db.from('landing_visits')
-                    .update({ converted: true })
-                    .eq('id', LandingApp._visitId)
-                    .then(() => {}).catch(() => {});
-            }
+            tick(); setInterval(tick, 1000);
         } catch(e) {}
     },
 
-    // ---- Vérification code promo ----
-    setupPromoCheck() {
-        const input = document.getElementById('pf-promo');
-        if (!input) return;
-
-        let timeout;
-        input.addEventListener('input', (e) => {
-            clearTimeout(timeout);
-            const code = e.target.value.trim().toUpperCase();
-            e.target.value = code;
-
-            if (code.length >= 3) {
-                timeout = setTimeout(() => this.checkPromoCode(code), 600);
-            } else {
-                this.resetPrice();
-            }
-        });
-    },
-
-    async checkPromoCode(code) {
+    async loadTestimonials() {
         try {
-            const { data, error } = await db.rpc('verify_promo_code', {
-                p_code: code,
-                p_section_id: null
-            });
+            const { data } = await db.from('landing_testimonials').select('*').eq('is_active', true).order('order_index');
+            const carousel = document.getElementById('testi-carousel');
+            if (!carousel) return;
 
-            if (error) throw error;
-
-            if (data && data.valid) {
-                this.promoData = data;
-                const discountPercent = data.discount_percent || 0;
-                const discountAmount = Math.round(this.basePrice * discountPercent / 100);
-                this.finalPrice = this.basePrice - discountAmount;
-
-                document.getElementById('price-summary').style.display = 'block';
-                document.getElementById('summary-base').textContent = Utils.formatPrice(this.basePrice);
-                document.getElementById('summary-discount-row').style.display = 'flex';
-                document.getElementById('summary-discount-percent').textContent = discountPercent;
-                document.getElementById('summary-discount-amount').textContent = new Intl.NumberFormat('fr-FR').format(discountAmount);
-                document.getElementById('summary-total').textContent = Utils.formatPrice(this.finalPrice);
-
-                document.querySelector('#btn-purchase .btn-text').textContent = 
-                    `Payer ${Utils.formatPrice(this.finalPrice)} `;
-
-                Utils.showToast(`✅ Code valide ! -${discountPercent}% de réduction`, 'success');
+            let slides = [];
+            if (data && data.length) {
+                // Images uploadées depuis admin
+                carousel.innerHTML = data.map(t => {
+                    let src = t.image_url;
+                    if (src && src.includes('res.cloudinary.com')) src = src.replace('/upload/', '/upload/f_auto,q_auto:good,w_320/');
+                    return `<div class="testi-slide"><img src="${src}" alt="Témoignage" loading="lazy" onerror="this.closest('.testi-slide').style.display='none'"></div>`;
+                }).join('');
+                slides = data;
             } else {
-                this.resetPrice();
-                if (code.length >= 3) {
-                    Utils.showToast(data?.error || 'Code invalide', 'error');
-                }
+                // Garder les slides par défaut et compter ceux présents
+                slides = Array.from(carousel.querySelectorAll('.testi-slide'));
             }
-        } catch (e) {
-            console.log('[Landing] Erreur promo:', e);
-            this.resetPrice();
-        }
+
+            const count = data && data.length ? data.length : carousel.querySelectorAll('.testi-slide').length;
+            // Dots
+            const nav = document.getElementById('testi-nav');
+            if (nav && count > 0) {
+                nav.innerHTML = Array.from({length: count}, (_,i) =>
+                    `<div class="testi-dot${i===0?' active':''}" onclick="LandingApp.scrollTesti(${i})"></div>`
+                ).join('');
+            }
+            // Auto scroll toutes les 3.5s
+            if (count > 1) {
+                let current = 0;
+                setInterval(() => {
+                    current = (current + 1) % count;
+                    LandingApp.scrollTesti(current);
+                }, 3500);
+            }
+        } catch(e) { console.log('[Testi]:', e); }
     },
 
-    resetPrice() {
-        this.finalPrice = this.basePrice;
-        this.promoData = null;
-        document.getElementById('price-summary').style.display = 'none';
-        document.querySelector('#btn-purchase .btn-text').textContent = 
-            `Payer ${Utils.formatPrice(this.basePrice)} `;
+    scrollTesti(idx) {
+        const carousel = document.getElementById('testi-carousel');
+        if (!carousel) return;
+        const slide = carousel.querySelectorAll('.testi-slide')[idx];
+        if (slide) {
+            carousel.scrollTo({ left: slide.offsetLeft - carousel.offsetLeft, behavior: 'smooth' });
+        }
+        document.querySelectorAll('#testi-nav .testi-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
     },
 
-    // ---- HANDLE PURCHASE ----
-    async handlePurchase() {
-        const name = document.getElementById('pf-name')?.value?.trim();
-        const email = document.getElementById('pf-email')?.value?.trim();
-        const phone = document.getElementById('pf-phone')?.value?.trim();
-        const password = document.getElementById('pf-password')?.value;
-        const password2 = document.getElementById('pf-password2')?.value;
-        const promo = document.getElementById('pf-promo')?.value?.trim().toUpperCase();
-        const terms = document.getElementById('pf-terms')?.checked;
-        const btn = document.getElementById('btn-purchase');
-
-        // Validations
-        if (!name || name.length < 2) {
-            Utils.showToast('Veuillez entrer votre nom complet', 'warning');
-            return;
-        }
-        if (!email || !Utils.isValidEmail(email)) {
-            Utils.showToast('Veuillez entrer un email valide', 'warning');
-            return;
-        }
-        if (!phone || !Utils.isValidPhone(phone)) {
-            Utils.showToast('Veuillez entrer un numéro valide', 'warning');
-            return;
-        }
-        if (!password || password.length < 6) {
-            Utils.showToast('Le mot de passe doit faire au moins 6 caractères', 'warning');
-            return;
-        }
-        if (password !== password2) {
-            Utils.showToast('Les mots de passe ne correspondent pas', 'error');
-            return;
-        }
-        if (!terms) {
-            Utils.showToast('Veuillez accepter les conditions d\'utilisation', 'warning');
-            return;
-        }
-
-        // Loading
-        btn.classList.add('btn-loading');
-        btn.disabled = true;
-
+    async loadPaymentMethods() {
+        const track = document.getElementById('payment-logos-track');
+        if (!track) return;
         try {
-            // Vérifier si l'email existe déjà
-            const { data: existingUser } = await db
-                .from('users')
-                .select('id')
-                .eq('email', email)
-                .maybeSingle();
-
-            if (existingUser) {
-                Utils.showToast('Cet email est déjà utilisé. Connectez-vous dans l\'app.', 'error');
-                btn.classList.remove('btn-loading');
-                btn.disabled = false;
-                return;
-            }
-
-            // Préparer les données
-            const purchaseData = {
-                name,
-                email,
-                phone,
-                password,
-                promo,
-                amount: this.finalPrice,
-                promoData: this.promoData
-            };
-
-            // Mode test ou paiement réel ?
-            if (CONFIG.TEST_MODE) {
-                console.log('[Landing] MODE TEST — Simulation de paiement');
-                this.simulatePayment(purchaseData);
+            const { data } = await db.from('landing_payment_methods').select('*').eq('is_active', true).order('order_index');
+            let logos = [];
+            if (data && data.length) {
+                logos = data;
             } else {
-                this.openFeexPay(purchaseData);
+                // Logos par défaut
+                logos = [
+                    { name: 'MTN MoMo', image_url: null },
+                    { name: 'Moov Money', image_url: null },
+                    { name: 'Orange Money', image_url: null },
+                    { name: 'Wave', image_url: null },
+                    { name: 'Carte Visa', image_url: null },
+                    { name: 'Mastercard', image_url: null },
+                ];
             }
-
-        } catch (error) {
-            console.error('[Landing] Erreur:', error);
-            Utils.showToast('Une erreur est survenue. Réessayez.', 'error');
-            btn.classList.remove('btn-loading');
-            btn.disabled = false;
-        }
-    },
-
-    // ---- SIMULATION DE PAIEMENT (MODE TEST) ----
-    simulatePayment(purchaseData) {
-        // Afficher un faux popup de confirmation
-        Utils.openBottomSheet(`
-            <div style="text-align:center;padding:var(--space-lg) 0;">
-                <div style="font-size:48px;margin-bottom:var(--space-base);">🧪</div>
-                <h3 style="font-family:var(--font-heading);color:var(--color-accent);margin-bottom:var(--space-sm);">
-                    Mode Test
-                </h3>
-                <p style="color:var(--color-gray-400);font-size:var(--text-sm);margin-bottom:var(--space-xl);line-height:var(--line-height-relaxed);">
-                    Mode test activé.<br>
-                    Voulez-vous simuler un paiement réussi de <strong style="color:var(--color-accent);">${Utils.formatPrice(purchaseData.amount)}</strong> ?
-                </p>
-                
-                <div style="display:flex;flex-direction:column;gap:var(--space-sm);">
-                    <button class="btn btn-primary btn-block" onclick="
-                        Utils.closeBottomSheet();
-                        LandingApp.completePurchase(LandingApp._tempPurchaseData, 'TEST-' + Date.now());
-                    ">
-                        <i class="fas fa-check"></i>
-                        <span>Simuler paiement réussi</span>
-                    </button>
-                    <button class="btn btn-secondary btn-block" onclick="
-                        Utils.closeBottomSheet();
-                        document.getElementById('btn-purchase').classList.remove('btn-loading');
-                        document.getElementById('btn-purchase').disabled = false;
-                    ">
-                        <span>Annuler</span>
-                    </button>
-                </div>
-            </div>
-        `);
-
-        // Stocker les données temporairement
-        this._tempPurchaseData = purchaseData;
-    },
-
-    // ---- OUVRIR FEEXPAY — SDK + redirection après paiement ----
-    openFeexPay: function(purchaseData) {
-        var btn = document.getElementById('btn-purchase');
-
-        // Générer une référence unique pour cette transaction
-        var reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase();
-
-        // Sauvegarder dans localStorage pour récupération après retour
-        localStorage.setItem('ako_feex_ref', reference);
-        localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
-
-        try {
-            // Initialiser le SDK FeexPay en mode redirect (callback_url sans callback JS)
-            FeexPayButton.init("feexpay-render", {
-                id: CONFIG.FEEXPAY_STORE,
-                amount: purchaseData.amount,
-                token: CONFIG.FEEXPAY_TOKEN,
-                callback_url: window.location.origin + window.location.pathname + '?feexpay=success&ref=' + reference,
-                error_callback_url: window.location.origin + window.location.pathname + '?feexpay=error',
-                mode: "LIVE",
-                custom_id: reference,
-                description: 'Acces AKOLABS Application Premium'
-            });
-
-            // Masquer le formulaire, afficher le bouton FeexPay
-            var form = document.getElementById('purchase-form');
-            if (form) form.style.display = 'none';
-            if (btn) { btn.classList.remove('btn-loading'); btn.style.display = 'none'; }
-
-            var instruction = document.getElementById('feexpay-instruction');
-            if (instruction) {
-                instruction.style.display = 'block';
-                setTimeout(function() {
-                    instruction.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 150);
-            }
-
-        } catch(e) {
-            console.error('[FeexPay] Erreur init SDK:', e);
-            localStorage.removeItem('ako_feex_ref');
-            localStorage.removeItem('ako_feex_data');
-            Utils.showToast('Erreur initialisation paiement. Réessayez.', 'error');
-            if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; btn.style.display = ''; }
-        }
-    },
-
-    // ---- ANNULER ET REVENIR AU FORMULAIRE ----
-    cancelFeexPay: function() {
-        localStorage.removeItem('ako_feex_ref');
-        localStorage.removeItem('ako_feex_data');
-
-        var instruction = document.getElementById('feexpay-instruction');
-        if (instruction) instruction.style.display = 'none';
-
-        var form = document.getElementById('purchase-form');
-        if (form) form.style.display = '';
-
-        var btn = document.getElementById('btn-purchase');
-        if (btn) { btn.disabled = false; btn.style.display = ''; }
-    },
-
-    // ---- FINALISER L'ACHAT ----
-    async completePurchase(purchaseData, transactionId) {
-        var btn = document.getElementById('btn-purchase');
-
-        try {
-            Utils.showToast('Paiement recu ! Creation de votre compte...', 'success', 1000);
-
-            // 1. Creer le compte utilisateur
-            var signUpResult = await db.auth.signUp({
-                email: purchaseData.email,
-                password: purchaseData.password,
-                options: {
-                    emailRedirectTo: null,
-                    data: {
-                        full_name: purchaseData.name,
-                        phone: purchaseData.phone,
-                        is_app_purchased: true,
-                        referred_by: (purchaseData.promoData && purchaseData.promoData.is_affiliate_code) 
-                            ? purchaseData.promo : null
-                    }
-                }
-            });
-
-            if (signUpResult.error) {
-                console.error('[Landing] Erreur creation compte:', signUpResult.error);
-                Utils.showToast('Erreur: ' + signUpResult.error.message, 'error');
-                if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
-                return;
-            }
-
-            var userId = signUpResult.data.user.id;
-            console.log('[Landing] Compte cree:', userId);
-
-            // 2. Attendre que le trigger cree le profil
-            await new Promise(function(resolve) { setTimeout(resolve, 3000); });
-
-            // 3. Se connecter avec le nouveau compte pour avoir les permissions
-            var signInResult = await db.auth.signInWithPassword({
-                email: purchaseData.email,
-                password: purchaseData.password
-            });
-
-            if (signInResult.error) {
-                console.log('[Landing] Note: auto-login:', signInResult.error.message);
-            } else {
-                console.log('[Landing] Auto-login reussi');
-            }
-
-            // 4. Mettre a jour le profil
-            try {
-                await db.from('users')
-                    .update({ is_app_purchased: true, phone: purchaseData.phone })
-                    .eq('id', userId);
-                console.log('[Landing] Profil mis a jour');
-            } catch (e) {
-                console.log('[Landing] Note: update profil echoue (pas grave):', e);
-            }
-
-            // 5. Creer l'enregistrement d'achat
-            try {
-                var affiliateUserId = (purchaseData.promoData && purchaseData.promoData.affiliate_user_id) 
-                    ? purchaseData.promoData.affiliate_user_id : null;
-                var commission = affiliateUserId 
-                    ? Math.round(purchaseData.amount * CONFIG.AFFILIATE_COMMISSION_PERCENT / 100) 
-                    : 0;
-                var fees = Math.ceil(purchaseData.amount * 3 / 100);
-
-                var purchaseResult = await db.from('purchases').insert({
-                    user_id: userId,
-                    purchase_type: 'app_access',
-                    amount: purchaseData.amount,
-                    fees: fees,
-                    total_paid: purchaseData.amount + fees,
-                    payment_ref: String(transactionId || ''),
-                    payment_provider: CONFIG.TEST_MODE ? 'test' : 'feexpay',
-                    promo_code_used: purchaseData.promo || null,
-                    discount_amount: LandingApp.basePrice - purchaseData.amount,
-                    affiliate_user_id: affiliateUserId,
-                    affiliate_commission: commission,
-                    status: 'confirmed',
-                    confirmed_at: new Date().toISOString()
-                });
-                if (purchaseResult && purchaseResult.error) {
-                    console.error('[Landing] Erreur insert achat:', purchaseResult.error);
+            // Dupliquer pour boucle infinie
+            const allLogos = [...logos, ...logos];
+            track.innerHTML = allLogos.map(pm => {
+                // Supporte logo_url (admin) et image_url (fallback)
+                const imgUrl = pm.logo_url || pm.image_url || null;
+                if (imgUrl) {
+                    let src = imgUrl;
+                    if (src.includes('res.cloudinary.com')) src = src.replace('/upload/', '/upload/f_auto,q_auto,w_112,h_112,c_fill,r_max/');
+                    return `<div class="payment-logo-item"><img src="${src}" alt="${pm.name||''}" title="${pm.name||''}" onerror="this.parentElement.innerHTML='<div class=pm-placeholder>${(pm.name||'Pay').substring(0,6)}</div>'"></div>`;
                 } else {
-                    LandingApp.trackConversion();
-                    console.log('[Landing] Achat enregistre avec succes');
+                    return `<div class="payment-logo-item"><div class="pm-placeholder">${(pm.name||'Pay').substring(0,6)}</div></div>`;
                 }
-            } catch (e) {
-                console.error('[Landing] Insert achat exception:', e);
-            }
-
-            // 6. Incrementer le code promo
-            if (purchaseData.promo) {
-                try {
-                    await db.rpc('increment_promo_usage', { p_code: purchaseData.promo });
-                } catch (e) {
-                    console.log('[Landing] Note: increment promo echoue:', e);
-                }
-            }
-
-            // 7. Analytics
-            try {
-                await db.from('app_analytics').insert({
-                    event_type: 'purchase',
-                    user_id: userId,
-                    metadata: {
-                        type: 'app_access',
-                        amount: purchaseData.amount,
-                        promo: purchaseData.promo || null,
-                        transaction_id: transactionId,
-                        test_mode: CONFIG.TEST_MODE
-                    }
-                });
-            } catch (e) {
-                console.log('[Landing] Note: analytics echoue:', e);
-            }
-
-            // 8. Envoyer l'email AVANT de déconnecter
-            try {
-                var loginUrl = window.location.origin + '/';
-                var installGuide = '1. Ouvrez ce lien sur votre telephone (Chrome ou Safari)\n2. Connectez-vous avec votre email et mot de passe\n3. Appuyez sur \"Ajouter a l\'ecran d\'accueil\" quand le message apparait';
-                await Utils.sendEmail(CONFIG.EMAILJS_TEMPLATE_WELCOME, {
-                    to_email: purchaseData.email,
-                    to_name: purchaseData.name,
-                    amount_paid: Utils.formatPrice(purchaseData.amount),
-                    app_link: loginUrl,
-                    install_guide: installGuide
-                });
-                console.log('[Landing] Email bienvenue envoye avec succes');
-            } catch(e) {
-                console.error('[Landing] Erreur envoi email:', e);
-            }
-
-            // 9. Deconnecter APRES l'email
-            await db.auth.signOut().catch(function() {});
-
-            // 10. Confetti
-            try {
-                Utils.showConfetti();
-                Utils.vibrate([100, 50, 100, 50, 200]);
-            } catch (e) {}
-
-            // 11. Afficher l'ecran de succes
-            LandingApp.showSuccessScreen(purchaseData);
-
-        } catch (error) {
-            console.error('[Landing] Erreur finalisation:', error);
-            
-            // Meme si y a une erreur, si le compte est cree, on montre le succes
-            if (purchaseData && purchaseData.email) {
-                LandingApp.showSuccessScreen(purchaseData);
-            } else {
-                Utils.showToast('Erreur lors de la finalisation. Contactez le support.', 'error');
-                if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
-            }
-        }
-    },
-    // ---- ECRAN DE SUCCES ----
-    showSuccessScreen: function(purchaseData) {
-        // --- INTEGRATION META PIXEL ---
-        if (typeof fbq === 'function') {
-            fbq('track', 'Purchase', {
-                value: purchaseData.amount || 1500,
-                currency: 'XOF',
-                content_type: 'product',
-                content_ids: ['akolabs_access'],
-                content_name: 'AKOLABS Accès à vie'
-            });
-        }
-        // ------------------------------
-
-        var section = document.getElementById('purchase');
-        if (!section) return;
-
-        var purchaseBox = section.querySelector('.purchase-section');
-        if (!purchaseBox) return;
-
-        var testBanner = '';
-        if (CONFIG.TEST_MODE) {
-            testBanner = '<div style="background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:14px;padding:12px;margin-bottom:20px;">'
-                + '<p style="color:#FFC107;font-size:12px;text-align:center;margin:0;">🧪 Mode test — Ce paiement est simule</p>'
-                + '</div>';
-        }
-
-        purchaseBox.innerHTML = ''
-            + '<div style="text-align:center;padding:20px 0;animation: fadeIn 0.5s ease;">'
-            + '  <div style="font-size:60px;margin-bottom:16px;">🎉</div>'
-            
-            + '  <h2 style="font-family:Cinzel,serif;color:#28A745;font-size:26px;margin-bottom:12px;">'
-            + '    Paiement Reussi !'
-            + '  </h2>'
-            
-            + '  <p style="color:#1A1A2E;font-size:15px;margin-bottom:32px;line-height:1.5;">'
-            + '    Felicitations <strong>' + (purchaseData.name.split(' ')[0]) + '</strong>, votre compte a ete cree avec succes.'
-            + '  </p>'
-
-            + testBanner
-
-            // Bloc de recommandation Email
-            + '  <div style="background:#FFF8E8; border:2px dashed #C9A84C; border-radius:16px; padding:24px; margin-bottom:16px; text-align:center;">'            + '    <i class="fas fa-envelope-open-text" style="font-size:40px; color:#4B0082; margin-bottom:16px;"></i>'            + '    <h3 style="color:#4B0082; font-family:Cinzel,serif; font-size:18px; margin-bottom:12px;">Consultez votre boite mail</h3>'            + '    <p style="color:#1A1A2E; font-size:14px; line-height:1.6; margin-bottom:12px;">Nous venons de vous envoyer un email important a :</p>'            + '    <div style="background:#4B0082; border-radius:10px; padding:10px 14px; margin-bottom:16px; overflow:hidden;">'            + '      <strong style="color:#C9A84C; font-size:13px; word-break:break-all; display:block;">' + purchaseData.email + '</strong>'            + '    </div>'            + '    <div style="text-align:left;">'            + '      <p style="color:#1A1A2E; font-size:14px; margin:0; line-height:1.9; font-weight:600;">'            + '        ✅ Vos identifiants de connexion<br>'            + '        ✅ Votre recu de paiement<br>'            + '        ✅ Le lien d\'acces pour installer l\'Application'            + '      </p>'            + '    </div>'            + '  </div>'
-            // Avertissement Spam
-            + '  <div style="background:#F0EDF8; border:1px solid rgba(75,0,130,0.2); border-radius:12px; padding:16px; text-align:left; margin-bottom:12px;">'            + '    <p style="color:#4A4767; font-size:12px; margin:0; line-height:1.5;">'            + '      <i class="fas fa-info-circle" style="color:#4B0082;"></i> '            + '      Si vous ne trouvez pas notre email d\'ici quelques minutes, pensez a verifier vos <strong style="color:#4B0082;">spams</strong> ou courriers indesirables.'            + '    </p>'            + '  </div>'
-            // Contact support
-            + '  <div style="background:#4B0082; border:1px solid #C9A84C; border-radius:12px; padding:14px; text-align:left;">'            + '    <p style="color:#FFFFFF; font-size:12px; margin:0; line-height:1.7;">'            + '      <i class="fas fa-headset" style="color:#C9A84C; margin-right:6px;"></i>'            + '      Achat effectue mais pas de mail recu ? Contactez-nous :<br>'            + '      <a href="mailto:akolabs.app@gmail.com" style="color:#C9A84C; font-weight:700; text-decoration:none;">akolabs.app@gmail.com</a>'            + '    </p>'            + '  </div>'  // fermeture div contact support
-            + '</div>';  // fermeture div wrapper principal (text-align:center)
-
-        section.scrollIntoView({ behavior: 'smooth' });
+            }).join('');
+        } catch(e) { console.log('[Landing] Payment methods:', e); }
     },
 
+    // =====================
+    // UI HELPERS
+    // =====================
+    showToast(msg, type = 'info', duration = 3000) {
+        const toast = document.getElementById('ako-toast');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.className = 'ako-toast ' + type + ' show';
+        clearTimeout(LandingApp._toastTimer);
+        LandingApp._toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+    },
 
-    // ---- FLOATING CTA ----
     setupFloatingCTA() {
-        const floatingCta = document.getElementById('floating-cta');
-        const heroSection = document.querySelector('.hero-section');
-        if (!floatingCta || !heroSection) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                floatingCta.classList.toggle('visible', !entry.isIntersecting);
-            },
-            { threshold: 0 }
-        );
-        observer.observe(heroSection);
+        const cta = document.getElementById('floating-cta');
+        const hero = document.querySelector('.hero');
+        if (!cta || !hero) return;
+        new IntersectionObserver(([e]) => cta.classList.toggle('visible', !e.isIntersecting), { threshold: 0 }).observe(hero);
     },
 
-    // ---- SMOOTH SCROLL ----
     setupSmoothScroll() {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                const t = document.querySelector(a.getAttribute('href'));
+                if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
     }
 };
 
-// Initialiser
-document.addEventListener('DOMContentLoaded', () => {
-    LandingApp.init();
-});
+document.addEventListener('DOMContentLoaded', () => { LandingApp.init(); });
 </script>
-
-    <!-- FeexPay : intégration via API REST -->
 
 </body>
 </html>
+ 
