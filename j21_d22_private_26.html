@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/admin.css">
-</head>
+</head> 
 <body class="admin-body">
 
     <!-- NAV -->
@@ -123,7 +123,10 @@
             { id: 'notifications', icon: 'fa-bell', label: 'Notifs' },
             { id: 'promos', icon: 'fa-tag', label: 'Promos' },
             { id: 'emails', icon: 'fa-envelope', label: 'Emails' },
-            { id: 'visuels', icon: 'fa-images', label: 'Visuels' }
+            { id: 'visuels', icon: 'fa-images', label: 'Visuels' },
+            { id: 'testimonials', icon: 'fa-star', label: 'Témoignages' },
+            { id: 'paymentmethods', icon: 'fa-credit-card', label: 'Paiements' },
+            { id: 'subscriptions', icon: 'fa-users-cog', label: 'Abonnements' }
         ];
 
         for (var i = 0; i < tabList.length; i++) {
@@ -164,6 +167,9 @@
         else if (tab === 'flash') await AdminApp.renderFlash(content);
         else if (tab === 'popups') await AdminApp.renderPopups(content);
         else if (tab === 'visuels') await AdminApp.renderVisuels(content);
+        else if (tab === 'testimonials') await AdminApp.renderTestimonials(content);
+        else if (tab === 'paymentmethods') await AdminApp.renderPaymentMethods(content);
+        else if (tab === 'subscriptions') await AdminApp.renderSubscriptions(content);
     };
 
     // ===== DASHBOARD =====
@@ -548,51 +554,18 @@
 
     // ===== PURCHASES =====
     AdminApp.renderPurchases = async function(container) {
-        // Essai avec jointure users
         var r = await db.from('purchases').select('*, users(full_name, email)').order('created_at', { ascending: false }).limit(50);
-
-        var items = [];
-        if (r.error || !r.data) {
-            console.warn('[Admin] Jointure purchases+users échouée:', r.error);
-            // Fallback : charger sans jointure
-            var r2 = await db.from('purchases').select('*').order('created_at', { ascending: false }).limit(50);
-            items = r2.data || [];
-        } else {
-            items = r.data;
-        }
-
-        // Enrichir avec les emails si pas de jointure
-        var userMap = {};
-        if (items.length > 0 && !items[0].users) {
-            var userIds = [...new Set(items.map(function(p) { return p.user_id; }).filter(Boolean))];
-            if (userIds.length > 0) {
-                var uR = await db.from('users').select('id, full_name, email').in('id', userIds);
-                (uR.data || []).forEach(function(u) { userMap[u.id] = u; });
-            }
-        }
+        var items = r.data || [];
 
         var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Achats (' + items.length + ')</div></div>';
         h += '<div class="admin-table"><table><tr><th>User</th><th>Type</th><th>Montant</th><th>Statut</th><th>Paiement</th><th>Date</th></tr>';
 
-        if (items.length === 0) {
-            h += '<tr><td colspan="6" style="text-align:center;color:#8A87A0;padding:20px;">Aucun achat</td></tr>';
-        }
-
         for (var i = 0; i < items.length; i++) {
             var p = items[i];
-            var userInfo = (p.users) || userMap[p.user_id] || {};
-            var name = userInfo.full_name || userInfo.email || p.user_id || '-';
+            var name = (p.users && p.users.full_name) || (p.users && p.users.email) || '-';
             var statusCls = p.status === 'confirmed' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive';
-            var dateStr = p.confirmed_at || p.created_at;
 
-            h += '<tr>';
-            h += '<td style="font-size:11px;">' + name + '</td>';
-            h += '<td style="font-size:11px;">' + (p.purchase_type || '-') + '</td>';
-            h += '<td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td>';
-            h += '<td><span class="status ' + statusCls + '">' + p.status + '</span></td>';
-            h += '<td style="font-size:11px;">' + (p.payment_provider || '-') + '</td>';
-            h += '<td style="font-size:11px;">' + Utils.timeAgo(dateStr) + '</td>';
-            h += '</tr>';
+            h += '<tr><td>' + name + '</td><td>' + p.purchase_type + '</td><td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td><td><span class="status ' + statusCls + '">' + p.status + '</span></td><td>' + (p.payment_provider || '-') + '</td><td>' + Utils.timeAgo(p.created_at) + '</td></tr>';
         }
 
         h += '</table></div></div>';
@@ -1787,6 +1760,229 @@
             AdminApp.switchTab('visuels');
         } catch(e) {
             Utils.showToast('Erreur', 'error');
+        }
+    };
+
+    // ===== TÉMOIGNAGES LANDING =====
+    AdminApp.renderTestimonials = async function(container) {
+        try {
+            var { data: items } = await db.from('landing_testimonials').select('*').order('order_index');
+            items = items || [];
+
+            var h = '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-star"></i> Témoignages — Carousel images</div></div>';
+            h += '<p style="font-size:13px;color:#4A4767;margin-bottom:16px;">Ces images s\'affichent dans la section <strong>"Ils ont sauté le pas"</strong> de la landing page. Format recommandé : portrait 3:4 (ex : 300×400px).</p>';
+
+            if (items.length > 0) {
+                h += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">';
+                items.forEach(function(t) {
+                    var src = t.image_url;
+                    if (src && src.indexOf('res.cloudinary.com') !== -1) src = src.replace('/upload/', '/upload/f_auto,q_auto,w_100,h_133,c_fill/');
+                    h += '<div style="text-align:center;background:#F5F4F8;border-radius:10px;padding:8px;width:110px;">';
+                    h += '<img src="' + src + '" loading="lazy" style="width:90px;height:120px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 4px;">';
+                    h += '<div style="font-size:10px;color:#4A4767;margin-bottom:4px;">Ordre : ' + t.order_index + '</div>';
+                    h += '<button class="admin-btn admin-btn-danger" style="font-size:10px;padding:3px 8px;" onclick="AdminApp.deleteTestimonial(\'' + t.id + '\')"><i class="fas fa-trash"></i></button>';
+                    h += '</div>';
+                });
+                h += '</div>';
+            } else {
+                h += '<p style="text-align:center;color:#888;font-size:13px;margin-bottom:16px;">Aucun témoignage. Les témoignages par défaut s\'affichent.</p>';
+            }
+
+            h += '<div style="border-top:1px solid #E2E0EC;padding-top:16px;">';
+            h += '<div class="admin-card-title" style="font-size:14px;margin-bottom:12px;"><i class="fas fa-plus-circle"></i> Ajouter un témoignage</div>';
+            h += '<div class="admin-form-group"><label class="admin-form-label">Image témoignage *</label>';
+            h += '<div style="display:flex;gap:8px;">';
+            h += '<input class="admin-form-input" id="tm-url" placeholder="URL ou uploader →" readonly>';
+            h += '<button class="admin-btn admin-btn-primary" onclick="AdminApp.uploadTestimonial()"><i class="fas fa-upload"></i> Upload</button>';
+            h += '</div>';
+            h += '<div id="tm-preview" style="margin-top:8px;display:none;"><img id="tm-preview-img" style="width:80px;height:107px;object-fit:cover;border-radius:8px;border:2px solid #C9A84C;"></div>';
+            h += '</div>';
+            h += '<div class="admin-form-group"><label class="admin-form-label">Ordre d\'affichage</label>';
+            h += '<input class="admin-form-input" id="tm-order" type="number" min="0" value="' + items.length + '"></div>';
+            h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.saveTestimonial()"><i class="fas fa-save"></i> Enregistrer</button>';
+            h += '</div></div>';
+            container.innerHTML = h;
+        } catch(e) {
+            container.innerHTML = '<div style="padding:20px;color:red;">Erreur : ' + (e.message||e) + '</div>';
+        }
+    };
+
+    AdminApp.uploadTestimonial = function() {
+        var input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*';
+        input.onchange = async function() {
+            var file = input.files[0]; if (!file) return;
+            Utils.showToast('Upload en cours...', 'info');
+            try {
+                var url = await Utils.uploadToCloudinary(file);
+                document.getElementById('tm-url').value = url;
+                var prev = document.getElementById('tm-preview');
+                document.getElementById('tm-preview-img').src = url;
+                prev.style.display = 'block';
+                Utils.showToast('Image uploadée !', 'success');
+            } catch(e) { Utils.showToast('Erreur upload : ' + e, 'error'); }
+        };
+        input.click();
+    };
+
+    AdminApp.saveTestimonial = async function() {
+        var url = (document.getElementById('tm-url')||{}).value || '';
+        var order = parseInt((document.getElementById('tm-order')||{}).value) || 0;
+        if (!url) { Utils.showToast('Uploadez d\'abord une image', 'warning'); return; }
+        try {
+            var { error } = await db.from('landing_testimonials').insert({ image_url: url, order_index: order, is_active: true });
+            if (error) throw error;
+            Utils.showToast('Témoignage ajouté !', 'success');
+            AdminApp.switchTab('testimonials');
+        } catch(e) { Utils.showToast('Erreur : ' + (e.message||e), 'error'); }
+    };
+
+    AdminApp.deleteTestimonial = async function(id) {
+        if (!confirm('Supprimer ce témoignage ?')) return;
+        try {
+            await db.from('landing_testimonials').delete().eq('id', id);
+            Utils.showToast('Témoignage supprimé', 'success');
+            AdminApp.switchTab('testimonials');
+        } catch(e) { Utils.showToast('Erreur', 'error'); }
+    };
+
+    // ===== MOYENS DE PAIEMENT LANDING =====
+    AdminApp.renderPaymentMethods = async function(container) {
+        try {
+            var { data: items } = await db.from('landing_payment_methods').select('*').order('order_index');
+            items = items || [];
+
+            var h = '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-credit-card"></i> Moyens de paiement — Logos</div></div>';
+            h += '<p style="font-size:13px;color:#4A4767;margin-bottom:16px;">Ces logos s\'affichent en cercle 1:1 dans la section <strong>"Paye avec ton moyen habituel"</strong>. Format recommandé : carré 200×200px.</p>';
+
+            if (items.length > 0) {
+                h += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">';
+                items.forEach(function(pm) {
+                    var src = pm.logo_url;
+                    if (src && src.indexOf('res.cloudinary.com') !== -1) src = src.replace('/upload/', '/upload/f_auto,q_auto,w_80,h_80,c_fill/');
+                    h += '<div style="text-align:center;background:#F5F4F8;border-radius:50%;padding:4px;width:88px;">';
+                    h += '<img src="' + src + '" loading="lazy" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 4px;">';
+                    h += '<div style="font-size:10px;color:#4A4767;margin-top:4px;">' + (pm.name||'') + '</div>';
+                    h += '<button class="admin-btn admin-btn-danger" style="font-size:10px;padding:2px 6px;margin-top:3px;" onclick="AdminApp.deletePaymentMethod(\'' + pm.id + '\')"><i class="fas fa-trash"></i></button>';
+                    h += '</div>';
+                });
+                h += '</div>';
+            } else {
+                h += '<p style="text-align:center;color:#888;font-size:13px;margin-bottom:16px;">Aucun logo. Des logos par défaut (texte) s\'affichent.</p>';
+            }
+
+            h += '<div style="border-top:1px solid #E2E0EC;padding-top:16px;">';
+            h += '<div class="admin-card-title" style="font-size:14px;margin-bottom:12px;"><i class="fas fa-plus-circle"></i> Ajouter un moyen de paiement</div>';
+            h += '<div class="admin-form-group"><label class="admin-form-label">Nom (ex: MTN MoMo) *</label><input class="admin-form-input" id="pm-name" placeholder="MTN MoMo"></div>';
+            h += '<div class="admin-form-group"><label class="admin-form-label">Logo *</label>';
+            h += '<div style="display:flex;gap:8px;">';
+            h += '<input class="admin-form-input" id="pm-logo-url" placeholder="URL ou uploader →" readonly>';
+            h += '<button class="admin-btn admin-btn-primary" onclick="AdminApp.uploadPaymentMethod()"><i class="fas fa-upload"></i> Upload</button>';
+            h += '</div>';
+            h += '<div id="pm-logo-preview" style="margin-top:8px;display:none;"><img id="pm-logo-preview-img" style="width:60px;height:60px;object-fit:cover;border-radius:50%;border:2px solid #C9A84C;"></div>';
+            h += '</div>';
+            h += '<div class="admin-form-group"><label class="admin-form-label">Ordre d\'affichage</label><input class="admin-form-input" id="pm-logo-order" type="number" min="0" value="' + items.length + '"></div>';
+            h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="AdminApp.savePaymentMethod()"><i class="fas fa-save"></i> Enregistrer</button>';
+            h += '</div></div>';
+            container.innerHTML = h;
+        } catch(e) {
+            container.innerHTML = '<div style="padding:20px;color:red;">Erreur : ' + (e.message||e) + '</div>';
+        }
+    };
+
+    AdminApp.uploadPaymentMethod = function() {
+        var input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*';
+        input.onchange = async function() {
+            var file = input.files[0]; if (!file) return;
+            Utils.showToast('Upload en cours...', 'info');
+            try {
+                var url = await Utils.uploadToCloudinary(file);
+                document.getElementById('pm-logo-url').value = url;
+                var prev = document.getElementById('pm-logo-preview');
+                document.getElementById('pm-logo-preview-img').src = url;
+                prev.style.display = 'block';
+                Utils.showToast('Logo uploadé !', 'success');
+            } catch(e) { Utils.showToast('Erreur upload : ' + e, 'error'); }
+        };
+        input.click();
+    };
+
+    AdminApp.savePaymentMethod = async function() {
+        var name = (document.getElementById('pm-name')||{}).value || '';
+        var url = (document.getElementById('pm-logo-url')||{}).value || '';
+        var order = parseInt((document.getElementById('pm-logo-order')||{}).value) || 0;
+        if (!url) { Utils.showToast('Uploadez d\'abord un logo', 'warning'); return; }
+        if (!name) { Utils.showToast('Entrez un nom', 'warning'); return; }
+        try {
+            var { error } = await db.from('landing_payment_methods').insert({ logo_url: url, name: name, order_index: order, is_active: true });
+            if (error) throw error;
+            Utils.showToast('Moyen de paiement ajouté !', 'success');
+            AdminApp.switchTab('paymentmethods');
+        } catch(e) { Utils.showToast('Erreur : ' + (e.message||e), 'error'); }
+    };
+
+    AdminApp.deletePaymentMethod = async function(id) {
+        if (!confirm('Supprimer ce moyen de paiement ?')) return;
+        try {
+            await db.from('landing_payment_methods').delete().eq('id', id);
+            Utils.showToast('Supprimé', 'success');
+            AdminApp.switchTab('paymentmethods');
+        } catch(e) { Utils.showToast('Erreur', 'error'); }
+    };
+
+    // ===== ABONNEMENTS =====
+    AdminApp.renderSubscriptions = async function(container) {
+        try {
+            var { data: subs } = await db.from('users')
+                .select('id, full_name, email, subscription_plan, subscription_expires_at, is_app_purchased, created_at')
+                .order('created_at', { ascending: false })
+                .limit(50);
+            subs = subs || [];
+
+            var now = new Date();
+            var h = '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-users-cog"></i> Gestion des abonnements</div></div>';
+            h += '<p style="font-size:13px;color:#4A4767;margin-bottom:16px;">Les utilisateurs avec <strong>subscription_plan = null ou \'lifetime\'</strong> sont les anciens membres avec accès à vie.</p>';
+
+            var stats = { lifetime: 0, starter: 0, pro: 0, premium: 0, expired: 0 };
+            subs.forEach(function(u) {
+                var plan = u.subscription_plan;
+                if (!plan || plan === 'lifetime') stats.lifetime++;
+                else if (plan === 'starter') stats.starter++;
+                else if (plan === 'pro') { if (!u.subscription_expires_at || new Date(u.subscription_expires_at) > now) stats.pro++; else stats.expired++; }
+                else if (plan === 'premium') { if (!u.subscription_expires_at || new Date(u.subscription_expires_at) > now) stats.premium++; else stats.expired++; }
+            });
+
+            h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">';
+            [['♾️ À vie', stats.lifetime, '#C9A84C'], ['🟢 Starter', stats.starter, '#3DDB7D'], ['⚡ Pro actif', stats.pro, '#6BB5FF'], ['💎 Premium actif', stats.premium, '#A78BFA'], ['⏰ Expirés', stats.expired, '#FF6B6B']].forEach(function(item) {
+                h += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;text-align:center;">';
+                h += '<div style="font-size:18px;font-weight:700;color:' + item[2] + ';">' + item[1] + '</div>';
+                h += '<div style="font-size:11px;color:#9B97B5;">' + item[0] + '</div></div>';
+            });
+            h += '</div>';
+
+            h += '<div class="admin-table"><table><tr><th>Utilisateur</th><th>Plan</th><th>Expiration</th><th>Statut</th></tr>';
+            subs.forEach(function(u) {
+                var plan = u.subscription_plan || 'lifetime';
+                var exp = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+                var isExpired = exp && exp < now;
+                var planColor = plan === 'lifetime' ? '#C9A84C' : plan === 'starter' ? '#3DDB7D' : plan === 'pro' ? '#6BB5FF' : plan === 'premium' ? '#A78BFA' : '#888';
+                var statusTxt = isExpired ? '<span style="color:#FF6B6B;font-size:11px;">⏰ Expiré</span>' : exp ? '<span style="color:#3DDB7D;font-size:11px;">✅ Actif</span>' : '<span style="color:#C9A84C;font-size:11px;">♾️ À vie</span>';
+                var expTxt = exp ? exp.toLocaleDateString('fr-FR') : '—';
+                h += '<tr>';
+                h += '<td style="font-size:11px;"><div>' + (u.full_name||'—') + '</div><div style="color:#9B97B5;font-size:10px;">' + (u.email||'') + '</div></td>';
+                h += '<td><span style="background:rgba(255,255,255,0.06);color:' + planColor + ';padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;">' + plan.toUpperCase() + '</span></td>';
+                h += '<td style="font-size:11px;">' + expTxt + '</td>';
+                h += '<td>' + statusTxt + '</td>';
+                h += '</tr>';
+            });
+            h += '</table></div></div>';
+            container.innerHTML = h;
+        } catch(e) {
+            container.innerHTML = '<div style="padding:20px;color:red;">Erreur : ' + (e.message||e) + '</div>';
         }
     };
 
