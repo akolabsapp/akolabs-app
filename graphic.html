@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Graphique animé (ω)</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0f17;
+        --panel: #0f1626;
+        --panel2: #0b1220;
+        --stroke: rgba(255, 255, 255, 0.08);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --brand: #6aa9ff;
+        --brand2: #9be7ff;
+        --good: #7ef0b2;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+        --radius: 18px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: radial-gradient(
+            900px 600px at 25% 10%,
+            rgba(106, 169, 255, 0.18),
+            transparent 55%
+          ),
+          radial-gradient(
+            900px 700px at 75% 10%,
+            rgba(155, 231, 255, 0.14),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 900px at 50% 100%,
+            rgba(126, 240, 178, 0.08),
+            transparent 55%
+          ),
+          var(--bg);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        padding: 26px;
+      }
+      .wrap {
+        width: min(980px, 100%);
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-size: 18px;
+        font-weight: 650;
+        letter-spacing: 0.2px;
+        margin: 0;
+      }
+      .hint {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .panel {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent),
+          var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .top {
+        padding: 16px 16px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+      }
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+      }
+      .sliderRow {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: center;
+      }
+      label {
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--brand);
+      }
+      .value {
+        font-variant-numeric: tabular-nums;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.85);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.25);
+      }
+      button {
+        cursor: pointer;
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.25);
+        color: rgba(255, 255, 255, 0.9);
+        padding: 10px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        transition: transform 0.06s ease, background 0.15s ease, border 0.15s ease;
+      }
+      button:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .card {
+        padding: 12px 12px 11px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent),
+          rgba(0, 0, 0, 0.18);
+      }
+      .card .k {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0 0 6px;
+      }
+      .card .v {
+        font-size: 20px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        margin: 0;
+        letter-spacing: 0.2px;
+      }
+      .card .u {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-left: 6px;
+        font-weight: 600;
+      }
+      .graph {
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.35)),
+          var(--panel2);
+        padding: 14px 14px 16px;
+      }
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+      .canvasWrap {
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        overflow: hidden;
+        background: #070b12;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: 300px;
+      }
+      #bode {
+        height: 170px;
+      }
+      .footer {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--good);
+        box-shadow: 0 0 0 3px rgba(126, 240, 178, 0.12);
+      }
+      @media (max-width: 700px) {
+        .controls {
+          grid-template-columns: 1fr;
+        }
+        .cards {
+          grid-template-columns: 1fr;
+        }
+        canvas {
+          height: 260px;
+        }
+        #bode {
+          height: 160px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Graphique animé “live” (ω)</h1>
+        <p class="hint">Slider → met à jour le signal et les valeurs en temps réel.</p>
+      </header>
+
+      <div class="panel">
+        <div class="top">
+          <div class="controls">
+            <div class="sliderRow">
+              <label for="omega">ω (rad/s)</label>
+              <input
+                id="omega"
+                type="range"
+                min="0.3"
+                max="15"
+                step="0.01"
+                value="6.25"
+              />
+              <div class="value" id="omegaValue">6.25</div>
+            </div>
+            <button id="toggle">Pause</button>
+          </div>
+
+          <div class="cards">
+            <div class="card">
+              <p class="k">Amplitude (déplacement) X<sub>m</sub></p>
+              <p class="v"><span id="xm">0.000</span><span class="u">m</span></p>
+            </div>
+            <div class="card">
+              <p class="k">Amplitude (vitesse) V<sub>m</sub> = ωX<sub>m</sub></p>
+              <p class="v"><span id="vm">0.000</span><span class="u">m/s</span></p>
+            </div>
+            <div class="card">
+              <p class="k">Phase (x vs force)</p>
+              <p class="v"><span id="phase">0</span><span class="u">°</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="graph">
+          <div class="stack">
+            <div class="canvasWrap">
+              <canvas id="c"></canvas>
+            </div>
+            <div class="canvasWrap">
+              <canvas id="bode"></canvas>
+            </div>
+          </div>
+          <div class="footer">
+            <span class="chip"><span class="dot"></span> Réponse forcée : x(t) + diagramme amplitude</span>
+            <span id="meta">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d", { alpha: false });
+      const bodeCanvas = document.getElementById("bode");
+      const bodeCtx = bodeCanvas.getContext("2d", { alpha: false });
+
+      const omegaInput = document.getElementById("omega");
+      const omegaValue = document.getElementById("omegaValue");
+      const toggleBtn = document.getElementById("toggle");
+
+      const xmEl = document.getElementById("xm");
+      const vmEl = document.getElementById("vm");
+      const phaseEl = document.getElementById("phase");
+      const metaEl = document.getElementById("meta");
+
+      const state = {
+        paused: false,
+        omega: Number(omegaInput.value),
+        t: 0,
+        lastTs: performance.now(),
+        markerX: 0.86, // position du curseur sur l'axe X (0..1)
+        // paramètres physiques (forçage harmonique F0 cos(ωt))
+        m: 1.0, // kg
+        k: 40.0, // N/m  -> ω0≈6.32 rad/s (proche de ta vidéo)
+        c: 1.0, // N·s/m (amortissement)
+        F0: 1.0, // N (amplitude de force excitatrice)
+      };
+
+      function format(n, digits = 3) {
+        return Number(n).toFixed(digits);
+      }
+
+      function resizeCanvasToDisplaySize() {
+        const dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+        const { width: cssW, height: cssH } = canvas.getBoundingClientRect();
+        const w = Math.max(1, Math.round(cssW * dpr));
+        const h = Math.max(1, Math.round(cssH * dpr));
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+        return { w, h, dpr };
+      }
+
+      function resizeCanvasToDisplaySize2(cnv) {
+        const dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+        const { width: cssW, height: cssH } = cnv.getBoundingClientRect();
+        const w = Math.max(1, Math.round(cssW * dpr));
+        const h = Math.max(1, Math.round(cssH * dpr));
+        if (cnv.width !== w || cnv.height !== h) {
+          cnv.width = w;
+          cnv.height = h;
+        }
+        return { w, h, dpr };
+      }
+
+      function responseAtOmega(omega) {
+        const { m, k, c, F0 } = state;
+        const denom = Math.sqrt((k - m * omega * omega) ** 2 + (c * omega) ** 2);
+        const X = F0 / (denom || 1e-12);
+        const V = Math.abs(omega * X);
+        const A = Math.abs(omega * omega * X);
+        const phi = Math.atan2(c * omega, k - m * omega * omega); // [0..π]
+        return { X, V, A, phi };
+      }
+
+      function updateReadouts() {
+        const omega = state.omega;
+        const { X, V, phi } = responseAtOmega(omega);
+        // phase de x(t) relative à la force excitatrice : x = X cos(ωt - φ) -> phase = -φ
+        const phaseDeg = (-phi * 180) / Math.PI;
+        omegaValue.textContent = format(omega, 2);
+        xmEl.textContent = format(X, 4);
+        vmEl.textContent = format(V, 4);
+        phaseEl.textContent = Math.round(phaseDeg).toString();
+      }
+
+      function drawGrid(w, h) {
+        ctx.save();
+        ctx.fillStyle = "#070b12";
+        ctx.fillRect(0, 0, w, h);
+
+        const midY = h * 0.5;
+        const gridA = "rgba(255,255,255,0.06)";
+        const gridB = "rgba(255,255,255,0.09)";
+
+        // lignes horizontales
+        ctx.strokeStyle = gridA;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const rows = 6;
+        for (let i = 1; i < rows; i++) {
+          const y = (h * i) / rows;
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+        }
+        ctx.stroke();
+
+        // axe central
+        ctx.strokeStyle = gridB;
+        ctx.beginPath();
+        ctx.moveTo(0, midY);
+        ctx.lineTo(w, midY);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawTimeResponse(w, h) {
+        const midY = h * 0.5;
+        const omega = state.omega;
+        const { X, phi } = responseAtOmega(omega);
+
+        // Fenêtre temporelle: montre plusieurs périodes, mais limite pour rester lisible.
+        const period = (2 * Math.PI) / omega;
+        const windowS = Math.max(1.2, Math.min(3.2, 5.0 * period));
+
+        const Xstatic = state.F0 / state.k; // déplacement statique (ω→0)
+        const pxPerM = (h * 0.38) / (Xstatic || 1e-12);
+
+        const tRight = state.t;
+        const tLeft = state.t - windowS;
+
+        const xOfT = (t) => X * Math.cos(omega * t - phi);
+        const fOfT = (t) => state.F0 * Math.cos(omega * t);
+
+        // Signal de force (normalisé sur Xstatic pour superposer)
+        ctx.save();
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+
+        // force (gris)
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        for (let ix = 0; ix <= w; ix++) {
+          const a = ix / w;
+          const t = tLeft + a * windowS;
+          const y = midY - (fOfT(t) / state.F0) * (pxPerM * Xstatic * 0.55);
+          if (ix === 0) ctx.moveTo(ix, y);
+          else ctx.lineTo(ix, y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // déplacement x(t) (bleu néon)
+        // glow
+        ctx.strokeStyle = "rgba(106, 169, 255, 0.22)";
+        ctx.lineWidth = Math.max(2, Math.round(w * 0.004));
+        ctx.beginPath();
+        for (let ix = 0; ix <= w; ix++) {
+          const a = ix / w;
+          const t = tLeft + a * windowS;
+          const y = midY - xOfT(t) * pxPerM;
+          if (ix === 0) ctx.moveTo(ix, y);
+          else ctx.lineTo(ix, y);
+        }
+        ctx.stroke();
+
+        // core
+        const grad = ctx.createLinearGradient(0, 0, w, 0);
+        grad.addColorStop(0, "rgba(106, 169, 255, 0.82)");
+        grad.addColorStop(0.6, "rgba(155, 231, 255, 0.97)");
+        grad.addColorStop(1, "rgba(106, 169, 255, 0.70)");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = Math.max(1.5, Math.round(w * 0.0028));
+        ctx.beginPath();
+        for (let ix = 0; ix <= w; ix++) {
+          const a = ix / w;
+          const t = tLeft + a * windowS;
+          const y = midY - xOfT(t) * pxPerM;
+          if (ix === 0) ctx.moveTo(ix, y);
+          else ctx.lineTo(ix, y);
+        }
+        ctx.stroke();
+
+        // curseur (temps correspondant à une position sur X)
+        const cursorX = Math.round(w * state.markerX);
+        const cursorT = tLeft + (cursorX / w) * windowS;
+        const cursorY = midY - xOfT(cursorT) * pxPerM;
+
+        ctx.strokeStyle = "rgba(255,255,255,0.16)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cursorX, h * 0.12);
+        ctx.lineTo(cursorX, h * 0.88);
+        ctx.stroke();
+
+        // tick rouge
+        ctx.strokeStyle = "rgba(255, 87, 87, 0.78)";
+        ctx.lineWidth = Math.max(2, Math.round(w * 0.003));
+        ctx.beginPath();
+        ctx.moveTo(cursorX - 18, cursorY - 20);
+        ctx.lineTo(cursorX + 20, cursorY - 20);
+        ctx.stroke();
+
+        // point
+        ctx.fillStyle = "rgba(155, 231, 255, 0.95)";
+        ctx.shadowColor = "rgba(155, 231, 255, 0.55)";
+        ctx.shadowBlur = 16;
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, Math.max(3, w * 0.006), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // readout
+        const xNow = xOfT(tRight);
+        const vNow = -omega * X * Math.sin(omega * tRight - phi);
+        metaEl.textContent = `x(t)=${format(xNow, 4)} m | v(t)=${format(
+          vNow,
+          4
+        )} m/s | fenêtre=${format(windowS, 2)} s`;
+
+        ctx.restore();
+      }
+
+      function drawResponseChart() {
+        const { w, h } = resizeCanvasToDisplaySize2(bodeCanvas);
+        const g = bodeCtx;
+        g.save();
+        g.fillStyle = "#070b12";
+        g.fillRect(0, 0, w, h);
+
+        // marges
+        const padL = Math.round(w * 0.06);
+        const padR = Math.round(w * 0.03);
+        const padT = Math.round(h * 0.18);
+        const padB = Math.round(h * 0.22);
+        const innerW = w - padL - padR;
+        const innerH = h - padT - padB;
+
+        // axes
+        g.strokeStyle = "rgba(255,255,255,0.10)";
+        g.lineWidth = 1;
+        g.beginPath();
+        g.rect(padL, padT, innerW, innerH);
+        g.stroke();
+
+        const omegaMin = Number(omegaInput.min);
+        const omegaMax = Number(omegaInput.max);
+        const omega0 = Math.sqrt(state.k / state.m);
+        const Xstatic = state.F0 / state.k;
+
+        const normAt = (omega) => {
+          const { X, V, A } = responseAtOmega(omega);
+          return {
+            Xn: X / (Xstatic || 1e-12),
+            Vn: V / ((omega0 * Xstatic) || 1e-12),
+            An: A / ((omega0 * omega0 * Xstatic) || 1e-12),
+          };
+        };
+
+        // on trace en "pseudo-log" compressé pour rester lisible
+        const yMap = (val) => {
+          const clamped = Math.max(0, Math.min(4.0, val));
+          const scaled = Math.log10(1 + 9 * clamped) / Math.log10(1 + 9 * 4.0);
+          return padT + innerH - scaled * innerH;
+        };
+        const xMap = (omega) => {
+          const a = (omega - omegaMin) / (omegaMax - omegaMin);
+          return padL + Math.max(0, Math.min(1, a)) * innerW;
+        };
+
+        // grid
+        g.strokeStyle = "rgba(255,255,255,0.06)";
+        g.beginPath();
+        for (let i = 1; i < 5; i++) {
+          const y = padT + (innerH * i) / 5;
+          g.moveTo(padL, y);
+          g.lineTo(padL + innerW, y);
+        }
+        for (let i = 1; i < 7; i++) {
+          const x = padL + (innerW * i) / 7;
+          g.moveTo(x, padT);
+          g.lineTo(x, padT + innerH);
+        }
+        g.stroke();
+
+        function plotCurve(getVal, stroke, glow) {
+          g.save();
+          g.lineJoin = "round";
+          g.lineCap = "round";
+
+          g.strokeStyle = glow;
+          g.lineWidth = Math.max(2, Math.round(w * 0.004));
+          g.beginPath();
+          const steps = 280;
+          for (let i = 0; i <= steps; i++) {
+            const omega = omegaMin + ((omegaMax - omegaMin) * i) / steps;
+            const v = getVal(normAt(omega));
+            const x = xMap(omega);
+            const y = yMap(v);
+            if (i === 0) g.moveTo(x, y);
+            else g.lineTo(x, y);
+          }
+          g.stroke();
+
+          g.strokeStyle = stroke;
+          g.lineWidth = Math.max(1.5, Math.round(w * 0.0028));
+          g.beginPath();
+          for (let i = 0; i <= steps; i++) {
+            const omega = omegaMin + ((omegaMax - omegaMin) * i) / steps;
+            const v = getVal(normAt(omega));
+            const x = xMap(omega);
+            const y = yMap(v);
+            if (i === 0) g.moveTo(x, y);
+            else g.lineTo(x, y);
+          }
+          g.stroke();
+          g.restore();
+        }
+
+        plotCurve((o) => o.Xn, "rgba(106,169,255,0.92)", "rgba(106,169,255,0.20)");
+        plotCurve((o) => o.Vn, "rgba(155,231,255,0.92)", "rgba(155,231,255,0.18)");
+        plotCurve((o) => o.An, "rgba(126,240,178,0.88)", "rgba(126,240,178,0.16)");
+
+        // repère ω actuel
+        const cx = xMap(state.omega);
+        g.strokeStyle = "rgba(255,255,255,0.16)";
+        g.lineWidth = 1;
+        g.beginPath();
+        g.moveTo(cx, padT);
+        g.lineTo(cx, padT + innerH);
+        g.stroke();
+
+        // repère ω0
+        const rx = xMap(omega0);
+        g.strokeStyle = "rgba(255,87,87,0.38)";
+        g.lineWidth = 1.5;
+        g.setLineDash([6, 6]);
+        g.beginPath();
+        g.moveTo(rx, padT);
+        g.lineTo(rx, padT + innerH);
+        g.stroke();
+        g.setLineDash([]);
+
+        // labels
+        g.fillStyle = "rgba(255,255,255,0.70)";
+        g.font = `${Math.max(11, Math.round(w * 0.016))}px ui-sans-serif, system-ui`;
+        g.fillText("Amplitude normalisée (X, V, A) vs ω", padL, Math.max(14, padT - 10));
+
+        g.fillStyle = "rgba(255,255,255,0.58)";
+        g.font = `${Math.max(10, Math.round(w * 0.014))}px ui-sans-serif, system-ui`;
+        g.fillText("X (bleu) ↓ ~1/ω²", padL, padT + innerH + Math.max(14, Math.round(h * 0.12)));
+        g.fillText("V (cyan) ↓ ~1/ω", padL + Math.round(innerW * 0.34), padT + innerH + Math.max(14, Math.round(h * 0.12)));
+        g.fillText("A (vert) → 1", padL + Math.round(innerW * 0.64), padT + innerH + Math.max(14, Math.round(h * 0.12)));
+
+        g.fillStyle = "rgba(255,87,87,0.65)";
+        g.fillText("ω₀", Math.min(w - 20, rx + 4), padT + 14);
+
+        g.restore();
+      }
+
+      function frame(ts) {
+        const { w, h } = resizeCanvasToDisplaySize();
+        const dt = Math.max(0, Math.min(0.05, (ts - state.lastTs) / 1000));
+        state.lastTs = ts;
+        if (!state.paused) state.t += dt;
+
+        updateReadouts();
+        drawGrid(w, h);
+        drawTimeResponse(w, h);
+        drawResponseChart();
+
+        requestAnimationFrame(frame);
+      }
+
+      omegaInput.addEventListener("input", () => {
+        state.omega = Number(omegaInput.value);
+        updateReadouts();
+      });
+
+      toggleBtn.addEventListener("click", () => {
+        state.paused = !state.paused;
+        toggleBtn.textContent = state.paused ? "Reprendre" : "Pause";
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === " " || e.code === "Space") {
+          e.preventDefault();
+          toggleBtn.click();
+        }
+        if (e.key === "ArrowLeft") state.markerX = Math.max(0.05, state.markerX - 0.02);
+        if (e.key === "ArrowRight") state.markerX = Math.min(0.95, state.markerX + 0.02);
+      });
+
+      updateReadouts();
+      requestAnimationFrame(frame);
+    </script>
+  </body>
+</html>
