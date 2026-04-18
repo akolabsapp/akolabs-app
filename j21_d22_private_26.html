@@ -175,8 +175,8 @@
     // ===== DASHBOARD =====
     AdminApp.renderStats = async function(container) {
         try {
-            var usersR = await db.from('users').select('id, created_at', { count: 'exact' });
-            var purchasesR = await db.from('purchases').select('amount, created_at', { count: 'exact' }).eq('status', 'confirmed');
+            var usersR = await db.from('users').select('id, created_at, subscription_plan', { count: 'exact' });
+            var purchasesR = await db.from('purchases').select('amount, purchase_type, created_at', { count: 'exact' }).eq('status', 'confirmed');
             var sectionsR = await db.from('sections').select('id', { count: 'exact' }).eq('is_active', true);
 
             var totalUsers = usersR.count || 0;
@@ -185,12 +185,36 @@
             var todayUsers = 0;
             var today = new Date().toISOString().split('T')[0];
 
+            // Compteurs par plan
+            var planCounts = { starter: 0, pro: 0, premium: 0, lifetime: 0 };
+            var planRevenue = { starter: 0, pro: 0, premium: 0, lifetime: 0 };
+
+            // Prix référence par type d'achat (si amount manquant ou 0)
+            var planPrices = {
+                'starter_access': 1000, 'starter': 1000,
+                'pro_access': 1500, 'pro': 1500,
+                'premium_access': 3500, 'premium': 3500,
+                'app_access': 1500 // ancien type = Pro par défaut
+            };
+
             if (purchasesR.data) {
                 for (var i = 0; i < purchasesR.data.length; i++) {
-                    totalRevenue += purchasesR.data[i].amount || 0;
-                    if (purchasesR.data[i].created_at && purchasesR.data[i].created_at.indexOf(today) === 0) {
-                        todayRevenue += purchasesR.data[i].amount || 0;
+                    var p = purchasesR.data[i];
+                    // Utiliser le montant réel, ou déduire du type si 0
+                    var amt = p.amount || 0;
+                    if (amt === 0 && p.purchase_type) {
+                        amt = planPrices[p.purchase_type.toLowerCase()] || 1500;
                     }
+                    totalRevenue += amt;
+                    if (p.created_at && p.created_at.indexOf(today) === 0) {
+                        todayRevenue += amt;
+                    }
+                    // Classer par plan
+                    var pt = (p.purchase_type || '').toLowerCase();
+                    if (pt.indexOf('starter') !== -1) { planCounts.starter++; planRevenue.starter += amt; }
+                    else if (pt.indexOf('premium') !== -1) { planCounts.premium++; planRevenue.premium += amt; }
+                    else if (pt.indexOf('pro') !== -1 || pt === 'app_access') { planCounts.pro++; planRevenue.pro += amt; }
+                    else { planCounts.lifetime++; planRevenue.lifetime += amt; }
                 }
             }
 
@@ -204,13 +228,44 @@
 
             var h = '';
 
-            // Stats
+            // Stats principales
             h += '<div class="admin-stats">';
             h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-users"></i></div><div class="admin-stat-value">' + totalUsers + '</div><div class="admin-stat-label">Utilisateurs</div><div class="admin-stat-change up">+' + todayUsers + ' aujourd\'hui</div></div>';
             h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-coins"></i></div><div class="admin-stat-value">' + Utils.formatPrice(totalRevenue) + '</div><div class="admin-stat-label">Revenus totaux</div><div class="admin-stat-change up">+' + Utils.formatPrice(todayRevenue) + ' aujourd\'hui</div></div>';
             h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-shopping-cart"></i></div><div class="admin-stat-value">' + (purchasesR.count || 0) + '</div><div class="admin-stat-label">Achats</div></div>';
             h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-th-large"></i></div><div class="admin-stat-value">' + (sectionsR.count || 0) + '</div><div class="admin-stat-label">Sections actives</div></div>';
             h += '</div>';
+
+            // Répartition par plan
+            var totalAchats = purchasesR.count || 0;
+            if (totalAchats > 0) {
+                h += '<div class="admin-card" style="margin-bottom:16px;">';
+                h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-chart-pie" style="color:#C9A84C;margin-right:8px;"></i>Répartition par plan</div></div>';
+                h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:4px 0 8px;">';
+
+                var planDefs = [
+                    { key: 'starter',  label: 'Starter',  price: '1 000 F', color: '#6BB5FF', icon: 'fa-star-half-alt' },
+                    { key: 'pro',      label: 'Pro',       price: '1 500 F', color: '#3DDB7D', icon: 'fa-bolt' },
+                    { key: 'premium',  label: 'Premium',   price: '3 500 F', color: '#C9A84C', icon: 'fa-gem' }
+                ];
+                planDefs.forEach(function(pl) {
+                    var cnt = planCounts[pl.key] || 0;
+                    var rev = planRevenue[pl.key] || 0;
+                    var pct = totalAchats > 0 ? Math.round((cnt / totalAchats) * 100) : 0;
+                    h += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;text-align:center;">';
+                    h += '<i class="fas ' + pl.icon + '" style="color:' + pl.color + ';font-size:16px;margin-bottom:6px;display:block;"></i>';
+                    h += '<div style="font-size:11px;color:#9B97B5;margin-bottom:4px;">' + pl.label + ' · ' + pl.price + '</div>';
+                    h += '<div style="font-size:18px;font-weight:700;color:' + pl.color + ';">' + cnt + '</div>';
+                    h += '<div style="font-size:10px;color:#6C6C7E;">' + pct + '% · ' + Utils.formatPrice(rev) + '</div>';
+                    // Barre de progression
+                    h += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:4px;margin-top:8px;">';
+                    h += '<div style="width:' + pct + '%;height:100%;background:' + pl.color + ';border-radius:4px;"></div>';
+                    h += '</div>';
+                    h += '</div>';
+                });
+                h += '</div>';
+                h += '</div>';
+            }
 
             // Quick actions
             h += '<div class="admin-quick-actions">';
@@ -228,10 +283,15 @@
 
             if (recentP.data && recentP.data.length > 0) {
                 h += '<div class="admin-table"><table><tr><th>Utilisateur</th><th>Type</th><th>Montant</th><th>Date</th></tr>';
+                var _planPrices = {'starter_access':1000,'starter':1000,'pro_access':1500,'pro':1500,'premium_access':3500,'premium':3500,'app_access':1500};
+                var _planLabels = {'starter_access':'⭐ Starter','starter':'⭐ Starter','pro_access':'⚡ Pro','pro':'⚡ Pro','premium_access':'💎 Premium','premium':'💎 Premium','app_access':'⚡ Pro'};
                 for (var k = 0; k < recentP.data.length; k++) {
                     var p = recentP.data[k];
                     var userName = (p.users && p.users.full_name) ? p.users.full_name : (p.users && p.users.email) ? p.users.email : 'Inconnu';
-                    h += '<tr><td>' + userName + '</td><td>' + p.purchase_type + '</td><td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td><td>' + Utils.timeAgo(p.created_at) + '</td></tr>';
+                    var pt = (p.purchase_type || 'app_access').toLowerCase();
+                    var amt = p.amount || _planPrices[pt] || 0;
+                    var lbl = _planLabels[pt] || p.purchase_type || '-';
+                    h += '<tr><td>' + userName + '</td><td>' + lbl + '</td><td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(amt) + '</td><td>' + Utils.timeAgo(p.created_at) + '</td></tr>';
                 }
                 h += '</table></div>';
             } else {
@@ -554,18 +614,81 @@
 
     // ===== PURCHASES =====
     AdminApp.renderPurchases = async function(container) {
-        var r = await db.from('purchases').select('*, users(full_name, email)').order('created_at', { ascending: false }).limit(50);
-        var items = r.data || [];
+        // Prix de référence par plan
+        var planPrices = {
+            'starter_access': 1000, 'starter': 1000,
+            'pro_access': 1500, 'pro': 1500,
+            'premium_access': 3500, 'premium': 3500,
+            'app_access': 1500
+        };
+        var planLabels = {
+            'starter_access': '⭐ Starter', 'starter': '⭐ Starter',
+            'pro_access': '⚡ Pro', 'pro': '⚡ Pro',
+            'premium_access': '💎 Premium', 'premium': '💎 Premium',
+            'app_access': '⚡ Pro (legacy)'
+        };
+        var planColors = {
+            'starter': '#6BB5FF', 'starter_access': '#6BB5FF',
+            'pro': '#3DDB7D', 'pro_access': '#3DDB7D', 'app_access': '#3DDB7D',
+            'premium': '#C9A84C', 'premium_access': '#C9A84C'
+        };
 
-        var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Achats (' + items.length + ')</div></div>';
-        h += '<div class="admin-table"><table><tr><th>User</th><th>Type</th><th>Montant</th><th>Statut</th><th>Paiement</th><th>Date</th></tr>';
+        var r = await db.from('purchases').select('*, users(full_name, email)').order('created_at', { ascending: false }).limit(50);
+        var items = [];
+
+        if (r.error || !r.data) {
+            // Fallback sans jointure
+            var r2 = await db.from('purchases').select('*').order('created_at', { ascending: false }).limit(50);
+            items = r2.data || [];
+            if (items.length > 0) {
+                var uids = [...new Set(items.map(function(p) { return p.user_id; }).filter(Boolean))];
+                var uMap = {};
+                var uR = await db.from('users').select('id, full_name, email').in('id', uids);
+                (uR.data || []).forEach(function(u) { uMap[u.id] = u; });
+                items.forEach(function(p) { if (!p.users && uMap[p.user_id]) p.users = uMap[p.user_id]; });
+            }
+        } else {
+            items = r.data;
+        }
+
+        // Calculer totaux
+        var totalRevenue = 0;
+        items.forEach(function(p) {
+            var amt = p.amount || 0;
+            if (amt === 0 && p.purchase_type) amt = planPrices[(p.purchase_type||'').toLowerCase()] || 0;
+            if (p.status === 'confirmed') totalRevenue += amt;
+        });
+
+        var h = '<div class="admin-card">';
+        h += '<div class="admin-card-header">';
+        h += '<div class="admin-card-title">Achats (' + items.length + ')</div>';
+        h += '<div style="font-size:13px;font-weight:700;color:#C9A84C;">Total : ' + Utils.formatPrice(totalRevenue) + '</div>';
+        h += '</div>';
+        h += '<div class="admin-table"><table><tr><th>Utilisateur</th><th>Plan</th><th>Montant</th><th>Statut</th><th>Paiement</th><th>Date</th></tr>';
+
+        if (items.length === 0) {
+            h += '<tr><td colspan="6" style="text-align:center;color:#6C6C7E;padding:20px;">Aucun achat</td></tr>';
+        }
 
         for (var i = 0; i < items.length; i++) {
             var p = items[i];
-            var name = (p.users && p.users.full_name) || (p.users && p.users.email) || '-';
+            var name = (p.users && p.users.full_name) || (p.users && p.users.email) || (p.user_id ? p.user_id.substring(0,8)+'...' : '-');
             var statusCls = p.status === 'confirmed' ? 'active' : p.status === 'pending' ? 'pending' : 'inactive';
+            var pt = (p.purchase_type || 'app_access').toLowerCase();
+            var planLabel = planLabels[pt] || p.purchase_type || '-';
+            var planColor = planColors[pt] || '#C9A84C';
+            // Montant : utiliser le réel ou déduire du plan
+            var amt = p.amount || 0;
+            if (amt === 0) amt = planPrices[pt] || 0;
 
-            h += '<tr><td>' + name + '</td><td>' + p.purchase_type + '</td><td style="color:#D4AF37;font-weight:700;">' + Utils.formatPrice(p.amount) + '</td><td><span class="status ' + statusCls + '">' + p.status + '</span></td><td>' + (p.payment_provider || '-') + '</td><td>' + Utils.timeAgo(p.created_at) + '</td></tr>';
+            h += '<tr>';
+            h += '<td style="font-size:11px;">' + name + '</td>';
+            h += '<td><span style="background:rgba(255,255,255,0.06);color:' + planColor + ';padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;">' + planLabel + '</span></td>';
+            h += '<td style="color:#C9A84C;font-weight:700;">' + Utils.formatPrice(amt) + '</td>';
+            h += '<td><span class="status ' + statusCls + '">' + p.status + '</span></td>';
+            h += '<td style="font-size:11px;">' + (p.payment_provider || '-') + '</td>';
+            h += '<td style="font-size:11px;">' + Utils.timeAgo(p.confirmed_at || p.created_at) + '</td>';
+            h += '</tr>';
         }
 
         h += '</table></div></div>';
