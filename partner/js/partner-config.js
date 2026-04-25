@@ -10,8 +10,8 @@ const CONFIG = {
 
     // ── SUPABASE (Projet séparé du partenaire) ──
     // Créer sur https://supabase.com → New Project
-    SUPABASE_URL: 'SUPABASE_URL_PARTENAIRE',
-    SUPABASE_ANON_KEY: 'SUPABASE_ANON_KEY_PARTENAIRE',
+    SUPABASE_URL: 'https://hyhpiwlfagfeeyajdpdi.supabase.co',
+    SUPABASE_ANON_KEY: 'sb_publishable_L0NFHgkMNphJyYLaNvD7tA_aoRh-0fM',
 
     // ── EMAILJS (Même compte que AKOLABS principal) ──
     EMAILJS_PUBLIC_KEY: 'Mq1BDoeRayGXaxxlE',
