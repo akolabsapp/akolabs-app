@@ -126,7 +126,8 @@
             { id: 'visuels', icon: 'fa-images', label: 'Visuels' },
             { id: 'testimonials', icon: 'fa-star', label: 'Témoignages' },
             { id: 'paymentmethods', icon: 'fa-credit-card', label: 'Paiements' },
-            { id: 'subscriptions', icon: 'fa-users-cog', label: 'Abonnements' }
+            { id: 'subscriptions', icon: 'fa-users-cog', label: 'Abonnements' },
+            { id: 'partner', icon: 'fa-handshake', label: 'Partenaire' }
         ];
 
         for (var i = 0; i < tabList.length; i++) {
@@ -170,41 +171,15 @@
         else if (tab === 'testimonials') await AdminApp.renderTestimonials(content);
         else if (tab === 'paymentmethods') await AdminApp.renderPaymentMethods(content);
         else if (tab === 'subscriptions') await AdminApp.renderSubscriptions(content);
+        else if (tab === 'partner') await AdminApp.renderPartner(content);
     };
 
     // ===== DASHBOARD =====
-    // ── Helper : charger TOUTES les lignes sans limite Supabase (pagination auto) ──
-    AdminApp._fetchAll = async function(query) {
-        var PAGE = 1000;
-        var allData = [];
-        var page = 0;
-        while (true) {
-            var r = await query.range(page * PAGE, (page + 1) * PAGE - 1);
-            if (r.error) { console.error('[Admin] fetchAll error:', r.error); break; }
-            var rows = r.data || [];
-            allData = allData.concat(rows);
-            if (rows.length < PAGE) break; // dernière page
-            page++;
-        }
-        return allData;
-    };
-
     AdminApp.renderStats = async function(container) {
         try {
-            // count: 'exact' donne le vrai total mais les data restent limitées à 1000
-            // On utilise head:false pour récupérer toutes les données
-            var usersR = await db.from('users').select('id, created_at, subscription_plan', { count: 'exact', head: false });
-            var purchasesR = await db.from('purchases').select('amount, purchase_type, created_at', { count: 'exact', head: false }).eq('status', 'confirmed');
+            var usersR = await db.from('users').select('id, created_at, subscription_plan', { count: 'exact' });
+            var purchasesR = await db.from('purchases').select('amount, purchase_type, created_at', { count: 'exact' }).eq('status', 'confirmed');
             var sectionsR = await db.from('sections').select('id', { count: 'exact' }).eq('is_active', true);
-            // Si plus de 1000 achats/users, paginer
-            if ((usersR.count || 0) > 1000) {
-                var uAll = await AdminApp._fetchAll(db.from('users').select('id, created_at, subscription_plan'));
-                usersR = { data: uAll, count: uAll.length, error: null };
-            }
-            if ((purchasesR.count || 0) > 1000) {
-                var pAll = await AdminApp._fetchAll(db.from('purchases').select('amount, purchase_type, created_at').eq('status', 'confirmed'));
-                purchasesR = { data: pAll, count: pAll.length, error: null };
-            }
 
             var totalUsers = usersR.count || 0;
             var totalRevenue = 0;
@@ -356,9 +331,7 @@
 
     // ===== USERS =====
     AdminApp.renderUsers = async function(container) {
-        // Charger tous les utilisateurs sans limite
-        var usersAll = await AdminApp._fetchAll(db.from('users').select('*').order('created_at', { ascending: false }));
-        var r = { data: usersAll, error: null };
+        var r = await db.from('users').select('*').order('created_at', { ascending: false }).limit(50);
         var users = r.data || [];
 
         var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Utilisateurs (' + users.length + ')</div></div>';
@@ -662,15 +635,12 @@
             'premium': '#C9A84C', 'premium_access': '#C9A84C'
         };
 
-        // Charger tous les achats sans limite
-        var purchAll = await AdminApp._fetchAll(db.from('purchases').select('*, users(full_name, email)').order('created_at', { ascending: false }));
-        var r = { data: purchAll, error: null };
+        var r = await db.from('purchases').select('*, users(full_name, email)').order('created_at', { ascending: false }).limit(50);
         var items = [];
 
         if (r.error || !r.data) {
             // Fallback sans jointure
-            var r2data = await AdminApp._fetchAll(db.from('purchases').select('*').order('created_at', { ascending: false }));
-            var r2 = { data: r2data, error: null };
+            var r2 = await db.from('purchases').select('*').order('created_at', { ascending: false }).limit(50);
             items = r2.data || [];
             if (items.length > 0) {
                 var uids = [...new Set(items.map(function(p) { return p.user_id; }).filter(Boolean))];
@@ -1091,14 +1061,19 @@
             var days = filter === '1d' ? 1 : filter === '7d' ? 7 : filter === '30d' ? 30 : 90;
             var from = new Date(now - days * 86400000).toISOString();
 
-            // Charger TOUTES les données sans limite 1000 (pagination auto)
-            var [views, purchases, newUsers, opens, topSectData] = await Promise.all([
-                AdminApp._fetchAll(db.from('section_views').select('created_at, is_free, section_id').gte('created_at', from)),
-                AdminApp._fetchAll(db.from('purchases').select('amount, purchase_type, created_at').eq('status', 'confirmed').gte('created_at', from)),
-                AdminApp._fetchAll(db.from('users').select('created_at').gte('created_at', from)),
-                AdminApp._fetchAll(db.from('app_opens').select('created_at').gte('created_at', from)),
-                AdminApp._fetchAll(db.from('section_views').select('section_id, sections(title)').gte('created_at', from))
+            // Charger les données en parallèle
+            var [viewsR, purchasesR, usersR, opensR, topSectR] = await Promise.all([
+                db.from('section_views').select('created_at, is_free, section_id').gte('created_at', from),
+                db.from('purchases').select('amount, created_at').eq('status', 'confirmed').gte('created_at', from),
+                db.from('users').select('created_at').gte('created_at', from),
+                db.from('app_opens').select('created_at').gte('created_at', from),
+                db.from('section_views').select('section_id, sections(title)').gte('created_at', from)
             ]);
+
+            var views = viewsR.data || [];
+            var purchases = purchasesR.data || [];
+            var newUsers = usersR.data || [];
+            var opens = opensR.data || [];
 
             // Calculs KPIs
             var totalViews = views.length;
@@ -1142,7 +1117,7 @@
 
             // Top sections
             var sectCount = {};
-            (topSectData || []).forEach(function(v) {
+            (topSectR.data || []).forEach(function(v) {
                 var title = v.sections ? v.sections.title : v.section_id;
                 sectCount[title] = (sectCount[title] || 0) + 1;
             });
@@ -1217,12 +1192,11 @@
 
     AdminApp._buildLandingBlock = async function(from, days, appDayMap, filter) {
         try {
-            // Charger TOUTES les visites sans limite 1000
-            var visits = await AdminApp._fetchAll(
-                db.from('landing_visits')
-                    .select('visitor_id, source, device, duration_seconds, converted, landed_at')
-                    .gte('landed_at', from)
-            );
+            var lR = await db.from('landing_visits')
+                .select('visitor_id, source, device, duration_seconds, converted, landed_at')
+                .gte('landed_at', from);
+
+            var visits = lR.data || [];
 
             if (visits.length === 0) {
                 return '<div class="admin-card" style="margin-top:16px;">'
@@ -2087,12 +2061,11 @@
     // ===== ABONNEMENTS =====
     AdminApp.renderSubscriptions = async function(container) {
         try {
-            // Charger tous les abonnements sans limite
-            var subs = await AdminApp._fetchAll(
-                db.from('users')
-                    .select('id, full_name, email, subscription_plan, subscription_expires_at, is_app_purchased, created_at')
-                    .order('created_at', { ascending: false })
-            );
+            var { data: subs } = await db.from('users')
+                .select('id, full_name, email, subscription_plan, subscription_expires_at, is_app_purchased, created_at')
+                .order('created_at', { ascending: false })
+                .limit(50);
+            subs = subs || [];
 
             var now = new Date();
             var h = '<div class="admin-card">';
@@ -2135,6 +2108,172 @@
             container.innerHTML = h;
         } catch(e) {
             container.innerHTML = '<div style="padding:20px;color:red;">Erreur : ' + (e.message||e) + '</div>';
+        }
+    };
+
+    // ===== PARTENAIRE =====
+    AdminApp.renderPartner = async function(container) {
+        // Connexion au Supabase du partenaire (lecture seule pour toi)
+        var PARTNER_SUPABASE_URL = 'https://hyhpiwlfagfeeyajdpdi.supabase.co';  // À remplir
+        var PARTNER_SUPABASE_KEY = 'sb_publishable_L0NFHgkMNphJyYLaNvD7tA_aoRh-0fM'; // À remplir
+
+        if (PARTNER_SUPABASE_URL.indexOf('PARTENAIRE') !== -1) {
+            container.innerHTML = '<div class="admin-card" style="text-align:center;padding:32px;">'
+                + '<div style="font-size:40px;margin-bottom:12px;">⚙️</div>'
+                + '<div style="font-family:Cinzel,serif;font-size:16px;color:#C9A84C;margin-bottom:8px;">Configuration requise</div>'
+                + '<div style="font-size:13px;color:#6C6C7E;">Remplis <strong>PARTNER_SUPABASE_URL</strong> et <strong>PARTNER_SUPABASE_KEY</strong> dans la fonction renderPartner de l\'admin.</div>'
+                + '</div>';
+            return;
+        }
+
+        var { createClient } = supabase;
+        var partnerDb = createClient(PARTNER_SUPABASE_URL, PARTNER_SUPABASE_KEY);
+
+        container.innerHTML = '<div style="text-align:center;padding:32px;"><div class="spinner"></div></div>';
+
+        try {
+            var planPrices = { starter_access:1000, pro_access:1500, premium_access:3500, app_access:1500 };
+            var now = new Date();
+            var today = now.toISOString().split('T')[0];
+            var weekAgo = new Date(now - 7*86400000).toISOString();
+            var monthAgo = new Date(now - 30*86400000).toISOString();
+
+            // Charger toutes les données partenaire
+            var fetchAll = async function(query) {
+                var PAGE = 1000, all = [], page = 0;
+                while (true) {
+                    var r = await query.range(page * PAGE, (page+1)*PAGE-1);
+                    if (r.error || !r.data) break;
+                    all = all.concat(r.data);
+                    if (r.data.length < PAGE) break;
+                    page++;
+                }
+                return all;
+            };
+
+            var [users, purchases, visits] = await Promise.all([
+                fetchAll(partnerDb.from('users').select('id, created_at, subscription_plan, total_spent, is_app_purchased')),
+                fetchAll(partnerDb.from('purchases').select('amount, purchase_type, created_at, status').eq('status','confirmed')),
+                fetchAll(partnerDb.from('landing_visits').select('visitor_id, converted, source, landed_at'))
+            ]);
+
+            // ── Calculs globaux ──
+            var totalRev = 0, weekRev = 0, todayRev = 0;
+            var weekPurchases = [], todayPurchases = [];
+            purchases.forEach(function(p) {
+                var amt = p.amount || planPrices[(p.purchase_type||'').toLowerCase()] || 0;
+                totalRev += amt;
+                if (p.created_at >= weekAgo) { weekRev += amt; weekPurchases.push(p); }
+                if (p.created_at && p.created_at.startsWith(today)) { todayRev += amt; todayPurchases.push(p); }
+            });
+
+            var commission15 = Math.round(weekRev * 0.15);
+            var uniqueVisitors = new Set(visits.map(function(v){return v.visitor_id;})).size;
+            var conversions = visits.filter(function(v){return v.converted;}).length;
+            var convRate = visits.length > 0 ? ((conversions/visits.length)*100).toFixed(1) : 0;
+
+            // ── Plans actifs ──
+            var planCounts = { starter:0, pro:0, premium:0, expired:0, lifetime:0 };
+            users.forEach(function(u) {
+                var p = u.subscription_plan||'lifetime';
+                if (!p||p==='lifetime') planCounts.lifetime++;
+                else if (p.indexOf('expired_')===0) planCounts.expired++;
+                else if (planCounts[p] !== undefined) planCounts[p]++;
+            });
+
+            var h = '';
+
+            // ── En-tête partenaire ──
+            h += '<div style="background:linear-gradient(135deg,#4B0082,#5D1494);border-radius:20px;padding:20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;">';
+            h += '<div style="width:50px;height:50px;border-radius:14px;background:rgba(212,175,55,0.2);border:1px solid #C9A84C;display:flex;align-items:center;justify-content:center;font-size:22px;">🤝</div>';
+            h += '<div>';
+            h += '<div style="font-family:Cinzel,serif;font-size:16px;color:#C9A84C;font-weight:700;">Partenaire AKOLABS</div>';
+            h += '<div style="font-size:12px;color:rgba(255,255,255,0.7);">partner.akolabs.store — Suivi en temps réel</div>';
+            h += '</div></div>';
+
+            // ── Stats principales ──
+            h += '<div class="admin-stats">';
+            [
+                ['fas fa-users', users.length, 'Utilisateurs', '+' + users.filter(function(u){return u.created_at&&u.created_at.startsWith(today);}).length + " aujourd'hui"],
+                ['fas fa-coins', Utils.formatPrice(totalRev), 'Revenus totaux', '+' + Utils.formatPrice(todayRev) + " aujourd'hui"],
+                ['fas fa-shopping-cart', purchases.length, 'Ventes totales', weekPurchases.length + ' cette semaine'],
+                ['fas fa-eye', uniqueVisitors, 'Visiteurs uniques', convRate + '% conversion']
+            ].forEach(function(s) {
+                h += '<div class="admin-stat-card">';
+                h += '<div class="admin-stat-icon"><i class="' + s[0] + '"></i></div>';
+                h += '<div class="admin-stat-value">' + s[1] + '</div>';
+                h += '<div class="admin-stat-label">' + s[2] + '</div>';
+                h += '<div class="admin-stat-change up">' + s[3] + '</div>';
+                h += '</div>';
+            });
+            h += '</div>';
+
+            // ── Commission de la semaine ──
+            h += '<div style="background:linear-gradient(135deg,rgba(61,219,125,0.12),rgba(46,158,91,0.08));border:1px solid rgba(61,219,125,0.3);border-radius:16px;padding:20px;margin-bottom:16px;">';
+            h += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">';
+            h += '<div>';
+            h += '<div style="font-size:12px;color:#3DDB7D;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;"><i class="fas fa-calendar-week" style="margin-right:6px;"></i>Commission semaine en cours</div>';
+            h += '<div style="font-size:28px;font-weight:700;color:#3DDB7D;font-family:Cinzel,serif;">' + Utils.formatPrice(commission15) + '</div>';
+            h += '<div style="font-size:11px;color:rgba(61,219,125,0.7);">15% de ' + Utils.formatPrice(weekRev) + ' générés cette semaine</div>';
+            h += '</div>';
+            h += '<div style="text-align:center;">';
+            h += '<div style="font-size:11px;color:#6C6C7E;margin-bottom:4px;">Ventes cette semaine</div>';
+            h += '<div style="font-size:22px;font-weight:700;color:#C9A84C;">' + weekPurchases.length + '</div>';
+            h += '<div style="font-size:10px;color:#6C6C7E;">à reverser lundi prochain</div>';
+            h += '</div></div></div>';
+
+            // ── Répartition plans ──
+            h += '<div class="admin-card" style="margin-bottom:16px;">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-chart-pie" style="color:#C9A84C;margin-right:8px;"></i>Répartition abonnements</div></div>';
+            h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">';
+            [
+                {key:'starter',label:'Starter',price:1000,color:'#6BB5FF',icon:'fa-star-half-alt'},
+                {key:'pro',    label:'Pro',    price:1500,color:'#3DDB7D',icon:'fa-bolt'},
+                {key:'premium',label:'Premium',price:3500,color:'#C9A84C',icon:'fa-gem'}
+            ].forEach(function(pl) {
+                var cnt = planCounts[pl.key]||0;
+                var rev = cnt * pl.price;
+                var total = purchases.length||1;
+                var pct = Math.round((cnt/total)*100);
+                h += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;text-align:center;">';
+                h += '<i class="fas ' + pl.icon + '" style="color:' + pl.color + ';font-size:16px;margin-bottom:6px;display:block;"></i>';
+                h += '<div style="font-size:10px;color:#9B97B5;margin-bottom:4px;">' + pl.label + '</div>';
+                h += '<div style="font-size:20px;font-weight:700;color:' + pl.color + ';">' + cnt + '</div>';
+                h += '<div style="font-size:10px;color:#6C6C7E;">' + Utils.formatPrice(rev) + '</div>';
+                h += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:4px;margin-top:6px;">';
+                h += '<div style="width:' + pct + '%;height:100%;background:' + pl.color + ';border-radius:4px;"></div></div>';
+                h += '</div>';
+            });
+            h += '</div></div>';
+
+            // ── Dernières ventes ──
+            var recentSales = purchases.slice(-10).reverse();
+            h += '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Dernières ventes</div></div>';
+            h += '<div class="admin-table"><table><tr><th>Type</th><th>Montant</th><th>Date</th></tr>';
+            if (recentSales.length === 0) {
+                h += '<tr><td colspan="3" style="text-align:center;color:#6C6C7E;padding:20px;">Aucune vente</td></tr>';
+            }
+            var planLabels = {starter_access:'⭐ Starter',pro_access:'⚡ Pro',premium_access:'💎 Premium',app_access:'⚡ Pro'};
+            var planColors2 = {starter_access:'#6BB5FF',pro_access:'#3DDB7D',premium_access:'#C9A84C',app_access:'#3DDB7D'};
+            recentSales.forEach(function(p) {
+                var pt = (p.purchase_type||'pro_access').toLowerCase();
+                var amt = p.amount || planPrices[pt] || 0;
+                h += '<tr>';
+                h += '<td><span style="color:' + (planColors2[pt]||'#C9A84C') + ';font-size:11px;font-weight:600;">' + (planLabels[pt]||pt) + '</span></td>';
+                h += '<td style="color:#C9A84C;font-weight:700;font-size:12px;">' + Utils.formatPrice(amt) + '</td>';
+                h += '<td style="font-size:11px;">' + Utils.timeAgo(p.created_at) + '</td>';
+                h += '</tr>';
+            });
+            h += '</table></div></div>';
+
+            container.innerHTML = h;
+
+        } catch(e) {
+            container.innerHTML = '<div class="admin-card" style="text-align:center;padding:32px;">'
+                + '<div style="font-size:40px;margin-bottom:12px;">❌</div>'
+                + '<div style="font-size:13px;color:#D93B3B;">Erreur de connexion au Supabase partenaire.<br>' + (e.message||e) + '</div>'
+                + '</div>';
+            console.error('[Partner]', e);
         }
     };
 
