@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1A1A2E">
+    <title>AKOLABS — Mon Dashboard</title>
+    <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+    <!-- NAV -->
+    <nav class="admin-nav">
+        <div class="admin-nav-left">
+            <img src="assets/images/logo.png" class="admin-nav-logo" alt="" onerror="this.style.display='none'">
+            <span class="admin-nav-title">Dashboard</span>
+            <span class="admin-nav-badge">LIVE</span>
+        </div>
+        <div class="admin-nav-right">
+            <button class="admin-nav-btn outline" onclick="window.open('index.html','_blank')"><i class="fas fa-external-link-alt"></i> App</button>
+            <button class="admin-nav-btn outline" onclick="PartnerAdmin.logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="admin-content" id="admin-content">
+        <div style="text-align:center;padding:60px 20px;">
+            <div class="spinner"></div>
+            <p style="color:#6C6C7E;margin-top:16px;font-size:14px;">Chargement...</p>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/partner-config.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+    // ============================================
+    // AKOLABS PARTNER ADMIN
+    // ============================================
+
+    var PartnerAdmin = {};
+    PartnerAdmin.currentTab = 'dashboard';
+
+    // ── INIT ──
+    PartnerAdmin.init = async function() {
+        var sessionR = await db.auth.getSession();
+        if (!sessionR.data.session) {
+            PartnerAdmin.showLogin();
+            return;
+        }
+        var profileR = await db.from('users').select('*').eq('id', sessionR.data.session.user.id).single();
+        if (!profileR.data || !profileR.data.is_admin) {
+            document.getElementById('admin-content').innerHTML = '<div style="text-align:center;padding:60px;color:#D93B3B;"><i class="fas fa-ban" style="font-size:48px;margin-bottom:16px;display:block;"></i>Accès refusé.</div>';
+            return;
+        }
+        PartnerAdmin.profile = profileR.data;
+        PartnerAdmin.renderTabs();
+    };
+
+    // ── LOGIN ──
+    PartnerAdmin.showLogin = function() {
+        document.getElementById('admin-content').innerHTML = `
+        <div style="max-width:380px;margin:60px auto;padding:0 20px;">
+            <div style="text-align:center;margin-bottom:32px;">
+                <img src="assets/images/logo.png" style="height:50px;margin-bottom:12px;" onerror="this.style.display='none'">
+                <div style="font-family:Cinzel,serif;font-size:22px;color:#C9A84C;font-weight:700;">Mon Dashboard</div>
+            </div>
+            <div class="admin-card" style="padding:24px;">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Email</label>
+                    <input type="email" class="admin-form-input" id="login-email" placeholder="votre@email.com">
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Mot de passe</label>
+                    <input type="password" class="admin-form-input" id="login-pass" placeholder="••••••••">
+                </div>
+                <button class="admin-btn admin-btn-primary admin-btn-block" onclick="PartnerAdmin.login()">
+                    <i class="fas fa-sign-in-alt"></i> Connexion
+                </button>
+                <div id="login-error" style="color:#D93B3B;font-size:12px;text-align:center;margin-top:12px;display:none;"></div>
+            </div>
+        </div>`;
+        document.getElementById('login-pass').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') PartnerAdmin.login();
+        });
+    };
+
+    PartnerAdmin.login = async function() {
+        var email = document.getElementById('login-email').value.trim();
+        var pass = document.getElementById('login-pass').value;
+        var errEl = document.getElementById('login-error');
+        errEl.style.display = 'none';
+        var r = await db.auth.signInWithPassword({ email, password: pass });
+        if (r.error) {
+            errEl.textContent = 'Email ou mot de passe incorrect.';
+            errEl.style.display = 'block';
+            return;
+        }
+        PartnerAdmin.init();
+    };
+
+    PartnerAdmin.logout = async function() {
+        await db.auth.signOut();
+        PartnerAdmin.showLogin();
+    };
+
+    // ── TABS ──
+    PartnerAdmin.renderTabs = function() {
+        var tabList = [
+            { id: 'dashboard',     icon: 'fa-chart-pie',    label: 'Dashboard' },
+            { id: 'analytics',     icon: 'fa-chart-line',   label: 'Analytics' },
+            { id: 'users',         icon: 'fa-users',        label: 'Utilisateurs' },
+            { id: 'purchases',     icon: 'fa-receipt',      label: 'Ventes' },
+            { id: 'subscriptions', icon: 'fa-users-cog',    label: 'Abonnements' },
+            { id: 'testimonials',  icon: 'fa-star',         label: 'Témoignages' },
+            { id: 'tokens',        icon: 'fa-key',          label: 'Tokens paiement' }
+        ];
+
+        var content = document.getElementById('admin-content');
+        var tabs = '<div class="admin-tabs">';
+        tabList.forEach(function(t) {
+            var cls = 'admin-tab-btn' + (t.id === PartnerAdmin.currentTab ? ' active' : '');
+            tabs += '<button class="' + cls + '" onclick="PartnerAdmin.switchTab(\'' + t.id + '\')"><i class="fas ' + t.icon + '"></i> ' + t.label + '</button>';
+        });
+        tabs += '</div><div id="tab-content" style="padding:16px;"></div>';
+        content.innerHTML = tabs;
+        PartnerAdmin.switchTab(PartnerAdmin.currentTab);
+    };
+
+    PartnerAdmin.switchTab = async function(tab) {
+        PartnerAdmin.currentTab = tab;
+        document.querySelectorAll('.admin-tab-btn').forEach(function(b) {
+            b.classList.toggle('active', b.textContent.trim().toLowerCase().includes(tab.toLowerCase()) || b.querySelector('i')?.className.includes(tab));
+        });
+        // Recalculer actif par data
+        document.querySelectorAll('.admin-tab-btn').forEach(function(b, i) {
+            b.classList.remove('active');
+        });
+        var allBtns = document.querySelectorAll('.admin-tab-btn');
+        var tabOrder = ['dashboard','analytics','users','purchases','subscriptions','testimonials','tokens'];
+        var idx = tabOrder.indexOf(tab);
+        if (allBtns[idx]) allBtns[idx].classList.add('active');
+
+        var content = document.getElementById('tab-content');
+        content.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+
+        if (tab === 'dashboard')     await PartnerAdmin.renderDashboard(content);
+        else if (tab === 'analytics') await PartnerAdmin.renderAnalytics(content);
+        else if (tab === 'users')     await PartnerAdmin.renderUsers(content);
+        else if (tab === 'purchases') await PartnerAdmin.renderPurchases(content);
+        else if (tab === 'subscriptions') await PartnerAdmin.renderSubscriptions(content);
+        else if (tab === 'testimonials')  await PartnerAdmin.renderTestimonials(content);
+        else if (tab === 'tokens')    await PartnerAdmin.renderTokens(content);
+    };
+
+    // ── HELPER : charger toutes les lignes sans limite ──
+    PartnerAdmin._fetchAll = async function(query) {
+        var PAGE = 1000, all = [], page = 0;
+        while (true) {
+            var r = await query.range(page * PAGE, (page + 1) * PAGE - 1);
+            if (r.error) break;
+            var rows = r.data || [];
+            all = all.concat(rows);
+            if (rows.length < PAGE) break;
+            page++;
+        }
+        return all;
+    };
+
+    // ── DASHBOARD ──
+    PartnerAdmin.renderDashboard = async function(container) {
+        var planPrices = { starter_access: 1000, pro_access: 1500, premium_access: 3500, app_access: 1500 };
+        var today = new Date().toISOString().split('T')[0];
+
+        var [usersAll, purchasesAll] = await Promise.all([
+            PartnerAdmin._fetchAll(db.from('users').select('id, created_at, subscription_plan, is_app_purchased')),
+            PartnerAdmin._fetchAll(db.from('purchases').select('amount, purchase_type, created_at, status').eq('status', 'confirmed'))
+        ]);
+
+        var totalRevenue = 0, todayRevenue = 0, todayUsers = 0;
+        purchasesAll.forEach(function(p) {
+            var amt = p.amount || planPrices[(p.purchase_type||'pro_access').toLowerCase()] || 0;
+            totalRevenue += amt;
+            if (p.created_at && p.created_at.startsWith(today)) todayRevenue += amt;
+        });
+        usersAll.forEach(function(u) {
+            if (u.created_at && u.created_at.startsWith(today)) todayUsers++;
+        });
+
+        var planCounts = { starter_access: 0, pro_access: 0, premium_access: 0 };
+        purchasesAll.forEach(function(p) {
+            var pt = (p.purchase_type || '').toLowerCase();
+            if (planCounts[pt] !== undefined) planCounts[pt]++;
+            else if (pt === 'app_access') planCounts['pro_access']++;
+        });
+
+        var h = '<div class="admin-stats">';
+        h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-users"></i></div><div class="admin-stat-value">' + usersAll.length + '</div><div class="admin-stat-label">Utilisateurs</div><div class="admin-stat-change up">+' + todayUsers + ' aujourd\'hui</div></div>';
+        h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-coins"></i></div><div class="admin-stat-value">' + Utils.formatPrice(totalRevenue) + '</div><div class="admin-stat-label">Revenus totaux</div><div class="admin-stat-change up">+' + Utils.formatPrice(todayRevenue) + ' aujourd\'hui</div></div>';
+        h += '<div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-shopping-cart"></i></div><div class="admin-stat-value">' + purchasesAll.length + '</div><div class="admin-stat-label">Ventes</div></div>';
+        h += '</div>';
+
+        // Répartition plans
+        h += '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-chart-pie" style="color:#C9A84C;margin-right:8px;"></i>Répartition par plan</div></div>';
+        h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">';
+        [
+            { key:'starter_access', label:'Starter', price:1000, color:'#6BB5FF', icon:'fa-star-half-alt' },
+            { key:'pro_access',     label:'Pro',     price:1500, color:'#3DDB7D', icon:'fa-bolt' },
+            { key:'premium_access', label:'Premium', price:3500, color:'#C9A84C', icon:'fa-gem' }
+        ].forEach(function(pl) {
+            var cnt = planCounts[pl.key] || 0;
+            var rev = cnt * pl.price;
+            var pct = purchasesAll.length > 0 ? Math.round(cnt / purchasesAll.length * 100) : 0;
+            h += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;text-align:center;">';
+            h += '<i class="fas ' + pl.icon + '" style="color:' + pl.color + ';font-size:16px;margin-bottom:6px;display:block;"></i>';
+            h += '<div style="font-size:10px;color:#9B97B5;margin-bottom:4px;">' + pl.label + ' · ' + Utils.formatPrice(pl.price) + '</div>';
+            h += '<div style="font-size:20px;font-weight:700;color:' + pl.color + ';">' + cnt + '</div>';
+            h += '<div style="font-size:10px;color:#6C6C7E;">' + pct + '% · ' + Utils.formatPrice(rev) + '</div>';
+            h += '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:4px;margin-top:8px;">';
+            h += '<div style="width:' + pct + '%;height:100%;background:' + pl.color + ';border-radius:4px;"></div>';
+            h += '</div></div>';
+        });
+        h += '</div></div>';
+
+        container.innerHTML = h;
+    };
+
+    // ── ANALYTICS ──
+    PartnerAdmin.renderAnalytics = async function(container) {
+        var days = 30;
+        var from = new Date(Date.now() - days * 86400000).toISOString();
+        var now = new Date();
+
+        var [visits, purchases, newUsers] = await Promise.all([
+            PartnerAdmin._fetchAll(db.from('landing_visits').select('visitor_id, source, converted, landed_at').gte('landed_at', from)),
+            PartnerAdmin._fetchAll(db.from('purchases').select('amount, purchase_type, created_at').eq('status','confirmed').gte('created_at', from)),
+            PartnerAdmin._fetchAll(db.from('users').select('created_at').gte('created_at', from))
+        ]);
+
+        var planPrices = { starter_access:1000, pro_access:1500, premium_access:3500, app_access:1500 };
+        var totalRevenue = purchases.reduce(function(s,p){ return s+(p.amount||planPrices[(p.purchase_type||'').toLowerCase()]||0); }, 0);
+        var uniqueVisitors = new Set(visits.map(function(v){return v.visitor_id;})).size;
+        var conversions = visits.filter(function(v){return v.converted;}).length;
+        var convRate = visits.length > 0 ? ((conversions / visits.length)*100).toFixed(1) : 0;
+
+        var h = '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-chart-line" style="color:#C9A84C;margin-right:8px;"></i>30 derniers jours</div></div>';
+        h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+        [
+            ['👁️','Visites',visits.length,'landing page'],
+            ['🧑','Visiteurs uniques',uniqueVisitors,'IDs distincts'],
+            ['🛒','Conversions',conversions,convRate+'% taux'],
+            ['💰','Revenus',Utils.formatPrice(totalRevenue),'période'],
+            ['👤','Nouveaux membres',newUsers.length,'inscrits'],
+            ['🛍️','Ventes',purchases.length,'confirmées']
+        ].forEach(function(item) {
+            h += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;">';
+            h += '<div style="font-size:22px;margin-bottom:4px;">' + item[0] + '</div>';
+            h += '<div style="font-size:18px;font-weight:700;color:#C9A84C;">' + item[2] + '</div>';
+            h += '<div style="font-size:11px;color:#9B97B5;">' + item[1] + '</div>';
+            h += '<div style="font-size:10px;color:#6C6C7E;">' + item[3] + '</div>';
+            h += '</div>';
+        });
+        h += '</div></div>';
+
+        // Sources trafic
+        var sourceMap = {};
+        visits.forEach(function(v){ var s = v.source||'Direct'; sourceMap[s] = (sourceMap[s]||0)+1; });
+        var sources = Object.entries(sourceMap).sort(function(a,b){return b[1]-a[1];});
+        if (sources.length > 0) {
+            h += '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Sources de trafic</div></div>';
+            h += '<div class="admin-table"><table><tr><th>Source</th><th>Visites</th><th>%</th></tr>';
+            sources.forEach(function(s) {
+                var pct = visits.length > 0 ? ((s[1]/visits.length)*100).toFixed(1) : 0;
+                h += '<tr><td>' + s[0] + '</td><td>' + s[1] + '</td><td>' + pct + '%</td></tr>';
+            });
+            h += '</table></div></div>';
+        }
+
+        container.innerHTML = h;
+    };
+
+    // ── USERS ──
+    PartnerAdmin.renderUsers = async function(container) {
+        var users = await PartnerAdmin._fetchAll(db.from('users').select('id,full_name,email,subscription_plan,subscription_expires_at,is_app_purchased,created_at,total_spent').order('created_at',{ascending:false}));
+
+        var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-users" style="color:#C9A84C;margin-right:8px;"></i>Utilisateurs (' + users.length + ')</div></div>';
+        h += '<div class="admin-table"><table><tr><th>Nom</th><th>Plan</th><th>Expiration</th><th>Total dépensé</th><th>Inscrit</th></tr>';
+        if (users.length === 0) h += '<tr><td colspan="5" style="text-align:center;color:#6C6C7E;padding:20px;">Aucun utilisateur</td></tr>';
+
+        var now = new Date();
+        var planColors = { lifetime:'#C9A84C', starter:'#6BB5FF', pro:'#3DDB7D', premium:'#A78BFA' };
+        users.forEach(function(u) {
+            var plan = u.subscription_plan || 'lifetime';
+            var isExpired = plan.indexOf('expired_') === 0;
+            var color = planColors[plan.replace('expired_','')] || '#6C6C7E';
+            var exp = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+            var expTxt = isExpired ? '<span style="color:#D93B3B;font-size:10px;">Expiré</span>' : exp ? exp.toLocaleDateString('fr-FR') : '♾️';
+            h += '<tr>';
+            h += '<td style="font-size:11px;"><div style="font-weight:600;">' + (u.full_name||'—') + '</div><div style="color:#6C6C7E;font-size:10px;">' + (u.email||'') + '</div></td>';
+            h += '<td><span style="background:rgba(255,255,255,0.06);color:' + color + ';padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;">' + plan.toUpperCase() + '</span></td>';
+            h += '<td style="font-size:11px;">' + expTxt + '</td>';
+            h += '<td style="color:#C9A84C;font-weight:600;font-size:12px;">' + Utils.formatPrice(u.total_spent||0) + '</td>';
+            h += '<td style="font-size:11px;">' + Utils.timeAgo(u.created_at) + '</td>';
+            h += '</tr>';
+        });
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    // ── PURCHASES ──
+    PartnerAdmin.renderPurchases = async function(container) {
+        var planPrices = { starter_access:1000, pro_access:1500, premium_access:3500, app_access:1500 };
+        var planLabels = { starter_access:'⭐ Starter', pro_access:'⚡ Pro', premium_access:'💎 Premium', app_access:'⚡ Pro' };
+        var planColors = { starter_access:'#6BB5FF', pro_access:'#3DDB7D', premium_access:'#C9A84C', app_access:'#3DDB7D' };
+
+        var purchases = await PartnerAdmin._fetchAll(db.from('purchases').select('*,users(full_name,email)').order('created_at',{ascending:false}));
+
+        var totalRevenue = purchases.reduce(function(s,p) {
+            var pt = (p.purchase_type||'').toLowerCase();
+            return s + (p.amount||planPrices[pt]||0);
+        }, 0);
+
+        var h = '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-receipt" style="color:#C9A84C;margin-right:8px;"></i>Ventes (' + purchases.length + ')</div>';
+        h += '<div style="font-size:13px;font-weight:700;color:#C9A84C;">Total : ' + Utils.formatPrice(totalRevenue) + '</div></div>';
+        h += '<div class="admin-table"><table><tr><th>Client</th><th>Plan</th><th>Montant</th><th>Statut</th><th>Date</th></tr>';
+        if (purchases.length === 0) h += '<tr><td colspan="5" style="text-align:center;color:#6C6C7E;padding:20px;">Aucune vente</td></tr>';
+
+        purchases.forEach(function(p) {
+            var name = (p.users&&p.users.full_name)||(p.users&&p.users.email)||'—';
+            var pt = (p.purchase_type||'pro_access').toLowerCase();
+            var amt = p.amount||planPrices[pt]||0;
+            var lbl = planLabels[pt]||pt;
+            var clr = planColors[pt]||'#C9A84C';
+            var statusCls = p.status==='confirmed'?'active':p.status==='pending'?'pending':'inactive';
+            h += '<tr>';
+            h += '<td style="font-size:11px;">' + name + '</td>';
+            h += '<td><span style="background:rgba(255,255,255,0.06);color:' + clr + ';padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;">' + lbl + '</span></td>';
+            h += '<td style="color:#C9A84C;font-weight:700;font-size:12px;">' + Utils.formatPrice(amt) + '</td>';
+            h += '<td><span class="status ' + statusCls + '">' + p.status + '</span></td>';
+            h += '<td style="font-size:11px;">' + Utils.timeAgo(p.confirmed_at||p.created_at) + '</td>';
+            h += '</tr>';
+        });
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    // ── SUBSCRIPTIONS ──
+    PartnerAdmin.renderSubscriptions = async function(container) {
+        var subs = await PartnerAdmin._fetchAll(db.from('users').select('id,full_name,email,subscription_plan,subscription_expires_at,created_at').order('created_at',{ascending:false}));
+        var now = new Date();
+        var stats = { lifetime:0, starter:0, pro:0, premium:0, expired:0 };
+        subs.forEach(function(u) {
+            var p = u.subscription_plan||'lifetime';
+            if (!p||p==='lifetime') stats.lifetime++;
+            else if (p==='starter') stats.starter++;
+            else if (p==='pro') { if (!u.subscription_expires_at||new Date(u.subscription_expires_at)>now) stats.pro++; else stats.expired++; }
+            else if (p==='premium') { if (!u.subscription_expires_at||new Date(u.subscription_expires_at)>now) stats.premium++; else stats.expired++; }
+            else stats.expired++;
+        });
+
+        var h = '<div class="admin-card" style="margin-bottom:16px;">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-users-cog" style="color:#C9A84C;margin-right:8px;"></i>Abonnements actifs</div></div>';
+        h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">';
+        [['♾️ À vie',stats.lifetime,'#C9A84C'],['⭐ Starter',stats.starter,'#6BB5FF'],['⚡ Pro actif',stats.pro,'#3DDB7D'],['💎 Premium actif',stats.premium,'#A78BFA'],['⏰ Expirés',stats.expired,'#D93B3B']].forEach(function(item){
+            h += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;text-align:center;">';
+            h += '<div style="font-size:18px;font-weight:700;color:' + item[2] + ';">' + item[1] + '</div>';
+            h += '<div style="font-size:11px;color:#9B97B5;">' + item[0] + '</div></div>';
+        });
+        h += '</div></div>';
+
+        h += '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Détail</div></div>';
+        h += '<div class="admin-table"><table><tr><th>Utilisateur</th><th>Plan</th><th>Expiration</th><th>Statut</th></tr>';
+        subs.forEach(function(u) {
+            var plan = u.subscription_plan||'lifetime';
+            var isExp = plan.indexOf('expired_')===0;
+            var exp = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+            var daysLeft = exp && exp > now ? Math.ceil((exp-now)/(1000*60*60*24)) : null;
+            var statusTxt = isExp ? '<span style="color:#D93B3B;font-size:11px;">⏰ Expiré</span>' : exp ? '<span style="color:#3DDB7D;font-size:11px;">✅ Actif — ' + daysLeft + 'j</span>' : '<span style="color:#C9A84C;font-size:11px;">♾️ À vie</span>';
+            var expTxt = exp ? exp.toLocaleDateString('fr-FR') : '—';
+            var planColors = {lifetime:'#C9A84C',starter:'#6BB5FF',pro:'#3DDB7D',premium:'#A78BFA'};
+            var pKey = plan.replace('expired_','');
+            var clr = planColors[pKey]||'#6C6C7E';
+            h += '<tr>';
+            h += '<td style="font-size:11px;"><div>' + (u.full_name||'—') + '</div><div style="color:#6C6C7E;font-size:10px;">' + (u.email||'') + '</div></td>';
+            h += '<td><span style="background:rgba(255,255,255,0.06);color:' + clr + ';padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;">' + plan.toUpperCase() + '</span></td>';
+            h += '<td style="font-size:11px;">' + expTxt + '</td>';
+            h += '<td>' + statusTxt + '</td>';
+            h += '</tr>';
+        });
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    // ── TÉMOIGNAGES ──
+    PartnerAdmin.renderTestimonials = async function(container) {
+        var { data: items } = await db.from('landing_testimonials').select('*').order('order_index');
+        items = items || [];
+
+        var h = '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-star" style="color:#C9A84C;margin-right:8px;"></i>Témoignages — Carousel images</div></div>';
+        h += '<p style="font-size:13px;color:#6C6C7E;margin-bottom:16px;">Ces images s\'affichent dans la section "Ils ont sauté le pas" de ta page de vente.</p>';
+
+        if (items.length > 0) {
+            h += '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">';
+            items.forEach(function(t) {
+                var src = t.image_url;
+                if (src&&src.indexOf('res.cloudinary.com')!==-1) src = src.replace('/upload/','/upload/f_auto,q_auto,w_100,h_133,c_fill/');
+                h += '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;width:110px;">';
+                h += '<img src="' + src + '" loading="lazy" style="width:90px;height:120px;object-fit:cover;border-radius:8px;display:block;margin:0 auto 4px;">';
+                h += '<div style="font-size:10px;color:#6C6C7E;margin-bottom:4px;">Ordre : ' + t.order_index + '</div>';
+                h += '<button class="admin-btn admin-btn-danger" style="font-size:10px;padding:3px 8px;" onclick="PartnerAdmin.deleteTestimonial(\'' + t.id + '\')"><i class="fas fa-trash"></i></button>';
+                h += '</div>';
+            });
+            h += '</div>';
+        } else {
+            h += '<p style="text-align:center;color:#6C6C7E;font-size:13px;margin-bottom:16px;">Aucun témoignage. Les témoignages par défaut s\'affichent.</p>';
+        }
+
+        h += '<div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;">';
+        h += '<div class="admin-card-title" style="font-size:14px;margin-bottom:12px;"><i class="fas fa-plus-circle"></i> Ajouter</div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Image *</label>';
+        h += '<div style="display:flex;gap:8px;"><input class="admin-form-input" id="tm-url" placeholder="URL ou uploader →" readonly>';
+        h += '<button class="admin-btn admin-btn-primary" onclick="PartnerAdmin.uploadTestimonial()"><i class="fas fa-upload"></i></button></div>';
+        h += '<div id="tm-preview" style="margin-top:8px;display:none;"><img id="tm-preview-img" style="width:80px;height:107px;object-fit:cover;border-radius:8px;border:2px solid #C9A84C;"></div></div>';
+        h += '<div class="admin-form-group"><label class="admin-form-label">Ordre</label><input class="admin-form-input" id="tm-order" type="number" min="0" value="' + items.length + '"></div>';
+        h += '<button class="admin-btn admin-btn-primary admin-btn-block" onclick="PartnerAdmin.saveTestimonial()"><i class="fas fa-save"></i> Enregistrer</button>';
+        h += '</div></div>';
+        container.innerHTML = h;
+    };
+
+    PartnerAdmin.uploadTestimonial = function() {
+        var input = document.createElement('input');
+        input.type = 'file'; input.accept = 'image/*';
+        input.onchange = async function() {
+            var file = input.files[0]; if (!file) return;
+            Utils.showToast('Upload...', 'info');
+            try {
+                var url = await Utils.uploadToCloudinary(file);
+                document.getElementById('tm-url').value = url;
+                document.getElementById('tm-preview-img').src = url;
+                document.getElementById('tm-preview').style.display = 'block';
+                Utils.showToast('Uploadé !', 'success');
+            } catch(e) { Utils.showToast('Erreur upload', 'error'); }
+        };
+        input.click();
+    };
+
+    PartnerAdmin.saveTestimonial = async function() {
+        var url = document.getElementById('tm-url').value;
+        var order = parseInt(document.getElementById('tm-order').value)||0;
+        if (!url) { Utils.showToast('Uploadez une image', 'warning'); return; }
+        var { error } = await db.from('landing_testimonials').insert({ image_url: url, order_index: order, is_active: true });
+        if (error) { Utils.showToast('Erreur: ' + error.message, 'error'); return; }
+        Utils.showToast('Témoignage ajouté !', 'success');
+        PartnerAdmin.switchTab('testimonials');
+    };
+
+    PartnerAdmin.deleteTestimonial = async function(id) {
+        if (!confirm('Supprimer ?')) return;
+        await db.from('landing_testimonials').delete().eq('id', id);
+        Utils.showToast('Supprimé', 'success');
+        PartnerAdmin.switchTab('testimonials');
+    };
+
+    // ── TOKENS DE PAIEMENT ──
+    PartnerAdmin.renderTokens = async function(container) {
+        var tokens = await PartnerAdmin._fetchAll(db.from('payment_tokens').select('*').order('created_at',{ascending:false}));
+        var now = new Date();
+        var active = tokens.filter(function(t){return !t.used && new Date(t.expires_at)>now;});
+        var used = tokens.filter(function(t){return t.used;});
+        var expired = tokens.filter(function(t){return !t.used && new Date(t.expires_at)<=now;});
+
+        var h = '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-key" style="color:#C9A84C;margin-right:8px;"></i>Tokens de paiement Chariow</div></div>';
+        h += '<p style="font-size:12px;color:#6C6C7E;margin-bottom:16px;">Chaque token est créé quand un utilisateur clique "Payer" et redirigé vers Chariow. Utilisé = paiement confirmé et compte créé.</p>';
+        h += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">';
+        [['🟢 Actifs',active.length,'#3DDB7D'],['✅ Utilisés',used.length,'#C9A84C'],['⏰ Expirés',expired.length,'#D93B3B']].forEach(function(s){
+            h += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;text-align:center;">';
+            h += '<div style="font-size:18px;font-weight:700;color:' + s[2] + ';">' + s[1] + '</div>';
+            h += '<div style="font-size:11px;color:#9B97B5;">' + s[0] + '</div></div>';
+        });
+        h += '</div>';
+
+        // Nettoyage des tokens expirés
+        if (expired.length > 0) {
+            h += '<button class="admin-btn admin-btn-danger" style="margin-bottom:16px;" onclick="PartnerAdmin.cleanExpiredTokens()"><i class="fas fa-trash"></i> Supprimer les ' + expired.length + ' tokens expirés</button>';
+        }
+
+        h += '<div class="admin-table"><table><tr><th>Token</th><th>Plan</th><th>Montant</th><th>Statut</th><th>Email utilisé</th><th>Date</th></tr>';
+        if (tokens.length === 0) h += '<tr><td colspan="6" style="text-align:center;color:#6C6C7E;padding:20px;">Aucun token</td></tr>';
+        tokens.slice(0, 50).forEach(function(t) {
+            var isExp = !t.used && new Date(t.expires_at) <= now;
+            var status = t.used ? '<span style="color:#3DDB7D;font-size:11px;">✅ Utilisé</span>' : isExp ? '<span style="color:#D93B3B;font-size:11px;">⏰ Expiré</span>' : '<span style="color:#C9A84C;font-size:11px;">⏳ Actif</span>';
+            var planColors = {starter:'#6BB5FF',pro:'#3DDB7D',premium:'#C9A84C'};
+            h += '<tr>';
+            h += '<td style="font-size:10px;font-family:monospace;">' + t.token.slice(0,20) + '...</td>';
+            h += '<td><span style="color:' + (planColors[t.plan]||'#C9A84C') + ';font-size:11px;font-weight:600;">' + (t.plan||'—').toUpperCase() + '</span></td>';
+            h += '<td style="color:#C9A84C;font-size:12px;font-weight:600;">' + Utils.formatPrice(t.amount||0) + '</td>';
+            h += '<td>' + status + '</td>';
+            h += '<td style="font-size:11px;">' + (t.used_by_email||'—') + '</td>';
+            h += '<td style="font-size:11px;">' + Utils.timeAgo(t.created_at) + '</td>';
+            h += '</tr>';
+        });
+        h += '</table></div></div>';
+        container.innerHTML = h;
+    };
+
+    PartnerAdmin.cleanExpiredTokens = async function() {
+        if (!confirm('Supprimer tous les tokens expirés non utilisés ?')) return;
+        var now = new Date().toISOString();
+        await db.from('payment_tokens').delete().eq('used', false).lt('expires_at', now);
+        Utils.showToast('Tokens expirés supprimés', 'success');
+        PartnerAdmin.switchTab('tokens');
+    };
+
+    // ── START ──
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof emailjs !== 'undefined' && CONFIG.EMAILJS_PUBLIC_KEY) {
+            emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY);
+        }
+        PartnerAdmin.init();
+    });
+    </script>
+
+</body>
+</html>
