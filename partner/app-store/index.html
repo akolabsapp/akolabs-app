@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#4B0082">
-    <meta name="description" content="AKOLABS - Apps premium, IA, formations. Accès complet dès 1000F.">
-    <title>AKOLABS - Votre Arsenal Digital Premium</title>
+    <meta name="description" content="AKOLABS Tedora - Apps premium, IA, formations. Accès complet dès 1000F.">
+    <title>AKOLABS Tedora - Votre Arsenal Digital Premium</title>
     <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,23 +62,23 @@ body.landing-body {
 .lnav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 20px;
+    padding: 10px 16px;
     background: linear-gradient(135deg, #4B0082, #3A006B);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 2px 20px rgba(75,0,130,0.25);
 }
 .lnav-logo {
-    display: flex; align-items: center; gap: 8px;
-    font-family: var(--font-deco); font-size: 18px; color: var(--ako-gold);
-    font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-deco); font-size: 13px; color: var(--ako-gold);
+    font-weight: 700; white-space: nowrap; line-height: 1;
 }
-.lnav-logo img { height: 28px; width: auto; }
+.lnav-logo img { height: 24px; width: auto; flex-shrink: 0; }
 .lnav-cta {
     background: linear-gradient(135deg, var(--ako-gold), var(--ako-gold-light));
-    color: #1A0A00; font-weight: 700; font-size: 13px;
-    padding: 9px 18px; border-radius: 50px; text-decoration: none;
-    font-family: var(--font-head);
+    color: #1A0A00; font-weight: 700; font-size: 11px;
+    padding: 8px 12px; border-radius: 50px; text-decoration: none;
+    font-family: var(--font-head); white-space: nowrap;
     box-shadow: 0 4px 20px rgba(201,168,76,0.35);
 }
 
@@ -809,8 +809,8 @@ body.landing-body {
 <!-- NAVBAR -->
 <nav class="lnav">
     <div class="lnav-logo">
-        <img src="../assets/images/logo.png" alt="AKOLABS" onerror="this.style.display='none'">
-        AKOLABS
+        <img src="../assets/images/logo.png" alt="AKOLABS Tedora" onerror="this.style.display='none'">
+        AKOLABS Tedora
     </div>
     <button onclick="LandingApp.openPlanModal('pro')" class="lnav-cta">
         <i class="fas fa-bolt"></i> Obtenir l'accès
@@ -822,7 +822,7 @@ body.landing-body {
     <span class="hero-badge">
         <i class="fas fa-fire"></i> 1387+ membres actifs — Offre limitée
     </span>
-    <img src="../assets/images/logo.png" alt="AKOLABS" class="hero-logo"
+    <img src="../assets/images/logo.png" alt="AKOLABS Tedora" class="hero-logo"
          onerror="this.outerHTML='<div style=\'font-family:Cinzel;font-size:48px;color:#C9A84C;font-weight:700;margin-bottom:20px;\'>A</div>'">
     <h1>Tout ce dont tu as besoin<br>pour <span class="accent">dominer le digital</span></h1>
     <p class="hero-sub">
@@ -934,14 +934,14 @@ body.landing-body {
         <span>52 500 F+</span>
     </div>
 
-    <div class="pain-vs">avec AKOLABS, tu peux avoir tout ça pour</div>
+    <div class="pain-vs">avec AKOLABS Tedora, tu peux avoir tout ça pour</div>
     <div class="pain-ako-price">1 000 F seulement</div>
     <div class="pain-ako-label">par mois — ou 3 500 F pour 3 mois complets</div>
 </section>
 
 <!-- FEATURES -->
 <section class="lsec" id="features">
-    <h2 class="lsec-title">Pourquoi <span class="accent">AKOLABS</span> ?</h2>
+    <h2 class="lsec-title">Pourquoi <span class="accent">AKOLABS Tedora</span> ?</h2>
     <p class="lsec-sub">Ce n'est pas juste une app. C'est ton avantage compétitif sur le digital.</p>
     <div class="features-grid">
         <div class="feature-card">
@@ -1080,7 +1080,7 @@ body.landing-body {
             </div>
             <div class="testi-slide testi-placeholder">
                 <div class="testi-stars">★★★★½</div>
-                <div class="testi-text">"NotebookLM m'a changé la vie pour mes révisions. Je charge mes cours en PDF et l'IA me génère des résumés automatiques. Ce truc existe vraiment et c'est dans AKOLABS. Mes collègues n'en revenaient pas."</div>
+                <div class="testi-text">"NotebookLM m'a changé la vie pour mes révisions. Je charge mes cours en PDF et l'IA me génère des résumés automatiques. Ce truc existe vraiment et c'est dans AKOLABS Tedora. Mes collègues n'en revenaient pas."</div>
                 <div class="testi-name">Fatou N.</div>
                 <div class="testi-role">Étudiante — Lomé</div>
             </div>
@@ -1102,11 +1102,11 @@ body.landing-body {
 
     <div class="payment-wa-box">
         <div class="payment-wa-text">
-            Tu ne trouves pas ton moyen de paiement dans la liste ? 
-            Écris-nous directement — on trouvera une solution pour toi ! 🤝
+            Besoin d'aide ou d'informations avant d'acheter ?
+            Notre équipe est disponible sur WhatsApp 🤝
         </div>
         <button class="btn-wa" onclick="LandingApp.openWaModal()">
-            <i class="fab fa-whatsapp"></i> Nous contacter sur WhatsApp
+            <i class="fab fa-whatsapp"></i> Contacter le support
         </button>
     </div>
 </section>
@@ -1127,14 +1127,14 @@ body.landing-body {
                 <div class="plan-price">1 000 F <span>paiement unique</span></div>
             </div>
             <ul class="plan-features">
-                <li><i class="fas fa-check pf-check"></i> AKOLABS Universe (outils IA)</li>
-                <li><i class="fas fa-check pf-check"></i> AKOLABS Learning (formations)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Tedora Universe (outils IA)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Tedora Learning (formations)</li>
                 <li><i class="fas fa-check pf-check"></i> Système d'affiliation</li>
                 <li><i class="fas fa-check pf-check"></i> Accès à vie aux contenus inclus</li>
-                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS App Prime</li>
-                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS IA 2</li>
-                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Ebook</li>
-                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Learning Premium</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Tedora App Prime</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Tedora IA 2</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Tedora Ebook</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Tedora Learning Premium</li>
             </ul>
             <button onclick="LandingApp.openPlanModal('starter')" class="btn-plan btn-plan-secondary">
                 <i class="fas fa-arrow-right"></i> Commencer avec Starter
@@ -1151,11 +1151,11 @@ body.landing-body {
                 <div class="plan-price">1 500 F <span>/ mois</span></div>
             </div>
             <ul class="plan-features">
-                <li><i class="fas fa-check pf-check"></i> <strong>Tout le catalogue AKOLABS</strong></li>
-                <li><i class="fas fa-check pf-check"></i> AKOLABS App Prime (APKs premium)</li>
-                <li><i class="fas fa-check pf-check"></i> AKOLABS IA 2 (modèles avancés)</li>
-                <li><i class="fas fa-check pf-check"></i> AKOLABS Ebook (10 000+ livres)</li>
-                <li><i class="fas fa-check pf-check"></i> AKOLABS Learning complet</li>
+                <li><i class="fas fa-check pf-check"></i> <strong>Tout le catalogue AKOLABS Tedora</strong></li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Tedora App Prime (APKs premium)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Tedora IA 2 (modèles avancés)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Tedora Ebook (10 000+ livres)</li>
+                <li><i class="fas fa-check pf-check"></i> AKOLABS Tedora Learning complet</li>
                 <li><i class="fas fa-check pf-check"></i> Affiliation 10% de commission</li>
                 <li><i class="fas fa-check pf-check"></i> Nouvelles sections incluses</li>
             </ul>
@@ -1196,11 +1196,11 @@ body.landing-body {
 
     <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-            <span>C'est quoi exactement AKOLABS ?</span>
+            <span>C'est quoi exactement AKOLABS Tedora ?</span>
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>AKOLABS est une application web progressive qui regroupe en un seul endroit : des apps Android premium débloquées, les meilleurs outils IA (ChatGPT, Claude, Gemini...), des formations vidéo complètes, des milliers d'ebooks, et bien plus. Tout ça accessible depuis ton téléphone ou PC.</p>
+            <p>AKOLABS Tedora est une application web progressive qui regroupe en un seul endroit : des apps Android premium débloquées, les meilleurs outils IA (ChatGPT, Claude, Gemini...), des formations vidéo complètes, des milliers d'ebooks, et bien plus. Tout ça accessible depuis ton téléphone ou PC.</p>
         </div>
     </div>
 
@@ -1220,7 +1220,7 @@ body.landing-body {
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>Non. Si tu avais déjà accès à AKOLABS avant cette mise à jour, ton accès à vie reste intact à 100%. Rien ne change pour toi — tu continues à accéder à tout ce que tu avais, pour toujours.</p>
+            <p>Non. Si tu avais déjà accès à AKOLABS Tedora avant cette mise à jour, ton accès à vie reste intact à 100%. Rien ne change pour toi — tu continues à accéder à tout ce que tu avais, pour toujours.</p>
         </div>
     </div>
 
@@ -1240,7 +1240,7 @@ body.landing-body {
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>Dès ton inscription, tu reçois un lien d'affiliation unique. Chaque personne qui achète AKOLABS via ton lien te rapporte 10% de commission. Certains membres ont déjà rentabilisé leur accès en 48h simplement en partageant dans leurs groupes WhatsApp.</p>
+            <p>Dès ton inscription, tu reçois un lien d'affiliation unique. Chaque personne qui achète AKOLABS Tedora via ton lien te rapporte 10% de commission. Certains membres ont déjà rentabilisé leur accès en 48h simplement en partageant dans leurs groupes WhatsApp.</p>
         </div>
     </div>
 
@@ -1250,13 +1250,13 @@ body.landing-body {
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>AKOLABS est une PWA (Progressive Web App). Elle fonctionne sur Android, iPhone et PC — directement depuis le navigateur. Tu peux l'installer sur ton écran d'accueil comme une vraie app. Un seul compte, sur tous tes appareils.</p>
+            <p>AKOLABS Tedora est une PWA (Progressive Web App). Elle fonctionne sur Android, iPhone et PC — directement depuis le navigateur. Tu peux l'installer sur ton écran d'accueil comme une vraie app. Un seul compte, sur tous tes appareils.</p>
         </div>
     </div>
 
     <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-            <span>Comment puis-je accéder à AKOLABS après l'achat ?</span>
+            <span>Comment puis-je accéder à AKOLABS Tedora après l'achat ?</span>
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
@@ -1267,11 +1267,11 @@ body.landing-body {
 
 <!-- FOOTER -->
 <footer class="lfooter">
-    <p>© 2026 AKOLABS — Tous droits réservés.</p>
+    <p>© 2026 AKOLABS Tedora — Tous droits réservés.</p>
     <p style="margin-top:8px;">
         <a href="#">Conditions d'utilisation</a> · 
         <a href="#">Confidentialité</a> · 
-        <a href="mailto:akolabs.app@gmail.com">Contact</a>
+        <a href="mailto:epandod@gmail.com">Contact</a>
     </p>
 </footer>
 
@@ -1283,7 +1283,7 @@ body.landing-body {
 </div>
 
 <!-- BOUTON WA FLOTTANT -->
-<button class="wa-float-btn" onclick="LandingApp.openWaModal()" title="Nous contacter">
+<button class="wa-float-btn" onclick="LandingApp.openWaModal()" title="Contacter le support">
     <i class="fab fa-whatsapp"></i>
 </button>
 
@@ -1343,7 +1343,7 @@ body.landing-body {
 
                 <div class="pmodal-terms">
                     <input type="checkbox" id="pm-terms">
-                    <span>J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'AKOLABS.</span>
+                    <span>J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'AKOLABS Tedora.</span>
                 </div>
 
                 <button id="btn-pmodal-pay" class="btn-pmodal-pay" onclick="LandingApp.handlePurchase()">
@@ -1373,7 +1373,7 @@ body.landing-body {
             <div class="wa-modal-title">💬 Nous contacter</div>
             <button onclick="LandingApp.closeWaModal(null)" style="background:none;border:none;color:#9B97B5;cursor:pointer;font-size:18px;"><i class="fas fa-times"></i></button>
         </div>
-        <div class="wa-modal-sub">Notre équipe répond dans la journée. N'hésite pas !</div>
+        <div class="wa-modal-sub">Contacte le support AKOLABS Tedora. On répond dans la journée 🤝</div>
 
         <div class="wa-input-group">
             <label class="wa-label">Ton prénom</label>
@@ -1384,10 +1384,10 @@ body.landing-body {
             <select class="wa-select" id="wa-subject">
                 <option value="">— Choisir un sujet —</option>
                 <option value="Question sur les plans">Question sur les plans</option>
-                <option value="Moyen de paiement indisponible">Moyen de paiement indisponible</option>
                 <option value="Problème d'accès après achat">Problème d'accès après achat</option>
                 <option value="Information sur le contenu">Information sur le contenu</option>
                 <option value="Affiliation et commissions">Affiliation et commissions</option>
+                <option value="Problème technique">Problème technique</option>
                 <option value="Autre question">Autre question</option>
             </select>
         </div>
@@ -1408,7 +1408,7 @@ body.landing-body {
     <div class="upsell-box">
         <div class="upsell-icon">🔓</div>
         <div class="upsell-title" id="upsell-title">Cette section est réservée au plan Pro</div>
-        <div class="upsell-text" id="upsell-text">Passe au plan Pro pour débloquer tout le catalogue AKOLABS — dès 1 500F/mois.</div>
+        <div class="upsell-text" id="upsell-text">Passe au plan Pro pour débloquer tout le catalogue AKOLABS Tedora — dès 1 500F/mois.</div>
         <div class="upsell-actions">
             <button class="btn-upsell btn-upsell-primary" onclick="LandingApp.closeUpsell(null);LandingApp.openPlanModal('pro')">
                 <i class="fas fa-rocket"></i> Passer au plan Pro — 1 500 F
@@ -1430,7 +1430,7 @@ body.landing-body {
 
 <script>
 // =============================================
-// AKOLABS LANDING — Système d'abonnements v2
+// AKOLABS Tedora LANDING — Système d'abonnements v2
 // =============================================
 
 const PLANS = {
@@ -1441,13 +1441,13 @@ const PLANS = {
         duration: null, // pas de durée — accès permanent aux sections incluses
         durationLabel: 'Accès à vie (sections incluses)',
         includes: [
-            'AKOLABS Universe (outils IA)',
-            'AKOLABS Learning (formations de base)',
+            'AKOLABS Tedora Universe (outils IA)',
+            'AKOLABS Tedora Learning (formations de base)',
             'Système d\'affiliation (10% commission)',
             'Stockage de fichiers dans l\'app'
         ],
         excludedSlugs: ['akolabs-app-prime', 'akolabs-ia-2', 'akolabs-ebook', 'akolabs-learning'],
-        excludedTitles: ['AKOLABS App Prime', 'AKOLABS IA 2', 'AKOLABS Ebook', 'AKOLABS Learning'],
+        excludedTitles: ['AKOLABS Tedora App Prime', 'AKOLABS Tedora IA 2', 'AKOLABS Tedora Ebook', 'AKOLABS Tedora Learning'],
         subscriptionMonths: null
     },
     pro: {
@@ -1457,11 +1457,11 @@ const PLANS = {
         duration: 1,
         durationLabel: 'Accès complet — 1 mois',
         includes: [
-            'Tout le catalogue AKOLABS',
-            'AKOLABS App Prime (APKs premium)',
-            'AKOLABS IA 2 (modèles avancés)',
-            'AKOLABS Ebook (10 000+ livres)',
-            'AKOLABS Learning complet',
+            'Tout le catalogue AKOLABS Tedora',
+            'AKOLABS Tedora App Prime (APKs premium)',
+            'AKOLABS Tedora IA 2 (modèles avancés)',
+            'AKOLABS Tedora Ebook (10 000+ livres)',
+            'AKOLABS Tedora Learning complet',
             'Affiliation 10% de commission',
             'Nouvelles sections incluses'
         ],
@@ -1598,7 +1598,7 @@ const LandingApp = {
         const t = document.getElementById('upsell-title');
         const txt = document.getElementById('upsell-text');
         if (t) t.textContent = '"' + (sectionTitle || 'Cette section') + '" est réservée au plan Pro';
-        if (txt) txt.textContent = 'Passe au plan Pro pour débloquer tout le catalogue AKOLABS — dès 1 500F/mois.';
+        if (txt) txt.textContent = 'Passe au plan Pro pour débloquer tout le catalogue AKOLABS Tedora — dès 1 500F/mois.';
         document.getElementById('upsell-modal').classList.add('open');
     },
 
@@ -1628,13 +1628,14 @@ const LandingApp = {
 
         if (!subject) { this.showToast('Choisis un sujet', 'warning'); return; }
 
-        let text = 'Bonjour AKOLABS ! 👋\n';
+        let text = 'Bonjour AKOLABS Tedora ! 👋\n';
         if (name) text += 'Je suis ' + name + '.\n';
         text += 'Sujet : ' + subject + '\n';
         if (message) text += '\n' + message;
-        text += '\n\n(Via akolabs.store)';
+        text += '\n\n(Via tedora.akolabs.site)';
 
         const waUrl = 'https://wa.me/2290155956693?text=' + encodeURIComponent(text);
+        console.log('[WA] Ouverture:', waUrl);
         window.open(waUrl, '_blank');
         this.closeWaModal(null);
     },
@@ -1849,7 +1850,7 @@ const LandingApp = {
             }
 
             if (new Date(tokenData.expires_at) < new Date()) {
-                LandingApp._showPaymentError('Ce lien de paiement a expiré (30 min). Recommencez depuis la page d'accueil.');
+                LandingApp._showPaymentError('Ce lien de paiement a expire. Recommencez depuis la page d\'accueil.');
                 return;
             }
 
@@ -1884,18 +1885,32 @@ const LandingApp = {
     },
 
     _showPaymentError(message) {
-        document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F5F4F8;padding:20px;">'
-            + '<div style="text-align:center;max-width:380px;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 40px rgba(75,0,130,0.1);">'
-            + '<div style="font-size:48px;margin-bottom:16px;">⚠️</div>'
+        var div = document.createElement('div');
+        div.style.cssText = 'min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F5F4F8;padding:20px;';
+        
+        var box = document.createElement('div');
+        box.style.cssText = 'text-align:center;max-width:380px;background:#fff;border-radius:20px;padding:32px;box-shadow:0 8px 40px rgba(75,0,130,0.1);';
+        
+        var waNum = CONFIG.WHATSAPP_NUMBER || '2290155956693';
+        
+        box.innerHTML = '<div style="font-size:48px;margin-bottom:16px;">⚠️</div>'
             + '<div style="font-family:Cinzel,serif;font-size:18px;font-weight:700;color:#D93B3B;margin-bottom:12px;">Problème de vérification</div>'
             + '<div style="font-size:13px;color:#4A4767;line-height:1.7;margin-bottom:24px;">' + message + '</div>'
             + '<div style="background:rgba(75,0,130,0.05);border-radius:12px;padding:14px;margin-bottom:20px;">'
-            + '<div style="font-size:12px;color:#4A4767;">Support disponible :</div>'
-            + '<a href="https://wa.me/' + (CONFIG.WHATSAPP_NUMBER||'') + '" style="color:#25D366;font-weight:700;font-size:13px;text-decoration:none;">'
+            + '<div style="font-size:12px;color:#4A4767;margin-bottom:6px;">Support disponible :</div>'
+            + '<a href="https://wa.me/' + waNum + '" style="color:#25D366;font-weight:700;font-size:13px;text-decoration:none;">'
             + '<i class="fab fa-whatsapp"></i> WhatsApp</a>'
-            + '</div>'
-            + '<button onclick="window.location.href='/app-store/'" style="background:linear-gradient(135deg,#4B0082,#5D1494);color:#fff;border:none;border-radius:50px;padding:12px 24px;font-size:13px;cursor:pointer;">← Retour à l'accueil</button>'
-            + '</div></div>';
+            + '</div>';
+        
+        var btn = document.createElement('button');
+        btn.style.cssText = 'background:linear-gradient(135deg,#4B0082,#5D1494);color:#fff;border:none;border-radius:50px;padding:12px 24px;font-size:13px;cursor:pointer;';
+        btn.textContent = "← Retour à l'accueil";
+        btn.onclick = function() { window.location.href = '/app-store/'; };
+        box.appendChild(btn);
+        
+        div.appendChild(box);
+        document.body.innerHTML = '';
+        document.body.appendChild(div);
     },
 
     // =====================
@@ -2056,7 +2071,7 @@ const LandingApp = {
                     currency: 'XOF',
                     content_type: 'product',
                     content_ids: ['akolabs_' + plan.id],
-                    content_name: 'AKOLABS Plan ' + plan.name
+                    content_name: 'AKOLABS Tedora Plan ' + plan.name
                 });
             }
 
@@ -2066,7 +2081,7 @@ const LandingApp = {
             if (checkUser.data) {
                 this.showSuccessScreen(purchaseData, plan);
             } else {
-                this.showToast('Erreur lors de la finalisation. Contactez: akolabs.app@gmail.com', 'error', 8000);
+                this.showToast('Erreur lors de la finalisation. Contactez: epandod@gmail.com', 'error', 8000);
                 if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
             }
         }
@@ -2112,7 +2127,7 @@ const LandingApp = {
                 <p style="color:#fff;font-size:11px;margin:0;line-height:1.7;">
                     <i class="fas fa-headset" style="color:#C9A84C;margin-right:6px;"></i>
                     Achat effectué mais pas de mail ? Contactez-nous :<br>
-                    <a href="mailto:akolabs.app@gmail.com" style="color:#C9A84C;font-weight:700;text-decoration:none;">akolabs.app@gmail.com</a>
+                    <a href="mailto:epandod@gmail.com" style="color:#C9A84C;font-weight:700;text-decoration:none;">epandod@gmail.com</a>
                 </p>
             </div>
         </div>`;
@@ -2216,7 +2231,7 @@ const LandingApp = {
                 <div class="modal-desc">${s.long_description||s.description||''}</div>
                 ${adv.length>0?`<div class="modal-adv-title"><i class="fas fa-gift"></i> Ce que tu obtiens</div>${adv.map(a=>`<div class="modal-adv-item"><i class="fas fa-check-circle"></i><span>${a}</span></div>`).join('')}`:''}
                 <button class="modal-cta" onclick="LandingApp.closeModal(null);LandingApp.openPlanModal('pro')">
-                    <i class="fas fa-rocket"></i> Obtenir l'accès AKOLABS
+                    <i class="fas fa-rocket"></i> Obtenir l'accès AKOLABS Tedora
                 </button>
             </div>`;
         document.getElementById('section-modal').classList.add('open');
@@ -2242,7 +2257,7 @@ const LandingApp = {
                 let src = s.url;
                 if (src && src.includes('res.cloudinary.com')) src = src.replace('/upload/', '/upload/f_auto,q_auto:good,w_360/');
                 return `<div class="screenshot-item">
-                    <img src="${src}" alt="${s.label||'AKOLABS'}" decoding="async" onload="this.classList.add('loaded')" onerror="this.closest('.screenshot-item').style.display='none'">
+                    <img src="${src}" alt="${s.label||'AKOLABS Tedora'}" decoding="async" onload="this.classList.add('loaded')" onerror="this.closest('.screenshot-item').style.display='none'">
                     ${s.label?`<div class="screenshot-label">${s.label}</div>`:''}
                 </div>`;
             }).join('');
@@ -2259,7 +2274,7 @@ const LandingApp = {
             const banner = document.getElementById('landing-flash-banner');
             if (!banner) return;
             document.getElementById('lf-title').textContent = data.title || 'Offre Flash';
-            document.getElementById('lf-desc').textContent = data.description || (data.discount_percent > 0 ? '-' + data.discount_percent + '% sur les plans AKOLABS' : '');
+            document.getElementById('lf-desc').textContent = data.description || (data.discount_percent > 0 ? '-' + data.discount_percent + '% sur les plans AKOLABS Tedora' : '');
             banner.style.display = 'block';
             const endDate = new Date(data.ends_at);
             const tick = () => {
@@ -2278,7 +2293,7 @@ const LandingApp = {
 
     async loadTestimonials() {
         try {
-            const { data } = await dbContent.from('landing_testimonials').select('*').eq('is_active', true).order('order_index');
+            const { data } = await db.from('landing_testimonials').select('*').eq('is_active', true).order('order_index');
             const carousel = document.getElementById('testi-carousel');
             if (!carousel) return;
 
@@ -2347,10 +2362,12 @@ const LandingApp = {
             // Dupliquer pour boucle infinie
             const allLogos = [...logos, ...logos];
             track.innerHTML = allLogos.map(pm => {
-                if (pm.image_url) {
-                    let src = pm.image_url;
-                    if (src.includes('res.cloudinary.com')) src = src.replace('/upload/', '/upload/f_auto,q_auto,w_112,h_112,c_fill/');
-                    return `<div class="payment-logo-item"><img src="${src}" alt="${pm.name||''}" title="${pm.name||''}"></div>`;
+                // Supporte logo_url (admin) et image_url (fallback)
+                const imgUrl = pm.logo_url || pm.image_url || null;
+                if (imgUrl) {
+                    let src = imgUrl;
+                    if (src.includes('res.cloudinary.com')) src = src.replace('/upload/', '/upload/f_auto,q_auto,w_112,h_112,c_fill,r_max/');
+                    return `<div class="payment-logo-item"><img src="${src}" alt="${pm.name||''}" title="${pm.name||''}" onerror="this.parentElement.innerHTML='<div class=pm-placeholder>${(pm.name||'Pay').substring(0,6)}</div>'"></div>`;
                 } else {
                     return `<div class="payment-logo-item"><div class="pm-placeholder">${(pm.name||'Pay').substring(0,6)}</div></div>`;
                 }
@@ -2389,6 +2406,8 @@ const LandingApp = {
 };
 
 document.addEventListener('DOMContentLoaded', () => { LandingApp.init(); });
+// Fonctions globales utilitaires
+window._akoGoHome = function() { window.location.href = '/app-store/'; };
 </script>
 
 </body>
