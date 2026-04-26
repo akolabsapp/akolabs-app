@@ -442,19 +442,40 @@
         container.innerHTML = h;
     };
 
+    // Upload Cloudinary local (indépendant de Utils)
+    PartnerAdmin._uploadToCloudinary = async function(file) {
+        var CLOUD = 'dtowyvewa';
+        var PRESET = 'akolabs_uploads';
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', PRESET);
+        formData.append('folder', 'partner_tedora');
+        var resp = await fetch('https://api.cloudinary.com/v1_1/' + CLOUD + '/image/upload', {
+            method: 'POST',
+            body: formData
+        });
+        if (!resp.ok) throw new Error('Cloudinary HTTP ' + resp.status);
+        var data = await resp.json();
+        if (!data.secure_url) throw new Error('Pas de secure_url');
+        return data.secure_url;
+    };
+
     PartnerAdmin.uploadTestimonial = function() {
         var input = document.createElement('input');
         input.type = 'file'; input.accept = 'image/*';
         input.onchange = async function() {
             var file = input.files[0]; if (!file) return;
-            Utils.showToast('Upload...', 'info');
+            Utils.showToast('Upload en cours...', 'info');
             try {
-                var url = await Utils.uploadToCloudinary(file);
+                var url = await PartnerAdmin._uploadToCloudinary(file);
                 document.getElementById('tm-url').value = url;
                 document.getElementById('tm-preview-img').src = url;
                 document.getElementById('tm-preview').style.display = 'block';
-                Utils.showToast('Uploadé !', 'success');
-            } catch(e) { Utils.showToast('Erreur upload', 'error'); }
+                Utils.showToast('Image uploadée !', 'success');
+            } catch(e) {
+                console.error('[Upload] Erreur:', e);
+                Utils.showToast('Erreur upload : ' + e.message, 'error');
+            }
         };
         input.click();
     };
