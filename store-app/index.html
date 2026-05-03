@@ -181,11 +181,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 }
 
 .screen-img-col{display:flex;justify-content:center}
-.screen-phone{width:220px;border-radius:28px;overflow:hidden;box-shadow:0 32px 80px rgba(14,1,24,0.22),0 8px 24px rgba(14,1,24,0.14),0 0 0 1px rgba(75,0,130,0.15);flex-shrink:0;background:linear-gradient(160deg,#1a0035,#2D0060);min-height:380px;position:relative}
-.screen-phone img{display:block;width:100%;height:auto;position:relative;z-index:1}
+.screen-phone{flex-shrink:0;background:transparent;position:relative;display:inline-block;max-width:260px;width:100%}
+.screen-phone img{display:block;width:100%;height:auto;position:relative;z-index:1;max-width:100%;border-radius:23px;box-shadow:0 32px 80px rgba(14,1,24,0.22),0 8px 24px rgba(14,1,24,0.14)}
+.screen-phone img{display:block;width:100%;height:auto;position:relative;z-index:1;max-width:100%}
 .screen-phone img[data-error]{display:none}
 /* Skeleton loading state */
-.screen-phone::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(75,0,130,0.3),rgba(201,168,76,0.1));border-radius:inherit}
+.screen-phone::before{content:none}
 .screen-phone-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;z-index:0}
 .screen-phone-label svg{width:32px;height:32px;color:rgba(201,168,76,0.5)}
 .screen-phone-label span{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.5}
@@ -808,7 +809,7 @@ textarea.wa-input{resize:vertical;min-height:90px}
       </div>
 
       <div style="text-align:center;position:relative">
-        <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta style="display:inline-flex;max-width:340px">
+        <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta style="display:flex;width:100%;max-width:340px;margin:0 auto;white-space:normal;text-align:center;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           Obtenir mon accès — 5 000 FCFA
         </a>
