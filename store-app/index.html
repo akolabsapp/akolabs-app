@@ -1389,7 +1389,7 @@ const App = {
 
     try {
       // ─── Appel au backend (recommandé — clé secrète côté serveur) ───
-      const res = await fetch(this.GP_BACKEND, {
+      const res = await fetch(this.GP_BACKEND + '/api/pay', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -1465,7 +1465,9 @@ const App = {
   setupSmooth() {
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
-        const t = document.querySelector(a.getAttribute('href') || '');
+        const href = a.getAttribute('href') || '';
+        if (href === '#' || href === '') return;
+        const t = document.querySelector(href);
         if (!t) return; e.preventDefault();
         t.scrollIntoView({behavior: 'smooth', block: 'start'});
       });
