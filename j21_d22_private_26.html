@@ -127,7 +127,8 @@
             { id: 'testimonials', icon: 'fa-star', label: 'Témoignages' },
             { id: 'paymentmethods', icon: 'fa-credit-card', label: 'Paiements' },
             { id: 'subscriptions', icon: 'fa-users-cog', label: 'Abonnements' },
-            { id: 'partner', icon: 'fa-handshake', label: 'Partenaire' }
+            { id: 'partner', icon: 'fa-handshake', label: 'Partenaire' },
+            { id: 'genv', icon: 'fa-film', label: '🎬 GenV' }
         ];
 
         for (var i = 0; i < tabList.length; i++) {
@@ -172,6 +173,7 @@
         else if (tab === 'paymentmethods') await AdminApp.renderPaymentMethods(content);
         else if (tab === 'subscriptions') await AdminApp.renderSubscriptions(content);
         else if (tab === 'partner') await AdminApp.renderPartner(content);
+        else if (tab === 'genv') await AdminApp.renderGenV(content);
     };
 
     // ===== DASHBOARD =====
@@ -2281,6 +2283,275 @@
     document.addEventListener('DOMContentLoaded', function() {
         AdminApp.init();
     });
+
+    // =========================================================
+    // GENV — Stats page de vente (ISOLÉES des stats AKOLABS)
+    // Table Supabase requise : genv_page_stats
+    // =========================================================
+    AdminApp._genvFilter = '7d';
+
+    AdminApp.renderGenV = async function(container) {
+        container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+        await AdminApp._loadGenV(container, AdminApp._genvFilter);
+    };
+
+    AdminApp._loadGenV = async function(container, filter) {
+        AdminApp._genvFilter = filter;
+        try {
+            var now = new Date();
+            var days = filter === 'today' ? 1 : filter === '7d' ? 7 : filter === '30d' ? 30 : 365;
+            var from = new Date(now - days * 86400000).toISOString();
+            var today = now.toISOString().split('T')[0];
+            var prevFrom = new Date(now - days * 2 * 86400000).toISOString();
+
+            // Charger en parallèle
+            var [statsR, prevStatsR] = await Promise.all([
+                db.from('genv_page_stats').select('*').gte('created_at', from).order('created_at', { ascending: false }),
+                db.from('genv_page_stats').select('*').gte('created_at', prevFrom).lt('created_at', from)
+            ]);
+
+            var stats = statsR.data || [];
+            var prevStats = prevStatsR.data || [];
+
+            // ── Calcul KPIs période actuelle ──
+            var pageviews   = stats.filter(function(s){ return s.event_type === 'pageview'; }).length;
+            var visitors    = new Set(stats.filter(function(s){ return s.event_type === 'pageview'; }).map(function(s){ return s.visitor_id; })).size;
+            var ctaClicks   = stats.filter(function(s){ return s.event_type === 'cta_click'; }).length;
+            var payStarts   = stats.filter(function(s){ return s.event_type === 'pay_start'; }).length;
+            var purchases   = stats.filter(function(s){ return s.event_type === 'purchase'; });
+            var totalSales  = purchases.length;
+            var revenue     = purchases.reduce(function(s,p){ return s + (p.amount || 5000); }, 0);
+            var cvr         = visitors > 0 ? ((totalSales / visitors) * 100).toFixed(2) : '0.00';
+
+            // ── Calcul KPIs période précédente (pour delta) ──
+            var prevVisitors  = new Set(prevStats.filter(function(s){ return s.event_type === 'pageview'; }).map(function(s){ return s.visitor_id; })).size;
+            var prevSales     = prevStats.filter(function(s){ return s.event_type === 'purchase'; }).length;
+            var prevRevenue   = prevStats.filter(function(s){ return s.event_type === 'purchase'; }).reduce(function(s,p){ return s + (p.amount || 5000); }, 0);
+
+            function delta(cur, prev) {
+                if (prev === 0) return cur > 0 ? '+100%' : '—';
+                var d = Math.round(((cur - prev) / prev) * 100);
+                return (d >= 0 ? '+' : '') + d + '%';
+            }
+            function deltaClass(cur, prev) { return cur >= prev ? 'up' : 'down'; }
+
+            // ── Sources de trafic ──
+            var sourceMap = {};
+            stats.filter(function(s){ return s.event_type === 'pageview' && s.source; }).forEach(function(s){
+                sourceMap[s.source] = (sourceMap[s.source] || 0) + 1;
+            });
+            var sources = Object.keys(sourceMap).map(function(k){ return { name: k, count: sourceMap[k] }; });
+            sources.sort(function(a,b){ return b.count - a.count; });
+
+            // ── Pays ──
+            var countryMap = {};
+            stats.filter(function(s){ return s.event_type === 'pageview' && s.country; }).forEach(function(s){
+                countryMap[s.country] = (countryMap[s.country] || 0) + 1;
+            });
+            var countries = Object.keys(countryMap).map(function(k){ return { name: k, count: countryMap[k] }; });
+            countries.sort(function(a,b){ return b.count - a.count; }).splice(8);
+
+            // ── Moyens de paiement ──
+            var pmMap = {};
+            purchases.forEach(function(p){ if(p.payment_method){ pmMap[p.payment_method] = (pmMap[p.payment_method] || 0) + 1; } });
+
+            // ── Données par jour pour graphique ──
+            var dayMap = {};
+            for (var d = 0; d < Math.min(days, 30); d++) {
+                var dd = new Date(now - (Math.min(days, 30) - 1 - d) * 86400000);
+                var key = dd.toISOString().split('T')[0];
+                dayMap[key] = { views: 0, sales: 0, revenue: 0 };
+            }
+            stats.forEach(function(s) {
+                var k = (s.created_at || '').split('T')[0];
+                if (!dayMap[k]) return;
+                if (s.event_type === 'pageview') dayMap[k].views++;
+                if (s.event_type === 'purchase') { dayMap[k].sales++; dayMap[k].revenue += (s.amount || 5000); }
+            });
+            var dayKeys = Object.keys(dayMap).sort();
+            var maxViews = Math.max.apply(null, dayKeys.map(function(k){ return dayMap[k].views; }).concat([1]));
+            var maxSales = Math.max.apply(null, dayKeys.map(function(k){ return dayMap[k].sales; }).concat([1]));
+
+            // ── Dernières transactions ──
+            var txns = stats.filter(function(s){ return s.event_type === 'purchase'; }).slice(0, 20);
+
+            // ═══ RENDER HTML ═══
+            var h = '';
+
+            // Header
+            h += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08);">';
+            h += '<div>';
+            h += '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#C9A84C;margin-bottom:4px;">Statistiques isolées</div>';
+            h += '<div style="font-size:20px;font-weight:800;color:#fff;">Page de vente — AKOLABS GenV</div>';
+            h += '<div style="font-size:12px;color:#6C6C7E;margin-top:2px;">Revenus non inclus dans les finances globales AKOLABS</div>';
+            h += '</div>';
+            // Period filter
+            h += '<div style="display:flex;gap:0;border:1px solid rgba(255,255,255,0.10);border-radius:10px;overflow:hidden;">';
+            ['today','7d','30d','all'].forEach(function(p){
+                var lbl = p === 'today' ? "Aujourd'hui" : p === '7d' ? '7 jours' : p === '30d' ? '30 jours' : 'Tout';
+                var active = p === filter;
+                h += '<button onclick="AdminApp._loadGenV(document.getElementById(\'admin-tab-content\'),\'' + p + '\')" style="padding:8px 14px;font-size:11px;font-weight:700;background:' + (active ? '#4B0082' : 'transparent') + ';color:' + (active ? '#fff' : '#8A87A0') + ';border:none;cursor:pointer;">' + lbl + '</button>';
+            });
+            h += '</div>';
+            h += '</div>';
+
+            // Notice isolation
+            h += '<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:10px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:12px;color:#9B97B5;">';
+            h += '<i class="fas fa-info-circle" style="color:#C9A84C;"></i>';
+            h += '<span>Ces revenus sont <strong style="color:#C9A84C;">isolés</strong> et ne s\'ajoutent <strong>pas</strong> aux finances globales AKOLABS. Connecte le webhook Genius Pay à <code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;">/api/webhook-genv</code> pour les stats en temps réel.</span>';
+            h += '</div>';
+
+            // ── KPI Cards ──
+            h += '<div class="admin-stats" style="grid-template-columns:repeat(2,1fr);">';
+            var kpis = [
+                { icon: 'fa-coins', val: Utils.formatPrice(revenue), label: 'Revenus GenV', delta: delta(revenue, prevRevenue), dc: deltaClass(revenue, prevRevenue), color: '#C9A84C' },
+                { icon: 'fa-check-circle', val: totalSales, label: 'Achats confirmés', delta: delta(totalSales, prevSales), dc: deltaClass(totalSales, prevSales), color: '#3DDB7D' },
+                { icon: 'fa-users', val: visitors.toLocaleString('fr-FR'), label: 'Visiteurs uniques', delta: delta(visitors, prevVisitors), dc: deltaClass(visitors, prevVisitors), color: '#6BB5FF' },
+                { icon: 'fa-chart-line', val: cvr + '%', label: 'Taux de conversion', delta: '—', dc: 'up', color: '#A78BFA' },
+                { icon: 'fa-eye', val: pageviews.toLocaleString('fr-FR'), label: 'Vues de page', delta: '—', dc: 'up', color: '#F472B6' },
+                { icon: 'fa-mouse-pointer', val: ctaClicks, label: 'Clics CTA', delta: '—', dc: 'up', color: '#FB923C' },
+                { icon: 'fa-credit-card', val: payStarts, label: 'Initiations paiement', delta: '—', dc: 'up', color: '#34D399' },
+                { icon: 'fa-tag', val: totalSales > 0 ? Utils.formatPrice(Math.round(revenue / totalSales)) : '—', label: 'Panier moyen', delta: '—', dc: 'up', color: '#FBBF24' },
+            ];
+            kpis.forEach(function(k) {
+                h += '<div class="admin-stat-card">';
+                h += '<div class="admin-stat-icon"><i class="fas ' + k.icon + '" style="color:' + k.color + ';"></i></div>';
+                h += '<div class="admin-stat-value">' + k.val + '</div>';
+                h += '<div class="admin-stat-label">' + k.label + '</div>';
+                if (k.delta && k.delta !== '—') h += '<div class="admin-stat-change ' + k.dc + '">' + k.delta + ' vs période préc.</div>';
+                h += '</div>';
+            });
+            h += '</div>';
+
+            // ── Graphique Vues / Achats par jour ──
+            if (dayKeys.length > 1) {
+                h += '<div class="admin-card" style="margin-bottom:16px;">';
+                h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-chart-bar" style="color:#C9A84C;margin-right:8px;"></i>Vues & Achats par jour</div></div>';
+                h += '<div style="display:flex;align-items:flex-end;gap:4px;height:100px;padding:0 0 8px;">';
+                dayKeys.forEach(function(k) {
+                    var vPct = maxViews > 0 ? Math.round((dayMap[k].views / maxViews) * 85) : 0;
+                    var sPct = maxSales > 0 ? Math.round((dayMap[k].sales / maxSales) * 85) : 0;
+                    var dayLbl = k.slice(5); // MM-DD
+                    h += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;">';
+                    h += '<div style="display:flex;align-items:flex-end;gap:2px;width:100%;justify-content:center;">';
+                    h += '<div title="' + dayMap[k].views + ' vues" style="width:40%;height:' + vPct + 'px;min-height:2px;background:linear-gradient(180deg,#6B21A8,#4B0082);border-radius:3px 3px 0 0;cursor:default;"></div>';
+                    h += '<div title="' + dayMap[k].sales + ' achats" style="width:40%;height:' + sPct + 'px;min-height:2px;background:linear-gradient(180deg,#E4C060,#C9A84C);border-radius:3px 3px 0 0;cursor:default;"></div>';
+                    h += '</div>';
+                    h += '<div style="font-size:8px;color:#6C6C7E;text-align:center;">' + dayLbl + '</div>';
+                    h += '</div>';
+                });
+                h += '</div>';
+                h += '<div style="display:flex;gap:16px;margin-top:4px;">';
+                h += '<span style="font-size:10px;color:#8A87A0;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:linear-gradient(#6B21A8,#4B0082);border-radius:2px;display:inline-block;"></span>Vues</span>';
+                h += '<span style="font-size:10px;color:#8A87A0;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:linear-gradient(#E4C060,#C9A84C);border-radius:2px;display:inline-block;"></span>Achats</span>';
+                h += '</div>';
+                h += '</div>';
+            }
+
+            // ── Sources & Pays ──
+            h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">';
+
+            // Sources
+            h += '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-share-alt" style="color:#C9A84C;margin-right:8px;"></i>Sources de trafic</div></div>';
+            if (sources.length === 0) {
+                h += '<div style="font-size:12px;color:#6C6C7E;padding:12px 0;">Aucune donnée — assure-toi d\'envoyer le paramètre <code>?ref=source</code> dans tes liens.</div>';
+            } else {
+                var totalSrcViews = sources.reduce(function(s,v){ return s + v.count; }, 0);
+                sources.slice(0, 6).forEach(function(s) {
+                    var pct = totalSrcViews > 0 ? Math.round((s.count / totalSrcViews) * 100) : 0;
+                    var icons = { 'whatsapp': 'fa-whatsapp', 'facebook': 'fa-facebook', 'tiktok': 'fa-tiktok', 'instagram': 'fa-instagram', 'direct': 'fa-link' };
+                    var ico = icons[s.name.toLowerCase()] || 'fa-globe';
+                    h += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">';
+                    h += '<i class="fab ' + ico + '" style="color:#C9A84C;width:14px;font-size:12px;flex-shrink:0;"></i>';
+                    h += '<span style="font-size:12px;color:#D4D4E8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + s.name + '</span>';
+                    h += '<div style="width:60px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin:0 6px;">';
+                    h += '<div style="width:' + pct + '%;height:100%;background:#4B0082;border-radius:2px;"></div>';
+                    h += '</div>';
+                    h += '<span style="font-size:11px;color:#C9A84C;font-weight:700;min-width:30px;text-align:right;">' + pct + '%</span>';
+                    h += '</div>';
+                });
+            }
+            h += '</div>';
+
+            // Pays
+            h += '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-globe" style="color:#C9A84C;margin-right:8px;"></i>Top pays</div></div>';
+            if (countries.length === 0) {
+                h += '<div style="font-size:12px;color:#6C6C7E;padding:12px 0;">Aucune donnée — envoie le pays via le script de tracking.</div>';
+            } else {
+                var totalCtry = countries.reduce(function(s,v){ return s + v.count; }, 0);
+                countries.forEach(function(c) {
+                    var pct = totalCtry > 0 ? Math.round((c.count / totalCtry) * 100) : 0;
+                    h += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);">';
+                    h += '<span style="font-size:12px;color:#D4D4E8;flex:1;">' + c.name + '</span>';
+                    h += '<div style="width:60px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin:0 6px;">';
+                    h += '<div style="width:' + pct + '%;height:100%;background:#C9A84C;border-radius:2px;"></div>';
+                    h += '</div>';
+                    h += '<span style="font-size:11px;color:#C9A84C;font-weight:700;min-width:30px;text-align:right;">' + pct + '%</span>';
+                    h += '</div>';
+                });
+            }
+            h += '</div>';
+            h += '</div>'; // grid
+
+            // ── Moyens de paiement ──
+            if (Object.keys(pmMap).length > 0) {
+                var totalPM = Object.values(pmMap).reduce(function(a,b){ return a+b; }, 0);
+                h += '<div class="admin-card" style="margin-bottom:16px;">';
+                h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-credit-card" style="color:#C9A84C;margin-right:8px;"></i>Moyens de paiement utilisés</div></div>';
+                h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;padding:4px 0;">';
+                Object.keys(pmMap).forEach(function(pm) {
+                    var pct = Math.round((pmMap[pm] / totalPM) * 100);
+                    h += '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;text-align:center;">';
+                    h += '<div style="font-size:16px;font-weight:800;color:#C9A84C;">' + pmMap[pm] + '</div>';
+                    h += '<div style="font-size:10px;color:#9B97B5;margin:4px 0;">' + pm + '</div>';
+                    h += '<div style="font-size:10px;color:#6C6C7E;">' + pct + '%</div>';
+                    h += '<div style="background:rgba(255,255,255,0.06);height:3px;border-radius:2px;margin-top:8px;"><div style="width:' + pct + '%;height:100%;background:#C9A84C;border-radius:2px;"></div></div>';
+                    h += '</div>';
+                });
+                h += '</div></div>';
+            }
+
+            // ── Transactions ──
+            h += '<div class="admin-card">';
+            h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-receipt" style="color:#C9A84C;margin-right:8px;"></i>Dernières ventes GenV (' + totalSales + ')</div>';
+            if (revenue > 0) h += '<div style="font-size:13px;font-weight:700;color:#C9A84C;">Total : ' + Utils.formatPrice(revenue) + '</div>';
+            h += '</div>';
+
+            if (txns.length === 0) {
+                h += '<div style="text-align:center;color:#6C6C7E;padding:24px;font-size:13px;">Aucun achat enregistré sur cette période.</div>';
+            } else {
+                h += '<div class="admin-table"><table>';
+                h += '<tr><th>Référence</th><th>Client</th><th>Téléphone</th><th>Montant</th><th>Moyen</th><th>Pays</th><th>Date</th></tr>';
+                txns.forEach(function(t) {
+                    h += '<tr>';
+                    h += '<td style="font-size:10px;font-family:monospace;color:#8A87A0;">' + (t.reference || '—') + '</td>';
+                    h += '<td style="font-size:11px;">' + (t.customer_name || t.email || '—') + '</td>';
+                    h += '<td style="font-size:11px;color:#8A87A0;">' + (t.phone || '—') + '</td>';
+                    h += '<td style="color:#C9A84C;font-weight:700;">' + Utils.formatPrice(t.amount || 5000) + '</td>';
+                    h += '<td style="font-size:11px;">' + (t.payment_method || '—') + '</td>';
+                    h += '<td style="font-size:11px;color:#8A87A0;">' + (t.country || '—') + '</td>';
+                    h += '<td style="font-size:11px;color:#8A87A0;">' + Utils.timeAgo(t.created_at) + '</td>';
+                    h += '</tr>';
+                });
+                h += '</table></div>';
+            }
+            h += '</div>';
+
+            // ── SQL Schema reminder ──
+            h += '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:12px;padding:14px 16px;margin-top:4px;">';
+            h += '<div style="font-size:11px;font-weight:700;color:#C9A84C;margin-bottom:8px;"><i class="fas fa-database" style="margin-right:6px;"></i>Table Supabase requise : <code>genv_page_stats</code></div>';
+            h += '<pre style="font-size:10px;color:#8A87A0;overflow-x:auto;line-height:1.6;">CREATE TABLE genv_page_stats (\n  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n  event_type text NOT NULL, -- pageview | cta_click | pay_start | purchase\n  visitor_id text,          -- fingerprint local (localStorage)\n  session_id text,\n  source text,              -- whatsapp | facebook | tiktok | direct | ...\n  country text,             -- détecté via IP ou headers\n  reference text,           -- ref Genius Pay (pour purchase)\n  customer_name text,\n  email text,\n  phone text,\n  amount integer DEFAULT 5000,\n  payment_method text,      -- MTN MoMo | Wave | ...\n  metadata jsonb,\n  created_at timestamptz DEFAULT now()\n);\n-- Index pour performance\nCREATE INDEX idx_genv_event ON genv_page_stats(event_type);\nCREATE INDEX idx_genv_created ON genv_page_stats(created_at);\n-- RLS : autoriser INSERT public, SELECT admin seulement\nALTER TABLE genv_page_stats ENABLE ROW LEVEL SECURITY;\nCREATE POLICY "insert_public" ON genv_page_stats FOR INSERT TO anon WITH CHECK (true);\nCREATE POLICY "select_admin" ON genv_page_stats FOR SELECT TO authenticated USING (true);</pre>';
+            h += '</div>';
+
+            container.innerHTML = h;
+
+        } catch(err) {
+            container.innerHTML = '<div style="padding:24px;color:#EF4444;font-size:13px;"><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i>Erreur lors du chargement des stats GenV : ' + (err.message || err) + '<br><br><span style="color:#8A87A0;font-size:12px;">Vérifies que la table <code>genv_page_stats</code> existe dans Supabase.</span></div>';
+        }
+    };
+
     </script>
 
 </body>
