@@ -121,6 +121,55 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"/></n
         payment_method: data.pm       || null,
         country:        data.country  || null
       });
+    },
+
+    // ── Sauvegarde panier abandonné ──
+    saveAbandonedCart: function(data) {
+      if (SUPABASE_URL.indexOf('REMPLACE') !== -1) return;
+      var payload = {
+        visitor_id:   getVisitorId(),
+        session_id:   SESSION_ID,
+        first_name:   data.firstName || null,
+        last_name:    data.lastName  || null,
+        email:        data.email,
+        phone:        data.phone     || null,
+        country_code: data.countryCode || null,
+        whatsapp_number: data.whatsappNumber || null,
+        source:       getSource(),
+        amount:       5000,
+        status:       'abandoned'
+      };
+      fetch(SUPABASE_URL + '/rest/v1/genv_abandoned_carts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey':        SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer':        'return=representation'
+        },
+        body: JSON.stringify(payload)
+      }).then(function(r){ return r.json(); }).then(function(rows){
+        if (rows && rows[0] && rows[0].id) {
+          try { sessionStorage.setItem('ako_cart_id', rows[0].id); } catch(e) {}
+        }
+      }).catch(function(){});
+    },
+
+    // ── Marquer le panier comme converti ──
+    convertCart: function(reference) {
+      var cartId = '';
+      try { cartId = sessionStorage.getItem('ako_cart_id') || ''; } catch(e) {}
+      if (!cartId || SUPABASE_URL.indexOf('REMPLACE') !== -1) return;
+      fetch(SUPABASE_URL + '/rest/v1/genv_abandoned_carts?id=eq.' + cartId, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey':        SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify({ status: 'converted', reference: reference, converted_at: new Date().toISOString() })
+      }).catch(function(){});
     }
   };
 
@@ -478,7 +527,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .pay-amount-badge-val{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--violet)}
 .pay-amount-badge-lbl{font-size:11px;color:var(--muted);font-weight:500}
 .pay-modal-body{padding:0 24px 24px}
-.pay-lbl{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.pay-phone-row{display:flex;gap:8px;margin-bottom:14px}
+.pay-dial-select{width:130px;flex-shrink:0;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:12px 10px;color:var(--ink);font-size:13px;font-family:var(--fb);outline:none;cursor:pointer;transition:border-color .2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.pay-dial-select:focus{border-color:var(--violet)}
+.pay-phone-num{flex:1;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;transition:border-color .2s;margin-bottom:0}
+.pay-phone-num:focus{border-color:var(--violet);background:var(--white)}
 .pay-input{width:100%;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;margin-bottom:14px;transition:border-color .2s}
 .pay-input:focus{border-color:var(--violet);background:var(--white)}
 .pay-input.error{border-color:#DC2626}
@@ -1307,9 +1360,38 @@ textarea.wa-input{resize:vertical;min-height:90px}
         <input type="email" class="pay-input" id="pay-email" placeholder="exemple@gmail.com" autocomplete="email"/>
         <div class="pay-hint">Le lien de téléchargement sera envoyé à cet email.</div>
 
-        <label class="pay-lbl">Numéro de téléphone (format international)</label>
-        <input type="tel" class="pay-input" id="pay-phone" placeholder="+229 01 23 45 67" autocomplete="tel"/>
-        <div class="pay-hint">Utilisé pour le paiement Mobile Money. Inclure l'indicatif pays (+229, +225, +221…)</div>
+        <label class="pay-lbl">Numéro de téléphone</label>
+        <div class="pay-phone-row">
+          <select class="pay-dial-select" id="pay-dial">
+            <option value="+229">🇧🇯 +229</option>
+            <option value="+225">🇨🇮 +225</option>
+            <option value="+221">🇸🇳 +221</option>
+            <option value="+223">🇲🇱 +223</option>
+            <option value="+226">🇧🇫 +226</option>
+            <option value="+228">🇹🇬 +228</option>
+            <option value="+227">🇳🇪 +227</option>
+            <option value="+224">🇬🇳 +224</option>
+            <option value="+237">🇨🇲 +237</option>
+            <option value="+242">🇨🇬 +242</option>
+            <option value="+243">🇨🇩 +243</option>
+            <option value="+241">🇬🇦 +241</option>
+            <option value="+236">🇨🇫 +236</option>
+            <option value="+235">🇹🇩 +235</option>
+            <option value="+240">🇬🇶 +240</option>
+            <option value="+261">🇲🇬 +261</option>
+            <option value="+212">🇲🇦 +212</option>
+            <option value="+213">🇩🇿 +213</option>
+            <option value="+216">🇹🇳 +216</option>
+            <option value="+20">🇪🇬 +20</option>
+            <option value="+234">🇳🇬 +234</option>
+            <option value="+233">🇬🇭 +233</option>
+            <option value="+32">🇧🇪 +32</option>
+            <option value="+33">🇫🇷 +33</option>
+            <option value="+1">🇺🇸 +1</option>
+          </select>
+          <input type="tel" class="pay-phone-num pay-input" id="pay-phone" placeholder="01 90 00 00 00" autocomplete="tel-national"/>
+        </div>
+        <div class="pay-hint" style="margin-top:-10px;">Utilisé pour le paiement Mobile Money. Aussi utilisé pour WhatsApp.</div>
 
         <button class="pay-btn" id="pay-btn" onclick="App.initPayment()">
           <svg id="pay-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -1443,6 +1525,8 @@ const App = {
       // Recover customer data saved before redirect
       var _cust = {};
       try { _cust = JSON.parse(sessionStorage.getItem('ako_genv_customer') || '{}'); sessionStorage.removeItem('ako_genv_customer'); } catch(e) {}
+      // Marquer le panier comme converti
+      if (window.GenvTrack) GenvTrack.convertCart(ref);
       // Track purchase in Supabase
       if (window.GenvTrack) {
         window.GenvTrack.purchase({
@@ -1485,7 +1569,7 @@ const App = {
     const phone = document.getElementById('pay-phone')?.value.trim();
     if (!fname || !lname) return 'Merci d\'entrer ton prénom et ton nom.';
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Adresse email invalide.';
-    if (!phone || phone.length < 8) return 'Numéro de téléphone invalide. Inclure l\'indicatif pays (+229…)';
+    if (!phone || phone.replace(/\D/g,'').length < 6) return 'Numéro de téléphone invalide.';
     return null;
   },
 
@@ -1514,7 +1598,21 @@ const App = {
     const fname = document.getElementById('pay-fname').value.trim();
     const lname = document.getElementById('pay-lname').value.trim();
     const email = document.getElementById('pay-email').value.trim();
-    const phone = document.getElementById('pay-phone').value.trim();
+    const dial  = document.getElementById('pay-dial').value;
+    const phoneRaw = document.getElementById('pay-phone').value.trim().replace(/^0+/, '');
+    const phone = dial + phoneRaw; // ex: +22901900000
+
+    // ── Sauvegarder le panier abandonné dès maintenant ──
+    if (window.GenvTrack) {
+      GenvTrack.saveAbandonedCart({
+        firstName:      fname,
+        lastName:       lname,
+        email:          email,
+        phone:          phone,
+        countryCode:    dial,
+        whatsappNumber: phone
+      });
+    }
 
     this._setLoading(true);
 
