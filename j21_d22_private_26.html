@@ -2312,13 +2312,17 @@
             var prevFrom = new Date(now - days * 2 * 86400000).toISOString();
 
             // Charger en parallèle
-            var [statsR, prevStatsR] = await Promise.all([
+            var [statsR, prevStatsR, cartsR] = await Promise.all([
                 genvDb.from('genv_page_stats').select('*').gte('created_at', from).order('created_at', { ascending: false }),
-                genvDb.from('genv_page_stats').select('*').gte('created_at', prevFrom).lt('created_at', from)
+                genvDb.from('genv_page_stats').select('*').gte('created_at', prevFrom).lt('created_at', from),
+                genvDb.from('genv_abandoned_carts').select('*').order('created_at', { ascending: false }).limit(100)
             ]);
 
             var stats = statsR.data || [];
             var prevStats = prevStatsR.data || [];
+            var allCarts = cartsR.data || [];
+            var abandonedCarts = allCarts.filter(function(c){ return c.status === 'abandoned'; });
+            var convertedCarts = allCarts.filter(function(c){ return c.status === 'converted'; });
 
             // ── Calcul KPIs période actuelle ──
             var pageviews   = stats.filter(function(s){ return s.event_type === 'pageview'; }).length;
@@ -2410,9 +2414,14 @@
 
             // ── KPI Cards ──
             h += '<div class="admin-stats" style="grid-template-columns:repeat(2,1fr);">';
+            var abandonRate = (abandonedCarts.length + convertedCarts.length) > 0
+                ? Math.round(abandonedCarts.length / (abandonedCarts.length + convertedCarts.length) * 100) : 0;
+
             var kpis = [
                 { icon: 'fa-coins', val: Utils.formatPrice(revenue), label: 'Revenus GenV', delta: delta(revenue, prevRevenue), dc: deltaClass(revenue, prevRevenue), color: '#C9A84C' },
                 { icon: 'fa-check-circle', val: totalSales, label: 'Achats confirmés', delta: delta(totalSales, prevSales), dc: deltaClass(totalSales, prevSales), color: '#3DDB7D' },
+                { icon: 'fa-shopping-cart', val: abandonedCarts.length, label: 'Paniers abandonnés', delta: '—', dc: 'down', color: '#F87171' },
+                { icon: 'fa-percent', val: abandonRate + '%', label: 'Taux d\'abandon', delta: '—', dc: 'down', color: '#FB923C' },
                 { icon: 'fa-users', val: visitors.toLocaleString('fr-FR'), label: 'Visiteurs uniques', delta: delta(visitors, prevVisitors), dc: deltaClass(visitors, prevVisitors), color: '#6BB5FF' },
                 { icon: 'fa-chart-line', val: cvr + '%', label: 'Taux de conversion', delta: '—', dc: 'up', color: '#A78BFA' },
                 { icon: 'fa-eye', val: pageviews.toLocaleString('fr-FR'), label: 'Vues de page', delta: '—', dc: 'up', color: '#F472B6' },
@@ -2519,6 +2528,65 @@
                 });
                 h += '</div></div>';
             }
+
+            // ── Paniers abandonnés ──
+            h += '<div class="admin-card">';
+            h += '<div class="admin-card-header">';
+            h += '<div class="admin-card-title"><i class="fas fa-shopping-cart" style="color:#F87171;margin-right:8px;"></i>Paniers abandonnés (' + abandonedCarts.length + ')</div>';
+            if (abandonedCarts.length > 0) h += '<div style="font-size:12px;color:#F87171;font-weight:600;">Taux abandon : ' + abandonRate + '%</div>';
+            h += '</div>';
+
+            if (abandonedCarts.length === 0) {
+                h += '<div style="text-align:center;color:#6C6C7E;padding:24px;font-size:13px;"><i class="fas fa-check-circle" style="color:#3DDB7D;margin-right:8px;"></i>Aucun panier abandonné — tout le monde a finalisé !</div>';
+            } else {
+                h += '<div style="overflow-x:auto;">';
+                h += '<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+                h += '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08);">';
+                ['Client','Email','Téléphone','Date abandon','Relances','WhatsApp','Statut'].forEach(function(col){
+                    h += '<th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#8A87A0;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;">' + col + '</th>';
+                });
+                h += '</tr></thead><tbody>';
+
+                abandonedCarts.forEach(function(c) {
+                    var name = ((c.first_name || '') + ' ' + (c.last_name || '')).trim() || '—';
+                    var waNum = (c.whatsapp_number || '').replace(/\D/g,'');
+                    var waMsg = encodeURIComponent(
+                        'Bonjour ' + (c.first_name || 'là') + ' 👋\n\n' +
+                        'Nous avons remarqué que tu as commencé une commande pour AKOLABS — l\'application de génération vidéo & image IA illimitée — mais tu n\'as pas finalisé ton achat.\n\n' +
+                        'Est-ce qu\'il y a eu un problème lors du paiement ? Ou tu avais une question sur l\'application ?\n\n' +
+                        'On est là pour t\'aider à finir en moins de 5 minutes. Ton accès à vie t\'attend encore 🎬\n\n' +
+                        '→ https://akolabs.store\n\n' +
+                        'L\'équipe AKOLABS 🚀'
+                    );
+                    var waLink = 'https://wa.me/' + waNum + '?text=' + waMsg;
+                    var relances = [c.email_1_sent_at, c.email_2_sent_at, c.email_day2_sent_at].filter(Boolean).length;
+                    var dateAbandoned = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+
+                    h += '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);transition:background .15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.03)\'" onmouseout="this.style.background=\'transparent\'">';
+                    h += '<td style="padding:12px;color:#fff;font-weight:600;white-space:nowrap;">' + name + '</td>';
+                    h += '<td style="padding:12px;color:#9B97B5;word-break:break-all;">' + (c.email || '—') + '</td>';
+                    h += '<td style="padding:12px;color:#9B97B5;white-space:nowrap;">' + (c.whatsapp_number || c.phone || '—') + '</td>';
+                    h += '<td style="padding:12px;color:#9B97B5;white-space:nowrap;">' + dateAbandoned + '</td>';
+                    h += '<td style="padding:12px;text-align:center;">';
+                    h += '<span style="background:rgba(201,168,76,0.15);color:#C9A84C;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;">' + relances + '/3</span>';
+                    h += '</td>';
+                    h += '<td style="padding:12px;">';
+                    if (waNum) {
+                        h += '<a href="' + waLink + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);color:#25D366;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">';
+                        h += '<i class="fab fa-whatsapp"></i> Relancer</a>';
+                    } else {
+                        h += '<span style="color:#6C6C7E;font-size:12px;">Pas de numéro</span>';
+                    }
+                    h += '</td>';
+                    h += '<td style="padding:12px;">';
+                    h += '<span style="background:rgba(248,113,113,0.12);color:#F87171;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;">Abandonné</span>';
+                    h += '</td>';
+                    h += '</tr>';
+                });
+
+                h += '</tbody></table></div>';
+            }
+            h += '</div>';
 
             // ── Transactions ──
             h += '<div class="admin-card">';
