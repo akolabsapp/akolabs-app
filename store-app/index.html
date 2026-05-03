@@ -559,15 +559,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 /* Résumé commande */
 .pay-summary{background:linear-gradient(135deg,#F8F5FF,#FDF9F0);border:1.5px solid rgba(201,168,76,0.25);border-radius:16px;padding:16px 18px;margin:8px 0 20px}
 .pay-summary-label{font-size:11px;font-weight:700;color:#9B8AB0;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-.pay-summary-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.pay-summary-left{display:flex;align-items:center;gap:12px}
+.pay-summary-row{display:flex;align-items:center;gap:12px}
+.pay-summary-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .pay-summary-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#2D0060,#4B0082);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .pay-summary-icon svg{width:22px;height:22px;color:#C9A84C}
 .pay-summary-name{font-family:var(--fh);font-size:14px;font-weight:700;color:#1A012E;line-height:1.3}
 .pay-summary-desc{font-size:11px;color:#9B8AB0;margin-top:2px}
-.pay-summary-price{text-align:right;flex-shrink:0}
-.pay-summary-amount{font-family:var(--fh);font-size:22px;font-weight:900;color:#4B0082;letter-spacing:-.5px}
-.pay-summary-unit{font-size:10px;color:#9B8AB0;margin-top:1px}
+.pay-summary-price{flex-shrink:0;text-align:right}
+.pay-summary-amount{font-family:var(--fh);font-size:20px;font-weight:900;color:#4B0082;letter-spacing:-.5px;white-space:nowrap}
+.pay-summary-unit{font-size:10px;color:#9B8AB0;margin-top:1px;text-align:right}
 
 /* Séparateur */
 .pay-divider{height:1px;background:#F0EEF5;margin:0 0 20px}
