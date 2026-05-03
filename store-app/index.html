@@ -6,6 +6,19 @@
 <meta name="theme-color" content="#2D0060"/>
 <meta name="description" content="AKOLABS — Génère des vidéos & images IA illimitées depuis ton téléphone. 5 000 FCFA, accès à vie."/>
 <title>AKOLABS — Créateur Vidéo & Image IA · 5 000 FCFA · Accès à Vie</title>
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','978376714855213');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"/></noscript>
+<!-- /Meta Pixel -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -1301,6 +1314,16 @@ const App = {
     const p = new URLSearchParams(window.location.search);
     if (p.get('payment') === 'success') {
       const ref = p.get('ref') || p.get('reference') || '—';
+      // Meta Pixel — Purchase (déclenché une seule fois au retour de Genius Pay)
+      if (typeof fbq === 'function') {
+        fbq('track', 'Purchase', {
+          value: 5000,
+          currency: 'XOF',
+          content_type: 'product',
+          content_ids: ['akolabs-acces-vie'],
+          content_name: 'AKOLABS — Accès à vie Vidéo & Image IA'
+        });
+      }
       setTimeout(() => this.openDl(ref), 600);
       window.history.replaceState({}, '', window.location.pathname);
     }
