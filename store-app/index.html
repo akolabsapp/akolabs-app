@@ -128,11 +128,19 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"/></n
 </script>
 <!-- ═══ /AKOLABS GENV TRACKING ═══ -->
 
+<!-- Préchargement critique -->
+<link rel="preload" href="../assets/images/logo.png" as="image" fetchpriority="high"/>
+<link rel="preconnect" href="https://upload.wikimedia.org"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 
 <style>
+/* ─── Optimisation chargement images ─── */
+img{content-visibility:auto}
+.screen-phone img{background:rgba(45,0,96,0.15);min-height:60px;transition:opacity .3s ease}
+.nav-logo img{will-change:auto}
+.pm-logo img{aspect-ratio:1;object-fit:contain}
 :root {
   --ink: #0E0118;
   --ink2: #1C0435;
@@ -565,7 +573,7 @@ textarea.wa-input{resize:vertical;min-height:90px}
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo">
-    <img src="../assets/images/logo.png" alt="AKOLABS" onerror="this.style.display='none'"/>
+    <img src="../assets/images/logo.png" alt="AKOLABS" fetchpriority="high" decoding="sync" onerror="this.style.display='none'"/>
     <span class="nav-logo-txt">AKOLABS</span>
   </div>
   <div class="nav-pill">
@@ -734,7 +742,7 @@ textarea.wa-input{resize:vertical;min-height:90px}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
               <span>Capture de l'application</span>
             </div>
-            <img src="screen-veo-models.jpg" alt="Modèles IA vidéo dans l'app" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+            <img src="screen-veo-models.jpg" alt="Modèles IA vidéo dans l'app" loading="lazy" decoding="async" onerror="this.setAttribute('data-error','1')"/>
           </div>
         </div>
         <div class="screen-txt-col">
@@ -760,7 +768,7 @@ textarea.wa-input{resize:vertical;min-height:90px}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M20 12h2M2 12h2M12 20v2M12 2v2"/></svg>
               <span>Paramètres de génération</span>
             </div>
-            <img src="screen-veo-settings.jpg" alt="Paramètres de génération vidéo" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+            <img src="screen-veo-settings.jpg" alt="Paramètres de génération vidéo" loading="lazy" decoding="async" onerror="this.setAttribute('data-error','1')"/>
           </div>
         </div>
         <div class="screen-txt-col">
@@ -785,7 +793,7 @@ textarea.wa-input{resize:vertical;min-height:90px}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
               <span>Modèles IA pour images</span>
             </div>
-            <img src="screen-image-models.jpg" alt="Modèles IA génération d'images" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+            <img src="screen-image-models.jpg" alt="Modèles IA génération d'images" loading="lazy" decoding="async" onerror="this.setAttribute('data-error','1')"/>
           </div>
         </div>
         <div class="screen-txt-col">
@@ -810,7 +818,7 @@ textarea.wa-input{resize:vertical;min-height:90px}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="0"/><rect x="8" y="8" width="8" height="8"/></svg>
               <span>Formats & résolutions</span>
             </div>
-            <img src="screen-image-formats.jpg" alt="Formats disponibles pour les images" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+            <img src="screen-image-formats.jpg" alt="Formats disponibles pour les images" loading="lazy" decoding="async" onerror="this.setAttribute('data-error','1')"/>
           </div>
         </div>
         <div class="screen-txt-col">
@@ -987,27 +995,27 @@ textarea.wa-input{resize:vertical;min-height:90px}
   <h2 class="sec-title center">Paye avec <em>ton moyen habituel</em></h2>
   <p class="sec-sub center">Propulsé par <strong>Genius Pay</strong> — l'agrégateur de paiement qui couvre plus de <strong>20 pays africains</strong>. Mobile Money, cartes bancaires, virements locaux. Aucune carte internationale requise.</p>
   <div class="pm-scroll"><div class="pm-row" id="pm-track"><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/New-mtn-logo.jpg/240px-New-mtn-logo.jpg" alt="MTN MoMo" title="MTN MoMo"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/New-mtn-logo.jpg/240px-New-mtn-logo.jpg" alt="MTN MoMo" title="MTN MoMo" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#FFCC00;color:#000">MTN</div>
           <span class="pm-item-name">MTN MoMo</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/240px-Orange_logo.svg.png" alt="Orange Money" title="Orange Money"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/240px-Orange_logo.svg.png" alt="Orange Money" title="Orange Money" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#FF6600;color:#fff">OM</div>
           <span class="pm-item-name">Orange Money</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Moov_Africa_logo_2022.png/240px-Moov_Africa_logo_2022.png" alt="Moov Money" title="Moov Money"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Moov_Africa_logo_2022.png/240px-Moov_Africa_logo_2022.png" alt="Moov Money" title="Moov Money" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#00A0DC;color:#fff">Moov</div>
           <span class="pm-item-name">Moov Money</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Wave_mobile_money_logo.png/240px-Wave_mobile_money_logo.png" alt="Wave" title="Wave"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Wave_mobile_money_logo.png/240px-Wave_mobile_money_logo.png" alt="Wave" title="Wave" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#1AC8ED;color:#fff">Wave</div>
           <span class="pm-item-name">Wave</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Airtel_Africa_logo.svg/240px-Airtel_Africa_logo.svg.png" alt="Airtel Money" title="Airtel Money"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Airtel_Africa_logo.svg/240px-Airtel_Africa_logo.svg.png" alt="Airtel Money" title="Airtel Money" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#E40000;color:#fff">Airtel</div>
           <span class="pm-item-name">Airtel Money</span>
@@ -1015,37 +1023,37 @@ textarea.wa-input{resize:vertical;min-height:90px}
           <div class="pm-item-fb" style="background:#CD0A00;color:#fff;display:flex">Free</div>
           <span class="pm-item-name">Free Money</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/240px-Visa_Inc._logo.svg.png" alt="Visa" title="Visa"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/240px-Visa_Inc._logo.svg.png" alt="Visa" title="Visa" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#1A1F71;color:#fff">VISA</div>
           <span class="pm-item-name">Visa</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/240px-Mastercard-logo.svg.png" alt="Mastercard" title="Mastercard"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/240px-Mastercard-logo.svg.png" alt="Mastercard" title="Mastercard" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#EB001B;color:#fff">MC</div>
           <span class="pm-item-name">Mastercard</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/New-mtn-logo.jpg/240px-New-mtn-logo.jpg" alt="MTN MoMo" title="MTN MoMo"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/New-mtn-logo.jpg/240px-New-mtn-logo.jpg" alt="MTN MoMo" title="MTN MoMo" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#FFCC00;color:#000">MTN</div>
           <span class="pm-item-name">MTN MoMo</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/240px-Orange_logo.svg.png" alt="Orange Money" title="Orange Money"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/240px-Orange_logo.svg.png" alt="Orange Money" title="Orange Money" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#FF6600;color:#fff">OM</div>
           <span class="pm-item-name">Orange Money</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Moov_Africa_logo_2022.png/240px-Moov_Africa_logo_2022.png" alt="Moov Money" title="Moov Money"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Moov_Africa_logo_2022.png/240px-Moov_Africa_logo_2022.png" alt="Moov Money" title="Moov Money" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#00A0DC;color:#fff">Moov</div>
           <span class="pm-item-name">Moov Money</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Wave_mobile_money_logo.png/240px-Wave_mobile_money_logo.png" alt="Wave" title="Wave"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Wave_mobile_money_logo.png/240px-Wave_mobile_money_logo.png" alt="Wave" title="Wave" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#1AC8ED;color:#fff">Wave</div>
           <span class="pm-item-name">Wave</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Airtel_Africa_logo.svg/240px-Airtel_Africa_logo.svg.png" alt="Airtel Money" title="Airtel Money"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Airtel_Africa_logo.svg/240px-Airtel_Africa_logo.svg.png" alt="Airtel Money" title="Airtel Money" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#E40000;color:#fff">Airtel</div>
           <span class="pm-item-name">Airtel Money</span>
@@ -1053,12 +1061,12 @@ textarea.wa-input{resize:vertical;min-height:90px}
           <div class="pm-item-fb" style="background:#CD0A00;color:#fff;display:flex">Free</div>
           <span class="pm-item-name">Free Money</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/240px-Visa_Inc._logo.svg.png" alt="Visa" title="Visa"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/240px-Visa_Inc._logo.svg.png" alt="Visa" title="Visa" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#1A1F71;color:#fff">VISA</div>
           <span class="pm-item-name">Visa</span>
         </div><div class="pm-item-new">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/240px-Mastercard-logo.svg.png" alt="Mastercard" title="Mastercard"
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/240px-Mastercard-logo.svg.png" alt="Mastercard" title="Mastercard" loading="lazy" decoding="async"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pm-item-fb" style="background:#EB001B;color:#fff">MC</div>
           <span class="pm-item-name">Mastercard</span>
@@ -1370,7 +1378,7 @@ const App = {
   // ═══════════════════════════════════════════════════════════
   // ⚙️  CONFIGURATION — Remplace ces valeurs par les tiennes
   // ═══════════════════════════════════════════════════════════
-  GP_API_KEY:    'pk_live_REMPLACE_PAR_TA_CLE_PUBLIQUE',  // ← Genius Pay Dashboard → Paramètres → API
+  GP_API_KEY:    'pk_sandbox_bM3xdt9lBmsX3szt0FUeztB05GjiTE1R',  // ← Genius Pay Dashboard → Paramètres → API
   GP_BACKEND:    'https://akolabs-pay-backend-production.up.railway.app',         // ← URL de ton backend (voir pay-backend.js)
   AMOUNT:        5000,
   CURRENCY:      'XOF',
