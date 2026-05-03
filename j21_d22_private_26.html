@@ -2298,6 +2298,13 @@
     AdminApp._loadGenV = async function(container, filter) {
         AdminApp._genvFilter = filter;
         try {
+            // ── Client Supabase GenV (base séparée de Social Vote) ──
+            var { createClient: _cc } = supabase;
+            var genvDb = _cc(
+                'https://cwjnjmawjcphtajfzlod.supabase.co',
+                'sb_publishable_UJ_ykbUaJsnBqKzgvbSmoQ_scUnivc8'
+            );
+
             var now = new Date();
             var days = filter === 'today' ? 1 : filter === '7d' ? 7 : filter === '30d' ? 30 : 365;
             var from = new Date(now - days * 86400000).toISOString();
@@ -2306,8 +2313,8 @@
 
             // Charger en parallèle
             var [statsR, prevStatsR] = await Promise.all([
-                db.from('genv_page_stats').select('*').gte('created_at', from).order('created_at', { ascending: false }),
-                db.from('genv_page_stats').select('*').gte('created_at', prevFrom).lt('created_at', from)
+                genvDb.from('genv_page_stats').select('*').gte('created_at', from).order('created_at', { ascending: false }),
+                genvDb.from('genv_page_stats').select('*').gte('created_at', prevFrom).lt('created_at', from)
             ]);
 
             var stats = statsR.data || [];
