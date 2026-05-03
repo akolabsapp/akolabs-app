@@ -19,6 +19,115 @@ fbq('track','PageView');
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"/></noscript>
 <!-- /Meta Pixel -->
+<!-- ═══ AKOLABS GENV TRACKING ═══
+     Envoie les events à Supabase table: genv_page_stats
+     Config: remplace SUPABASE_URL et SUPABASE_ANON_KEY
+→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→ -->
+<script>
+(function() {
+  // ─── CONFIG ─────────────────────────────────────────────────
+  var SUPABASE_URL  = 'https://cwjnjmawjcphtajfzlod.supabase.co';  // ← ton URL Supabase
+  var SUPABASE_KEY  = 'sb_publishable_UJ_ykbUaJsnBqKzgvbSmoQ_scUnivc8';                   // ← ta clé anon publique
+  var TABLE         = 'genv_page_stats';
+  // ────────────────────────────────────────────────────────────
+
+  // Générer / récupérer un visitor_id persistant
+  function getVisitorId() {
+    var k = 'ako_genv_vid';
+    var v = localStorage.getItem(k);
+    if (!v) {
+      v = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+      try { localStorage.setItem(k, v); } catch(e) {}
+    }
+    return v;
+  }
+
+  // Session ID (reset à chaque onglet)
+  var SESSION_ID = 's_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+
+  // Détecter la source UTM / referrer
+  function getSource() {
+    var p = new URLSearchParams(window.location.search);
+    if (p.get('utm_source')) return p.get('utm_source');
+    if (p.get('ref'))        return p.get('ref');
+    var ref = document.referrer || '';
+    if (ref.indexOf('facebook') !== -1 || ref.indexOf('fb.com') !== -1) return 'facebook';
+    if (ref.indexOf('instagram') !== -1) return 'instagram';
+    if (ref.indexOf('tiktok') !== -1)    return 'tiktok';
+    if (ref.indexOf('twitter') !== -1 || ref.indexOf('t.co') !== -1) return 'twitter';
+    if (ref.indexOf('youtube') !== -1)   return 'youtube';
+    if (ref.indexOf('wa.me') !== -1 || ref.indexOf('whatsapp') !== -1) return 'whatsapp';
+    if (ref.indexOf('google') !== -1)    return 'google';
+    if (ref && ref !== window.location.href) return 'referral';
+    return 'direct';
+  }
+
+  // Envoyer un event à Supabase via REST API
+  function track(eventType, extra) {
+    if (SUPABASE_URL.indexOf('REMPLACE') !== -1) return; // config manquante
+    var payload = Object.assign({
+      event_type:  eventType,
+      visitor_id:  getVisitorId(),
+      session_id:  SESSION_ID,
+      source:      getSource(),
+      metadata:    { path: window.location.pathname, ua: navigator.userAgent.slice(0, 120) }
+    }, extra || {});
+
+    // Fetch non-bloquant (fire-and-forget)
+    fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    }).catch(function(){});
+  }
+
+  // Éviter double-comptage pageview
+  var _pv_sent = false;
+  function trackPageview() {
+    if (_pv_sent) return;
+    _pv_sent = true;
+    track('pageview');
+  }
+
+  // ── Pageview : déclenché au chargement ──
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', trackPageview);
+  } else {
+    trackPageview();
+  }
+
+  // ── CTA clicks : tous les boutons "Obtenir l'accès" ──
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('[data-cta], .nav-cta, .float-cta a, .hero-cta-main');
+    if (el) track('cta_click', { metadata: { button_text: el.textContent.trim().slice(0, 80) } });
+  });
+
+  // ── Exposition au tracking de la section paiement ──
+  // trackPayStart() est appelé manuellement depuis App.openPay()
+  window.GenvTrack = {
+    payStart: function() { track('pay_start'); },
+    purchase: function(data) {
+      track('purchase', {
+        reference:      data.reference || null,
+        customer_name:  data.name     || null,
+        email:          data.email    || null,
+        phone:          data.phone    || null,
+        amount:         data.amount   || 5000,
+        payment_method: data.pm       || null,
+        country:        data.country  || null
+      });
+    }
+  };
+
+})();
+</script>
+<!-- ═══ /AKOLABS GENV TRACKING ═══ -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -181,11 +290,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 }
 
 .screen-img-col{display:flex;justify-content:center}
-.screen-phone{flex-shrink:0;background:transparent;position:relative;display:inline-block;max-width:260px;width:100%}
-.screen-phone img{display:block;width:100%;height:auto;position:relative;z-index:1;max-width:100%;border-radius:23px;box-shadow:0 32px 80px rgba(14,1,24,0.22),0 8px 24px rgba(14,1,24,0.14)}
-.screen-phone img{display:block;width:100%;height:auto;position:relative;z-index:1;max-width:100%}
+.screen-phone{width:220px;flex-shrink:0;background:transparent;min-height:0;position:relative}
+.screen-phone img{display:block;width:100%;height:auto;position:relative;z-index:1;border-radius:23px;box-shadow:0 32px 80px rgba(14,1,24,0.22),0 8px 24px rgba(14,1,24,0.14)}
 .screen-phone img[data-error]{display:none}
-/* Skeleton loading state */
 .screen-phone::before{content:none}
 .screen-phone-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;z-index:0}
 .screen-phone-label svg{width:32px;height:32px;color:rgba(201,168,76,0.5)}
@@ -809,7 +916,7 @@ textarea.wa-input{resize:vertical;min-height:90px}
       </div>
 
       <div style="text-align:center;position:relative">
-        <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta style="display:flex;width:100%;max-width:340px;margin:0 auto;white-space:normal;text-align:center;">
+        <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta style="display:flex;width:100%;max-width:340px;margin:0 auto;white-space:normal;text-align:center;justify-content:center;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           Obtenir mon accès — 5 000 FCFA
         </a>
@@ -1325,6 +1432,19 @@ const App = {
           content_name: 'AKOLABS — Accès à vie Vidéo & Image IA'
         });
       }
+      // Recover customer data saved before redirect
+      var _cust = {};
+      try { _cust = JSON.parse(sessionStorage.getItem('ako_genv_customer') || '{}'); sessionStorage.removeItem('ako_genv_customer'); } catch(e) {}
+      // Track purchase in Supabase
+      if (window.GenvTrack) {
+        window.GenvTrack.purchase({
+          reference: ref,
+          name:  _cust.name  || null,
+          email: _cust.email || null,
+          phone: _cust.phone || null,
+          amount: 5000
+        });
+      }
       setTimeout(() => this.openDl(ref), 600);
       window.history.replaceState({}, '', window.location.pathname);
     }
@@ -1338,6 +1458,8 @@ const App = {
     document.getElementById('pay-success-view').classList.remove('show');
     document.getElementById('pay-err').classList.remove('show');
     document.body.style.overflow = 'hidden';
+    // Track pay_start event
+    if (window.GenvTrack) window.GenvTrack.payStart();
   },
 
   closePay(ev) {
@@ -1422,6 +1544,12 @@ const App = {
       // ─── Redirection vers checkout Genius Pay ───
       // La SUCCESS_URL doit pointer vers cette page avec ?payment=success&ref={reference}
       // Le backend doit inclure ?payment=success&ref=MTX-xxx dans success_url
+      // Save customer data for post-payment tracking
+      try {
+        sessionStorage.setItem('ako_genv_customer', JSON.stringify({
+          name: `${fname} ${lname}`, email: email, phone: phone
+        }));
+      } catch(e) {}
       document.getElementById('pay-form-view').style.display = 'none';
       document.getElementById('pay-success-view').classList.add('show');
       document.getElementById('pay-redirect-btn').href = data.checkout_url;
