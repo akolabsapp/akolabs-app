@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0"/>
+<meta name="theme-color" content="#2D0060"/>
+<meta name="description" content="AKOLABS — Génère des vidéos & images IA illimitées depuis ton téléphone. 5 000 FCFA, accès à vie."/>
+<title>AKOLABS — Créateur Vidéo & Image IA · 5 000 FCFA · Accès à Vie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<style>
+:root {
+  --ink: #0E0118;
+  --ink2: #1C0435;
+  --violet: #4B0082;
+  --violet-m: #6B21A8;
+  --violet-l: #9333EA;
+  --gold: #C9A84C;
+  --gold-l: #E4C060;
+  --gold-d: #A07830;
+  --cream: #FAF8F4;
+  --cream2: #F2EEE8;
+  --white: #FFFFFF;
+  --muted: #7C6FA0;
+  --muted2: #B0A8C4;
+  --border: rgba(75,0,130,0.12);
+  --border-l: rgba(75,0,130,0.07);
+  --green: #22C55E;
+  --fh: 'Plus Jakarta Sans', sans-serif;
+  --fb: 'Outfit', sans-serif;
+  --grad: linear-gradient(135deg,#4B0082,#6B21A8);
+  --grad-gold: linear-gradient(135deg,#C9A84C,#E4C060);
+  --grad-dark: linear-gradient(160deg,#0E0118 0%,#2D0060 50%,#1a0040 100%);
+}
+
+/* ═══ SVG RENDER FIX (Mobile Android) ═══ */
+svg{display:inline-block;vertical-align:middle;overflow:visible;shape-rendering:geometricPrecision;-webkit-font-smoothing:antialiased}
+.cmp-cell svg,.cmp-feat svg,.no-val svg,.yes-val svg,.yes-val-gold svg{display:inline-flex;flex-shrink:0;overflow:hidden;shape-rendering:crispEdges}
+.feat-icon svg,.step-icon-wrap svg,.pf-icon svg,.method-icon svg,.cstat svg{overflow:hidden;display:block}
+/* Remove mixed fill+stroke SVG artifacts */
+.cmp-feat>svg{display:none}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--ink);font-family:var(--fb);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ═══ NOISE TEXTURE OVERLAY ═══ */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ═══ NAV ═══ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(14,1,24,0.92);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-logo{display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden}
+.nav-logo img{height:30px;width:auto}
+.nav-logo-txt{font-family:var(--fh);font-size:16px;font-weight:800;color:var(--gold);letter-spacing:-.3px;white-space:nowrap}
+.nav-pill{display:none;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;border:1px solid rgba(201,168,76,0.3);background:rgba(201,168,76,0.08);color:var(--gold-l);font-size:11px;font-weight:600;font-family:var(--fh);letter-spacing:.2px}
+.nav-cta{height:36px;padding:0 14px;background:var(--grad-gold);color:var(--ink);font-family:var(--fh);font-weight:700;font-size:12px;border-radius:999px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.35);transition:transform .15s,box-shadow .15s;white-space:nowrap;flex-shrink:0}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(201,168,76,0.45)}
+.nav-cta svg{width:14px;height:14px}
+@media(min-width:700px){.nav-pill{display:inline-flex}}
+
+/* ═══ HERO ═══ */
+.hero{min-height:100svh;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 24px 64px;text-align:center;overflow:hidden;background:var(--grad-dark)}
+
+/* Animated background orbs */
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5;pointer-events:none;animation:orbDrift 12s ease-in-out infinite}
+.hero-orb-1{width:500px;height:500px;background:radial-gradient(circle,rgba(107,33,168,0.6),transparent 70%);top:-10%;left:-15%;animation-delay:0s}
+.hero-orb-2{width:400px;height:400px;background:radial-gradient(circle,rgba(201,168,76,0.25),transparent 70%);bottom:5%;right:-10%;animation-delay:-5s}
+.hero-orb-3{width:300px;height:300px;background:radial-gradient(circle,rgba(147,51,234,0.4),transparent 70%);top:40%;left:60%;animation-delay:-8s}
+@keyframes orbDrift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(.95)}}
+
+/* Grid lines decoration */
+.hero-grid{position:absolute;inset:0;pointer-events:none;opacity:.04;background-image:linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px);background-size:60px 60px}
+
+.hero-eyebrow{position:relative;display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:999px;border:1px solid rgba(201,168,76,0.35);background:rgba(201,168,76,0.1);color:var(--gold-l);font-size:12px;font-weight:600;font-family:var(--fh);letter-spacing:.4px;margin-bottom:28px}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.5)}50%{opacity:.6;box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+
+.hero-badge-price{position:relative;display:inline-flex;align-items:center;gap:10px;padding:10px 20px;border-radius:14px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.28);margin-bottom:24px}
+.hero-badge-price-label{font-size:11px;color:var(--gold);font-weight:600;font-family:var(--fh);text-transform:uppercase;letter-spacing:.8px}
+.hero-badge-price-val{font-family:var(--fh);font-size:22px;font-weight:800;color:var(--gold-l)}
+.hero-badge-price-sub{font-size:11px;color:rgba(255,255,255,0.5);border-left:1px solid rgba(255,255,255,0.15);padding-left:10px}
+
+.hero h1{position:relative;font-family:var(--fh);font-size:clamp(26px,6vw,54px);font-weight:700;line-height:1.15;letter-spacing:-.4px;color:var(--white);margin-bottom:20px;max-width:800px}
+.hero h1 em{font-style:normal;background:var(--grad-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.hero-sub{position:relative;font-size:clamp(15px,3vw,18px);color:rgba(255,255,255,0.68);max-width:600px;margin:0 auto 32px;line-height:1.75;font-weight:300}
+.hero-sub strong{color:rgba(255,255,255,0.92);font-weight:600}
+
+/* Model tags */
+.hero-models{position:relative;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:36px}
+.model-tag{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);font-size:12px;font-weight:500;transition:border-color .2s,background .2s}
+.model-tag:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.08)}
+.model-tag svg{width:16px;height:16px;flex-shrink:0}
+
+.hero-ctas{position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:380px}
+.hero-cta-main{width:100%;max-width:100%;height:54px;background:var(--grad-gold);color:var(--ink);font-family:var(--fh);font-weight:700;font-size:15px;border-radius:14px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 32px rgba(201,168,76,0.35),0 2px 8px rgba(201,168,76,0.2);transition:transform .15s,box-shadow .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-cta-main:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(201,168,76,0.45)}
+.hero-cta-main svg{width:18px;height:18px}
+.hero-cta-sec{color:rgba(255,255,255,0.6);font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .2s}
+.hero-cta-sec:hover{color:rgba(255,255,255,0.9)}
+.hero-cta-sec svg{width:14px;height:14px}
+
+/* Proof bar */
+.hero-proof{position:relative;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:40px;padding-top:32px;border-top:1px solid rgba(255,255,255,0.08)}
+.hpf{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:13px}
+.hpf svg{width:16px;height:16px;color:var(--gold)}
+.hpf strong{color:var(--gold-l);font-weight:700}
+
+/* ═══ FLAGS MARQUEE ═══ */
+.marquee-wrap{background:var(--ink2);border-top:1px solid rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.06);padding:0;overflow:hidden}
+.marquee-head{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-bottom:1px solid rgba(255,255,255,0.06);font-family:var(--fh);font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase}
+.marquee-head svg{width:14px;height:14px}
+.marquee-track{display:flex;gap:0;width:max-content;animation:marquee 30s linear infinite}
+.marquee-track:hover{animation-play-state:paused}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.flag-item{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;font-size:12px;color:rgba(255,255,255,0.6);white-space:nowrap;border-right:1px solid rgba(255,255,255,0.05)}
+.flag-item:hover{color:rgba(255,255,255,0.9)}
+.flag-em{font-size:16px;line-height:1}
+
+/* ═══ TRUST BAR ═══ */
+.trust-bar{background:var(--white);border-bottom:1px solid var(--border);padding:16px 24px}
+.trust-inner{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:center}
+.trust-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:500}
+.trust-item svg{width:16px;height:16px;color:var(--violet)}
+
+/* ═══ SECTIONS ═══ */
+.section{padding:80px 24px;max-width:920px;margin:0 auto}
+.section-w{padding:80px 24px;background:var(--white);border-top:1px solid var(--border-l);border-bottom:1px solid var(--border-l)}
+.section-dark{padding:80px 24px;background:var(--ink);position:relative;overflow:hidden}
+.section-dark::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(107,33,168,0.3),transparent 60%),radial-gradient(ellipse at 80% 50%,rgba(201,168,76,0.08),transparent 60%);pointer-events:none}
+.section-w-inner{max-width:920px;margin:0 auto}
+
+.sec-label{font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.sec-label-dark{color:rgba(201,168,76,0.7)}
+.sec-title{font-family:var(--fh);font-size:clamp(22px,5vw,38px);font-weight:800;line-height:1.15;letter-spacing:-.5px;color:var(--ink);margin-bottom:14px}
+.sec-title em{font-style:normal;color:var(--violet)}
+.sec-title-dark{color:var(--white)}
+.sec-title-dark em{color:var(--gold-l)}
+.sec-sub{font-size:15px;color:var(--muted);line-height:1.8;max-width:640px;margin:0 auto 48px}
+.sec-sub-dark{color:rgba(255,255,255,0.55)}
+.center{text-align:center}
+
+/* ═══ FEATURE GRID ═══ */
+.feat-grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:640px){.feat-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.feat-grid{grid-template-columns:repeat(3,1fr)}}
+
+.feat-card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:28px;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+.feat-card:hover{transform:translateY(-4px);border-color:rgba(75,0,130,0.25);box-shadow:0 20px 60px rgba(75,0,130,0.10)}
+.feat-card:hover::before{transform:scaleX(1)}
+
+.feat-icon{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,rgba(75,0,130,0.10),rgba(107,33,168,0.06));border:1px solid rgba(75,0,130,0.10);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.feat-icon svg{width:26px;height:26px;color:var(--violet)}
+.feat-title{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;letter-spacing:-.2px}
+.feat-desc{font-size:13px;color:var(--muted);line-height:1.75}
+
+/* ═══ SCREENSHOT BLOCKS ═══ */
+.screen-pair{display:flex;flex-direction:column;gap:64px}
+.screen-block{display:grid;grid-template-columns:1fr;gap:32px;align-items:center}
+@media(min-width:760px){
+  .screen-block{grid-template-columns:auto 1fr;gap:48px}
+  .screen-block.rev{grid-template-columns:1fr auto}
+  .screen-block.rev .screen-img-col{order:2}
+  .screen-block.rev .screen-txt-col{order:1}
+}
+
+.screen-img-col{display:flex;justify-content:center}
+.screen-phone{width:220px;border-radius:28px;overflow:hidden;box-shadow:0 32px 80px rgba(14,1,24,0.22),0 8px 24px rgba(14,1,24,0.14),0 0 0 1px rgba(75,0,130,0.15);flex-shrink:0;background:linear-gradient(160deg,#1a0035,#2D0060);min-height:380px;position:relative}
+.screen-phone img{display:block;width:100%;height:auto;position:relative;z-index:1}
+.screen-phone img[data-error]{display:none}
+/* Skeleton loading state */
+.screen-phone::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(75,0,130,0.3),rgba(201,168,76,0.1));border-radius:inherit}
+.screen-phone-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;z-index:0}
+.screen-phone-label svg{width:32px;height:32px;color:rgba(201,168,76,0.5)}
+.screen-phone-label span{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.5}
+
+.screen-txt-col{}
+.screen-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:rgba(75,0,130,0.08);border:1px solid rgba(75,0,130,0.15);font-family:var(--fh);font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.screen-badge svg{width:12px;height:12px}
+.screen-title{font-family:var(--fh);font-size:clamp(20px,4vw,28px);font-weight:800;letter-spacing:-.4px;line-height:1.2;color:var(--ink);margin-bottom:12px}
+.screen-title em{font-style:normal;color:var(--violet)}
+.screen-desc{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:20px}
+.screen-desc strong{color:var(--ink);font-weight:600}
+
+.tag-row{display:flex;flex-wrap:wrap;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--cream);border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--ink)}
+.tag svg{width:13px;height:13px;color:var(--green)}
+
+/* ═══ HOW IT WORKS ═══ */
+.steps-grid{display:grid;grid-template-columns:1fr;gap:0;position:relative}
+@media(min-width:640px){.steps-grid{grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}}
+@media(min-width:900px){.steps-grid{grid-template-columns:repeat(4,1fr)}}
+
+.step-card{padding:32px 28px;background:var(--white);position:relative}
+.step-num{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--muted2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px}
+.step-icon-wrap{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#4B0082,#6B21A8);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 8px 24px rgba(75,0,130,0.25)}
+.step-icon-wrap svg{width:28px;height:28px;color:var(--gold-l)}
+.step-title{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--muted);line-height:1.75}
+.step-desc strong{color:var(--violet);font-weight:600}
+
+/* ═══ CALLOUT - ILLIMITÉ ═══ */
+.callout-box{position:relative;border-radius:24px;background:linear-gradient(160deg,#2D0060,#4B0082 50%,#3a0070);overflow:hidden;padding:48px 32px;text-align:center}
+.callout-box::before{content:'';position:absolute;top:-50%;left:-30%;width:80%;height:200%;background:radial-gradient(circle,rgba(201,168,76,0.15),transparent 60%);pointer-events:none}
+.callout-box::after{content:'';position:absolute;bottom:-40%;right:-20%;width:60%;height:180%;background:radial-gradient(circle,rgba(147,51,234,0.2),transparent 60%);pointer-events:none}
+
+.callout-title{position:relative;font-family:var(--fh);font-size:clamp(22px,5vw,36px);font-weight:800;color:var(--white);letter-spacing:-.5px;margin-bottom:12px}
+.callout-title em{font-style:normal;background:var(--grad-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.callout-sub{position:relative;font-size:15px;color:rgba(255,255,255,0.6);max-width:560px;margin:0 auto 40px;line-height:1.75}
+
+/* Two method cards */
+.methods-grid{position:relative;display:grid;grid-template-columns:1fr;gap:16px;max-width:600px;margin:0 auto 36px}
+@media(min-width:540px){.methods-grid{grid-template-columns:1fr 1fr}}
+.method-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:18px;padding:24px 20px;text-align:center;transition:background .2s,border-color .2s}
+.method-card:hover{background:rgba(255,255,255,0.11);border-color:rgba(201,168,76,0.3)}
+.method-icon{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.method-icon svg{width:28px;height:28px;color:var(--gold-l)}
+.method-title{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px}
+.method-desc{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.6}
+.method-or{display:flex;align-items:center;justify-content:center;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;border-radius:50%;background:var(--ink2);border:1px solid rgba(255,255,255,0.1);font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);font-family:var(--fh)}
+@media(max-width:539px){.method-or{display:none}}
+
+.callout-stats{position:relative;display:flex;flex-direction:column;gap:10px;align-items:center;margin-bottom:32px;width:100%;max-width:400px;margin-left:auto;margin-right:auto}
+.cstat{padding:12px 20px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;gap:10px;width:100%}
+.cstat svg{width:18px;height:18px;color:var(--gold-l)}
+.cstat-txt{font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);font-family:var(--fh)}
+
+/* ═══ COMPARISON ═══ */
+.cmp-table{border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--white);box-shadow:0 20px 60px rgba(75,0,130,0.08)}
+.cmp-head-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;background:var(--ink);color:var(--white)}
+.cmp-head-cell{padding:14px 12px;font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.2px}
+.cmp-head-cell:nth-child(2){background:rgba(239,68,68,0.15);text-align:center;color:rgba(255,255,255,0.6)}
+.cmp-head-cell:nth-child(3){background:rgba(201,168,76,0.15);text-align:center;color:var(--gold-l)}
+.cmp-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;border-bottom:1px solid var(--border-l);min-width:0}
+.cmp-row:last-child{border-bottom:none}
+.cmp-cell{padding:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;word-break:break-word;min-width:0;overflow-wrap:anywhere}
+.cmp-cell:nth-child(2){justify-content:center;text-align:center;background:rgba(239,68,68,0.025);flex-direction:column;gap:3px}
+.cmp-cell:nth-child(3){justify-content:center;text-align:center;background:rgba(201,168,76,0.03);flex-direction:column;gap:3px}
+.cmp-feat{font-weight:500;color:var(--ink);font-size:12px}
+.cmp-feat svg{width:16px;height:16px;color:var(--muted2);flex-shrink:0}
+.no-val{color:#DC2626;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;text-align:center;flex-wrap:wrap;line-height:1.3}
+.yes-val{color:var(--green);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;text-align:center;flex-wrap:wrap;line-height:1.3}
+.yes-val-gold{color:var(--gold-d);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;text-align:center;flex-wrap:wrap;line-height:1.3}
+.cmp-divider{display:block;padding:8px 12px;background:linear-gradient(90deg,rgba(75,0,130,0.06),rgba(201,168,76,0.10),rgba(75,0,130,0.06));font-family:var(--fh);font-size:10px;font-weight:700;color:var(--violet);letter-spacing:1px;text-transform:uppercase;text-align:center;grid-column:1/-1}
+.cmp-highlight{background:linear-gradient(90deg,rgba(201,168,76,0.08),rgba(201,168,76,0.04));border-left:3px solid var(--gold)}
+@media(max-width:480px){
+  .cmp-head-row{grid-template-columns:1fr 1fr 1fr}
+  .cmp-row{grid-template-columns:1fr 1fr 1fr}
+  .cmp-head-cell{padding:10px 6px;font-size:10px}
+  .cmp-cell{padding:10px 6px;font-size:10px}
+  .cmp-feat{font-size:10px}
+  .no-val,.yes-val,.yes-val-gold{font-size:10px}
+}
+
+.cmp-callout{margin-top:16px;padding:14px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(75,0,130,0.06));border:1px solid rgba(201,168,76,0.2);font-size:13px;font-weight:600;color:var(--ink);text-align:center}
+
+/* ═══ PAYMENT ═══ */
+.pm-scroll{overflow:hidden;margin-bottom:24px;padding:8px 0}
+.pm-row{display:flex;gap:16px;width:max-content;animation:marquee 22s linear infinite;align-items:center}
+.pm-row:hover{animation-play-state:paused}
+/* New PM item styles */
+.pm-item-new{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:default}
+.pm-item-new img{width:56px;height:56px;border-radius:14px;object-fit:contain;background:#fff;padding:4px;border:1px solid rgba(75,0,130,0.10);box-shadow:0 2px 12px rgba(75,0,130,0.08)}
+.pm-item-fb{width:56px;height:56px;border-radius:14px;display:none;align-items:center;justify-content:center;font-weight:800;font-size:11px;text-align:center;border:1px solid rgba(0,0,0,0.08);flex-shrink:0}
+.pm-item-name{font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;text-align:center;max-width:60px;overflow:hidden;text-overflow:ellipsis}
+.pm-wa-box{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.pm-wa-text{font-size:14px;color:var(--muted);line-height:1.7}
+.btn-wa{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;background:#25D366;color:#fff;font-family:var(--fh);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,0.35)}
+.btn-wa svg{width:18px;height:18px}
+
+/* ═══ PRICING ═══ */
+.price-card{position:relative;border-radius:24px;background:linear-gradient(160deg,#1a0035,#2D0060 40%,#3d0080);overflow:hidden;padding:32px 20px;max-width:720px;margin:0 auto}
+@media(min-width:520px){.price-card{padding:48px 36px}}
+.price-card::before{content:'';position:absolute;top:-40%;left:-20%;width:70%;height:160%;background:radial-gradient(circle,rgba(201,168,76,0.12),transparent 60%);pointer-events:none}
+.price-card::after{content:'';position:absolute;bottom:-30%;right:-10%;width:50%;height:120%;background:radial-gradient(circle,rgba(147,51,234,0.2),transparent 60%);pointer-events:none}
+.price-label{position:relative;font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;text-align:center}
+.price-amount-row{position:relative;display:flex;align-items:baseline;justify-content:center;gap:10px;margin-bottom:8px}
+.price-big{font-family:var(--fh);font-size:clamp(44px,10vw,64px);font-weight:800;color:var(--gold-l);line-height:1;letter-spacing:-1px}
+.price-currency{font-family:var(--fh);font-size:22px;font-weight:700;color:rgba(255,255,255,0.6);padding-bottom:12px}
+.price-once{position:relative;display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:999px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:var(--green);font-family:var(--fh);font-size:12px;font-weight:700;margin:0 auto 36px;text-align:center;letter-spacing:.3px}
+.price-once svg{width:16px;height:16px}
+.price-feats{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:36px}
+@media(max-width:480px){.price-feats{grid-template-columns:1fr}}
+.pf{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08)}
+.pf-icon{width:36px;height:36px;border-radius:10px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-icon svg{width:18px;height:18px;color:var(--gold-l)}
+.pf-txt{font-size:12px;line-height:1.55;color:rgba(255,255,255,0.7)}
+.pf-txt strong{color:var(--white);display:block;font-size:13px;font-weight:600;margin-bottom:2px;font-family:var(--fh)}
+.price-cta{position:relative;text-align:center}
+.price-reassure{position:relative;margin-top:16px;font-size:12px;color:rgba(255,255,255,0.4);text-align:center;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.price-reassure span{display:flex;align-items:center;gap:5px}
+.price-reassure svg{width:13px;height:13px;color:rgba(255,255,255,0.3)}
+
+/* ═══ FAQ ═══ */
+.faq-list{display:flex;flex-direction:column;gap:0;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--white)}
+.faq-item{border-bottom:1px solid var(--border-l)}
+.faq-item:last-child{border-bottom:none}
+.faq-btn{width:100%;background:none;border:none;text-align:left;padding:22px 24px;display:flex;align-items:center;gap:14px;cursor:pointer;color:var(--ink);font-family:var(--fh);font-weight:700;font-size:14px;letter-spacing:-.1px;transition:background .15s}
+.faq-btn:hover{background:var(--cream)}
+.faq-icon{width:38px;height:38px;border-radius:12px;background:rgba(75,0,130,0.07);border:1px solid rgba(75,0,130,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.faq-icon svg{width:18px;height:18px;color:var(--violet)}
+.faq-item.open .faq-icon{background:var(--violet);border-color:var(--violet)}
+.faq-item.open .faq-icon svg{color:var(--white)}
+.faq-chev{margin-left:auto;flex-shrink:0;width:18px;height:18px;color:var(--muted2);transition:transform .25s}
+.faq-item.open .faq-chev{transform:rotate(180deg);color:var(--violet)}
+.faq-answer{display:none;padding:0 24px 22px 76px;font-size:14px;color:var(--muted);line-height:1.85}
+.faq-item.open .faq-answer{display:block}
+
+/* ═══ FINAL CTA ═══ */
+.final-sec{padding:80px 24px;text-align:center;background:var(--cream2);border-top:1px solid var(--border)}
+.final-inner{max-width:600px;margin:0 auto}
+.final-title{font-family:var(--fh);font-size:clamp(26px,6vw,44px);font-weight:800;letter-spacing:-.8px;line-height:1.1;color:var(--ink);margin-bottom:16px}
+.final-title em{font-style:normal;color:var(--violet)}
+.final-sub{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:36px}
+.final-proof{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:24px}
+.fpill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:500}
+.fpill svg{width:14px;height:14px;color:var(--violet)}
+
+/* ═══ FOOTER ═══ */
+.footer{padding:32px 24px;border-top:1px solid var(--border);text-align:center;background:var(--white)}
+.footer-logo{font-family:var(--fh);font-size:18px;font-weight:800;color:var(--violet);margin-bottom:8px}
+.footer-sub{font-size:12px;color:var(--muted2);line-height:1.8}
+
+/* ═══ FLOATING CTA ═══ */
+.float-cta{position:fixed;left:12px;right:12px;bottom:12px;z-index:400;display:flex;justify-content:center;pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s}
+.float-cta.vis{opacity:1;transform:translateY(0);pointer-events:auto}
+.float-cta a{width:min(480px,100%);height:50px;background:var(--grad-gold);color:var(--ink);font-family:var(--fh);font-weight:700;font-size:13px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-shadow:0 8px 32px rgba(201,168,76,0.4),0 2px 0 rgba(255,255,255,0.3) inset;white-space:nowrap;padding:0 16px}
+.float-cta a svg{width:16px;height:16px}
+
+/* ═══ WA FLOAT ═══ */
+.wa-float{position:fixed;bottom:80px;right:16px;z-index:401;width:52px;height:52px;border-radius:50%;background:#25D366;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.45);animation:waup 3.5s ease-in-out infinite}
+@keyframes waup{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.wa-float svg{width:26px;height:26px;color:#fff}
+
+/* ═══ WA MODAL ═══ */
+/* ═══ PAYMENT MODAL ═══ */
+.pay-ov{display:none;position:fixed;inset:0;z-index:600;background:rgba(14,1,24,0.88);backdrop-filter:blur(12px);align-items:flex-end;justify-content:center}
+.pay-ov.open{display:flex}
+.pay-modal{background:var(--white);border-radius:24px 24px 0 0;max-width:480px;width:100%;padding:0;max-height:92svh;overflow-y:auto;min-height:0}
+.pay-modal-top{padding:24px 24px 0;position:sticky;top:0;background:var(--white);z-index:2;border-bottom:1px solid var(--border-l);padding-bottom:16px;margin-bottom:20px}
+.pay-modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.pay-modal-title{font-family:var(--fh);font-size:18px;font-weight:800;color:var(--ink)}
+.pay-modal-sub{font-size:13px;color:var(--muted);line-height:1.5}
+.pay-amount-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(75,0,130,0.08),rgba(201,168,76,0.10));border:1px solid rgba(201,168,76,0.2);margin-top:10px}
+.pay-amount-badge-val{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--violet)}
+.pay-amount-badge-lbl{font-size:11px;color:var(--muted);font-weight:500}
+.pay-modal-body{padding:0 24px 24px}
+.pay-lbl{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.pay-input{width:100%;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;margin-bottom:14px;transition:border-color .2s}
+.pay-input:focus{border-color:var(--violet);background:var(--white)}
+.pay-input.error{border-color:#DC2626}
+.pay-field-group{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pay-hint{font-size:11px;color:var(--muted2);margin-top:-10px;margin-bottom:14px;line-height:1.4}
+.pay-btn{width:100%;height:52px;background:var(--grad-gold);color:var(--ink);border:none;border-radius:14px;cursor:pointer;font-family:var(--fh);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;transition:transform .15s,box-shadow .15s}
+.pay-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,168,76,0.4)}
+.pay-btn:disabled{opacity:.6;cursor:not-allowed}
+.pay-btn svg{width:18px;height:18px}
+.pay-btn-loading{display:none;width:18px;height:18px;border:2px solid rgba(26,1,46,0.3);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pay-cancel{width:100%;padding:12px;background:transparent;color:var(--muted);border:none;cursor:pointer;font-size:13px;margin-top:8px;font-family:var(--fb)}
+.pay-secure{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--muted2);margin-top:12px}
+.pay-secure svg{width:13px;height:13px;color:var(--muted2)}
+.pay-error-msg{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:14px;display:none}
+.pay-error-msg.show{display:block}
+/* ═══ SUCCESS PAGE ═══ */
+.pay-success{display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;gap:16px}
+.pay-success.show{display:flex}
+.pay-success-icon{width:72px;height:72px;border-radius:50%;background:rgba(34,197,94,0.12);border:2px solid rgba(34,197,94,0.3);display:flex;align-items:center;justify-content:center}
+.pay-success-icon svg{width:36px;height:36px;color:var(--green)}
+.pay-success-title{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--ink)}
+.pay-success-sub{font-size:14px;color:var(--muted);line-height:1.7;max-width:360px}
+/* ═══ SUCCESS DOWNLOAD MODAL ═══ */
+.dl-ov{display:none;position:fixed;inset:0;z-index:700;background:rgba(14,1,24,0.92);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:20px}
+.dl-ov.open{display:flex}
+.dl-modal{background:var(--white);border-radius:28px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 40px 100px rgba(14,1,24,0.5)}
+.dl-top{background:linear-gradient(160deg,#1a0035,#3D0080);padding:32px 28px 28px;text-align:center;position:relative;overflow:hidden}
+.dl-top::before{content:'';position:absolute;top:-40%;left:-30%;width:80%;height:180%;background:radial-gradient(circle,rgba(201,168,76,0.2),transparent 60%);pointer-events:none}
+.dl-check{width:64px;height:64px;border-radius:50%;background:rgba(34,197,94,0.15);border:2px solid rgba(34,197,94,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;position:relative}
+.dl-check svg{width:30px;height:30px;color:#22C55E}
+.dl-check-ring{position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(34,197,94,0.2);animation:ringPulse 2s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.08);opacity:.2}}
+.dl-title{font-family:var(--fh);font-size:20px;font-weight:800;color:var(--white);margin-bottom:6px;position:relative}
+.dl-sub{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;position:relative}
+.dl-details{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px 16px;margin-top:16px;position:relative;display:flex;flex-direction:column;gap:6px}
+.dl-detail-row{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.dl-detail-lbl{color:rgba(255,255,255,0.5)}
+.dl-detail-val{color:rgba(255,255,255,0.9);font-weight:600;font-family:var(--fh)}
+.dl-body{padding:24px 28px}
+.dl-body-title{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:16px;text-align:center}
+.dl-stores{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.dl-store-btn{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:16px;text-decoration:none;transition:transform .15s,box-shadow .15s;border:1px solid}
+.dl-store-btn.android{background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(255,255,255,0.08)}
+.dl-store-btn.ios{background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(255,255,255,0.08)}
+.dl-store-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(14,1,24,0.2)}
+.dl-store-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dl-store-icon.android-ic{background:linear-gradient(135deg,#3ddc84,#2ea55a)}
+.dl-store-icon.ios-ic{background:linear-gradient(135deg,#a2aaad,#6e7073)}
+.dl-store-icon svg{width:22px;height:22px;color:#fff}
+.dl-store-info{flex:1;min-width:0}
+.dl-store-info-top{font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:2px}
+.dl-store-info-name{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--white)}
+.dl-store-arrow{width:18px;height:18px;color:rgba(255,255,255,0.3);flex-shrink:0}
+.dl-store-btn:hover .dl-store-arrow{color:var(--gold-l)}
+.dl-close{width:100%;padding:12px;background:var(--cream);border:1px solid var(--border);border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);font-family:var(--fh);transition:background .15s}
+.dl-close:hover{background:var(--cream2)}
+.wa-ov{display:none;position:fixed;inset:0;z-index:600;background:rgba(14,1,24,0.85);backdrop-filter:blur(10px);align-items:flex-end;justify-content:center}
+.wa-ov.open{display:flex}
+.wa-modal{background:var(--white);border-radius:24px 24px 0 0;max-width:480px;width:100%;padding:28px 24px;max-height:92svh;overflow-y:auto;min-height:0}
+.wa-modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.wa-modal-title{font-family:var(--fh);font-size:18px;font-weight:800;color:var(--ink)}
+.wa-close{width:36px;height:36px;border-radius:10px;background:var(--cream);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.wa-close svg{width:16px;height:16px}
+.wa-modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.wa-lbl{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block}
+.wa-input{width:100%;background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--ink);font-size:14px;font-family:var(--fb);outline:none;margin-bottom:14px;transition:border-color .2s}
+.wa-input:focus{border-color:var(--violet)}
+textarea.wa-input{resize:vertical;min-height:90px}
+.wa-send{width:100%;height:50px;background:#25D366;color:#fff;border:none;border-radius:12px;cursor:pointer;font-family:var(--fh);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+.wa-send svg{width:18px;height:18px}
+.wa-cancel{width:100%;padding:12px;background:transparent;color:var(--muted);border:none;cursor:pointer;font-size:13px;margin-top:8px;font-family:var(--fb)}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:12px;font-size:13px;z-index:700;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-3px)}
+
+/* ═══ REVEAL ═══ */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:translateY(0)}
+.rv-d1{transition-delay:.1s}
+.rv-d2{transition-delay:.2s}
+.rv-d3{transition-delay:.3s}
+
+/* Animated SVG icon pulse */
+@keyframes iconPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.feat-card:hover .feat-icon svg{animation:iconPulse .6s ease}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <img src="../assets/images/logo.png" alt="AKOLABS" onerror="this.style.display='none'"/>
+    <span class="nav-logo-txt">AKOLABS</span>
+  </div>
+  <div class="nav-pill">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+    5 000 FCFA · Accès à vie · Illimité
+  </div>
+  <a class="nav-cta" href="#" onclick="event.preventDefault();App.openPay()" data-cta>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Obtenir l'accès
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-eyebrow">
+    <span class="hero-eyebrow-dot"></span>
+    Propulsé par Google Veo 3.1 · xAI Grok · Imagen 4
+  </div>
+
+  <div class="hero-badge-price">
+    <span class="hero-badge-price-label">Prix lancement</span>
+    <span class="hero-badge-price-val">5 000 FCFA</span>
+    <span class="hero-badge-price-sub">Paiement unique · Accès à vie</span>
+  </div>
+
+  <h1>Génère des <em>Vidéos & Images IA</em><br>illimitées depuis ton téléphone</h1>
+
+  <p class="hero-sub">Tu décris. L'IA crée. Tu postes. Vidéos cinématographiques, images haute résolution, TikTok, Reels, publicités — <strong>sans aucune limite</strong>, sans abonnement mensuel.</p>
+
+  <div class="hero-models">
+    <span class="model-tag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+      Google Veo 3.1
+    </span>
+    <span class="model-tag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      xAI Grok
+    </span>
+    <span class="model-tag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
+      Google Imagen 4
+    </span>
+    <span class="model-tag">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Nano Banana Pro
+    </span>
+  </div>
+
+  <div class="hero-ctas">
+    <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Obtenir mon accès — 5 000 FCFA
+    </a>
+    <a class="hero-cta-sec" href="#comment">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      Voir comment ça marche
+    </a>
+  </div>
+
+  <div class="hero-proof">
+    <div class="hpf">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span><strong>4.4 / 5</strong> — Plus de 2 400 avis</span>
+    </div>
+    <div class="hpf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      <span>Android & iOS</span>
+    </div>
+    <div class="hpf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span>Accès immédiat</span>
+    </div>
+  </div>
+</section>
+
+<!-- FLAGS MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-head">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    Disponible dans toute l'Afrique francophone
+  </div>
+  <div style="overflow:hidden"><div class="marquee-track" id="flags-track"></div></div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-inner">
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Paiement sécurisé via Genius Pay</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>Accès à vie garanti</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Accès immédiat après paiement</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Support WhatsApp réactif</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Android & iOS</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section rv" id="fonctions">
+  <div class="sec-label center">Ce que tu obtiens</div>
+  <h2 class="sec-title center">Un studio de création IA <em>dans ta poche</em></h2>
+  <p class="sec-sub center">Oublie les logiciels compliqués et les abonnements en dollars. AKOLABS te donne accès aux mêmes outils que les grandes agences mondiales — depuis ton smartphone, sans aucune limite.</p>
+
+  <div class="feat-grid">
+    <div class="feat-card rv rv-d1">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none" opacity=".6"/></svg>
+      </div>
+      <div class="feat-title">Vidéos IA jusqu'à 1080p Full HD</div>
+      <div class="feat-desc">Clips 8 secondes en 9:16 (TikTok/Reels) ou 16:9 (YouTube). Qualité cinématographique professionnelle. Prêt à publier sans retouche.</div>
+    </div>
+    <div class="feat-card rv rv-d2">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none" opacity=".6"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <div class="feat-title">Images IA haute résolution 2K</div>
+      <div class="feat-desc">PNG ou JPG en 10 formats (1:1, 16:9, 9:16, 4:3…). Résolution 1K standard ou 2K premium. Visuels publicitaires de niveau professionnel.</div>
+    </div>
+    <div class="feat-card rv rv-d3">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      </div>
+      <div class="feat-title">6 modèles IA de pointe</div>
+      <div class="feat-desc">Veo 3.1 Fast, Veo 3.1, xAI Grok pour la vidéo. Nano Banana Pro, Nano Banana 2, Imagen 4 pour les images. Tu choisis selon ton besoin.</div>
+    </div>
+    <div class="feat-card rv rv-d1">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3l14 9-14 9V3z" fill="currentColor" stroke="none" opacity=".4"/><circle cx="12" cy="12" r="10"/></svg>
+      </div>
+      <div class="feat-title">Vidéo depuis une image</div>
+      <div class="feat-desc">Génère une vidéo animée à partir d'une photo ou d'une image IA. Donne vie à tes visuels. Idéal pour les publicités et les contenus créatifs percutants.</div>
+    </div>
+    <div class="feat-card rv rv-d2">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      </div>
+      <div class="feat-title">Génération vraiment illimitée</div>
+      <div class="feat-desc">Aucun quota. Aucun crédit. Aucun plafond. Regarde une courte publicité ou utilise un bloqueur de pub — zéro franc supplémentaire par génération.</div>
+    </div>
+    <div class="feat-card rv rv-d3">
+      <div class="feat-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <div class="feat-title">Interface en français</div>
+      <div class="feat-desc">Décris ta création en français, en anglais ou en arabe. L'interface est en français. Pas besoin de maîtriser l'anglais pour créer du contenu professionnel.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section class="section-w rv" id="aperçus">
+  <div class="section-w-inner">
+    <div class="sec-label center">L'app en vrai</div>
+    <h2 class="sec-title center">Ce que tu vois <em>exactement</em> dans l'application</h2>
+    <p class="sec-sub center">Pas de promesses vagues. Voici les captures réelles. Ce que tu achètes, c'est exactement ce que tu vois ici.</p>
+
+    <div class="screen-pair">
+
+      <div class="screen-block rv">
+        <div class="screen-img-col">
+          <div class="screen-phone">
+            <div class="screen-phone-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+              <span>Capture de l'application</span>
+            </div>
+            <img src="screen-veo-models.jpg" alt="Modèles IA vidéo dans l'app" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+          </div>
+        </div>
+        <div class="screen-txt-col">
+          <div class="screen-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+            Génération Vidéo
+          </div>
+          <h3 class="screen-title">Les meilleurs modèles vidéo IA <em>du monde</em></h3>
+          <p class="screen-desc">Dans une seule application, tu accèdes à <strong>xAI Grok</strong>, <strong>Google Veo 3.1 Fast</strong> et <strong>Google Veo 3.1</strong>. Veo 3.1 Fast pour générer vite. Veo 3.1 pour la qualité cinématographique maximale.</p>
+          <div class="tag-row">
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>xAI Grok</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Veo 3.1 Fast</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Google Veo 3.1</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Full HD 1080p</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-block rev rv">
+        <div class="screen-img-col">
+          <div class="screen-phone">
+            <div class="screen-phone-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M20 12h2M2 12h2M12 20v2M12 2v2"/></svg>
+              <span>Paramètres de génération</span>
+            </div>
+            <img src="screen-veo-settings.jpg" alt="Paramètres de génération vidéo" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+          </div>
+        </div>
+        <div class="screen-txt-col">
+          <div class="screen-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M20 12h2M2 12h2M12 20v2M12 2v2"/></svg>
+            Contrôle Total
+          </div>
+          <h3 class="screen-title">Tu contrôles <em>chaque paramètre</em></h3>
+          <p class="screen-desc">Durée (8 secondes), format (9:16 pour TikTok ou 16:9 pour YouTube), résolution (720p HD ou <strong>1080p Full HD</strong>). Tu ajustes tout, tu génères, tu télécharges.</p>
+          <div class="tag-row">
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>9:16 TikTok & Reels</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>16:9 YouTube</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>720p & 1080p</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-block rv">
+        <div class="screen-img-col">
+          <div class="screen-phone">
+            <div class="screen-phone-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Modèles IA pour images</span>
+            </div>
+            <img src="screen-image-models.jpg" alt="Modèles IA génération d'images" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+          </div>
+        </div>
+        <div class="screen-txt-col">
+          <div class="screen-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg>
+            Génération d'Images
+          </div>
+          <h3 class="screen-title">Images IA <em>haute résolution</em> jusqu'à 2K</h3>
+          <p class="screen-desc">Accès à <strong>Nano Banana Pro</strong> (le plus puissant), <strong>Nano Banana 2</strong> et <strong>Google Imagen 4</strong>. Des visuels professionnels pour tes posts, publicités et créations commerciales.</p>
+          <div class="tag-row">
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Nano Banana Pro</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Google Imagen 4</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Résolution 2K</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-block rev rv">
+        <div class="screen-img-col">
+          <div class="screen-phone">
+            <div class="screen-phone-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="0"/><rect x="8" y="8" width="8" height="8"/></svg>
+              <span>Formats & résolutions</span>
+            </div>
+            <img src="screen-image-formats.jpg" alt="Formats disponibles pour les images" loading="lazy" onerror="this.setAttribute('data-error','1')"/>
+          </div>
+        </div>
+        <div class="screen-txt-col">
+          <div class="screen-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="0"/><rect x="8" y="8" width="8" height="8"/></svg>
+            Tous les Formats
+          </div>
+          <h3 class="screen-title">Le bon format pour <em>chaque plateforme</em></h3>
+          <p class="screen-desc">PNG ou JPG. 10 ratios disponibles : 1:1 (Instagram), 16:9 (YouTube), 9:16 (Stories/TikTok), 4:3, 3:4, 3:2, 2:3, 4:5, 5:4, 21:9. Résolution 1K ou 2K. Prêt à publier partout.</p>
+          <div class="tag-row">
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>PNG & JPG</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>10 ratios d'aspect</span>
+            <span class="tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>1K & 2K</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section rv" id="comment">
+  <div class="sec-label center">Le processus</div>
+  <h2 class="sec-title center">Générer gratuitement — <em>2 méthodes</em></h2>
+  <p class="sec-sub center">Ton accès est unique à 5 000 FCFA. Après ça, chaque génération est gratuite pour toujours. Voici comment.</p>
+
+  <div class="steps-grid">
+    <div class="step-card rv">
+      <div class="step-num">01 — Décris</div>
+      <div class="step-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <div class="step-title">Décris ta création</div>
+      <div class="step-desc">Écris en français ce que tu veux générer : une scène, un visuel, une publicité. Jusqu'à 1 000 caractères pour décrire exactement ta vision.</div>
+    </div>
+    <div class="step-card rv rv-d1">
+      <div class="step-num">02 — Choisis</div>
+      <div class="step-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      </div>
+      <div class="step-title">Choisis ton modèle IA</div>
+      <div class="step-desc">Veo 3.1, Grok, Imagen 4… Chaque modèle a ses forces. Veo Fast pour la rapidité, Veo 3.1 pour la qualité maximale, Nano Banana Pro pour les images premium.</div>
+    </div>
+    <div class="step-card rv rv-d2">
+      <div class="step-num">03 — Génère</div>
+      <div class="step-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="step-title">2 façons de générer gratuitement</div>
+      <div class="step-desc"><strong>Option A :</strong> Regarde une pub de 30s → génération gratuite. <strong>Option B :</strong> Active un bloqueur de pub → génère sans voir aucune publicité. Les deux sont 100% gratuits.</div>
+    </div>
+    <div class="step-card rv rv-d3">
+      <div class="step-num">04 — Publie</div>
+      <div class="step-icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </div>
+      <div class="step-title">Télécharge & publie</div>
+      <div class="step-desc">Ta vidéo ou image est prête en moins de 30 secondes. Télécharge-la et publie directement sur TikTok, Instagram Reels ou YouTube Shorts.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ILLIMITÉ CALLOUT -->
+<div class="section-dark rv">
+  <div class="section-w-inner">
+    <div class="callout-box">
+      <div class="sec-label sec-label-dark center" style="margin-bottom:16px">Zéro piège</div>
+      <div class="callout-title">Générations vraiment <em>illimitées</em></div>
+      <div class="callout-sub">On ne te vend pas un quota mensuel. On ne te découpe pas en crédits. Tu génères autant que tu veux, quand tu veux. Deux méthodes, zéro franc supplémentaire.</div>
+
+      <div class="methods-grid" style="position:relative">
+        <div class="method-card">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="method-title">Regarde une pub</div>
+          <div class="method-desc">Une courte publicité de 15 à 30 secondes. Et tu génères gratuitement.</div>
+        </div>
+        <div class="method-or">OU</div>
+        <div class="method-card">
+          <div class="method-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+          </div>
+          <div class="method-title">Bloqueur de pub actif</div>
+          <div class="method-desc">Active AdGuard ou tout bloqueur de pub. Tu génères sans voir aucune publicité.</div>
+        </div>
+      </div>
+
+      <div class="callout-stats">
+        <div class="cstat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
+          <span class="cstat-txt">Aucune limite</span>
+        </div>
+        <div class="cstat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          <span class="cstat-txt">Zéro quota journalier</span>
+        </div>
+        <div class="cstat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span class="cstat-txt">0 FCFA par génération</span>
+        </div>
+      </div>
+
+      <div style="text-align:center;position:relative">
+        <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta style="display:inline-flex;max-width:340px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Obtenir mon accès — 5 000 FCFA
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO DEMO -->
+<section class="section rv" id="demo">
+  <div class="sec-label center">Démo réelle</div>
+  <h2 class="sec-title center">Regarde comment <em>ça fonctionne</em></h2>
+  <p class="sec-sub center">Un utilisateur réel génère une vidéo IA en moins de 30 secondes — avec pub ou avec bloqueur. Tu vois exactement le processus, aucune mise en scène.</p>
+  <div style="max-width:380px;margin:0 auto;background:var(--white);border:1px solid var(--border);border-radius:24px;padding:16px;box-shadow:0 20px 60px rgba(75,0,130,0.08)">
+    <div style="width:100%;aspect-ratio:9/16;border-radius:16px;overflow:hidden;background:var(--ink);position:relative;border:1px solid var(--border)">
+      <video controls playsinline preload="metadata" id="demo-vid" style="width:100%;height:100%;object-fit:cover;display:none">
+        <source src="../assets/videos/genv-demo.mp4" type="video/mp4"/>
+      </video>
+      <div id="vph" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center">
+        <div style="width:72px;height:72px;border-radius:20px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.9)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="rgba(201,168,76,0.9)" stroke="none"/></svg>
+        </div>
+        <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--white)">Démo : Générer une vidéo IA</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6">Ajoute ton fichier dans<br><code style="color:rgba(201,168,76,0.7);font-size:11px">../assets/videos/genv-demo.mp4</code></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;font-size:13px;color:var(--muted);text-align:center;line-height:1.7">
+      <strong style="color:var(--violet)">Dans la démo :</strong> prompt en français → modèle IA → génération via pub ou bloqueur → résultat Full HD téléchargeable.
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="section-w rv" id="comparatif">
+  <div class="section-w-inner">
+    <div class="sec-label center">Comparatif</div>
+    <h2 class="sec-title center">Pourquoi <em>AKOLABS</em> — et pas les autres ?</h2>
+    <p class="sec-sub center">D'autres plateformes te réclament jusqu'à 55 000 FCFA par mois pour les mêmes fonctionnalités. AKOLABS : 5 000 FCFA une seule fois, pour toujours.</p>
+
+    <div class="cmp-table">
+      <div class="cmp-head-row">
+        <div class="cmp-head-cell">Fonctionnalité</div>
+        <div class="cmp-head-cell">Plateformes payantes</div>
+        <div class="cmp-head-cell">AKOLABS</div>
+      </div>
+
+      <div class="cmp-row"><div class="cmp-cell cmp-feat">Vidéo IA Full HD</div><div class="cmp-cell"><span class="no-val">✕ 15 000–55 000 FCFA/mois</span></div><div class="cmp-cell"><span class="yes-val-gold">✓ 5 000 FCFA · à vie</span></div></div>
+
+      <div class="cmp-row"><div class="cmp-cell cmp-feat">Images haute résolution</div><div class="cmp-cell"><span class="no-val">✕ Plan supérieur requis</span></div><div class="cmp-cell"><span class="yes-val-gold">✓ Inclus dès l'accès</span></div></div>
+
+      <div class="cmp-row"><div class="cmp-cell cmp-feat">Vidéo depuis image</div><div class="cmp-cell"><span class="no-val">✕ Plan premium uniquement</span></div><div class="cmp-cell"><span class="yes-val-gold">✓ Inclus</span></div></div>
+
+      <div class="cmp-row"><div class="cmp-cell cmp-feat">Générations illimitées</div><div class="cmp-cell"><span class="no-val">✕ Crédits limités</span></div><div class="cmp-cell"><span class="yes-val-gold">✓ Illimité via pub/bloqueur</span></div></div>
+
+      <div class="cmp-row cmp-highlight"><div class="cmp-cell cmp-feat">Bloqueur pub = 0 pub</div><div class="cmp-cell"><span class="no-val">✕ Non disponible</span></div><div class="cmp-cell"><span class="yes-val-gold">✓ Oui, ça fonctionne</span></div></div>
+
+      <div class="cmp-row cmp-highlight"><div class="cmp-cell cmp-feat">Mobile Money africain</div><div class="cmp-cell"><span class="no-val">✕ Carte Visa obligatoire</span></div><div class="cmp-cell"><span class="yes-val-gold">✓ MTN, Orange, Wave…</span></div></div>
+
+      <div class="cmp-row cmp-highlight"><div class="cmp-cell cmp-feat">Coût sur 12 mois</div><div class="cmp-cell"><span class="no-val">✕ 180 000–660 000 FCFA</span></div><div class="cmp-cell"><span class="yes-val-gold">✓ 5 000 FCFA · une fois</span></div></div>
+    </div>
+    <div class="cmp-callout">Sur 12 mois, les concurrents te coûtent jusqu'à <strong>660 000 FCFA</strong>. AKOLABS : <strong>5 000 FCFA une seule fois</strong>. La différence parle d'elle-même.</div>
+  </div>
+</section>
+
+<!-- PAYMENT -->
+<section class="section rv" id="paiement">
+  <div class="sec-label center">Moyens de paiement</div>
+  <h2 class="sec-title center">Paye avec <em>ton moyen habituel</em></h2>
+  <p class="sec-sub center">Propulsé par <strong>Genius Pay</strong> — l'agrégateur de paiement qui couvre plus de <strong>20 pays africains</strong>. Mobile Money, cartes bancaires, virements locaux. Aucune carte internationale requise.</p>
+  <div class="pm-scroll"><div class="pm-row" id="pm-track"><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/New-mtn-logo.jpg/240px-New-mtn-logo.jpg" alt="MTN MoMo" title="MTN MoMo"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#FFCC00;color:#000">MTN</div>
+          <span class="pm-item-name">MTN MoMo</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/240px-Orange_logo.svg.png" alt="Orange Money" title="Orange Money"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#FF6600;color:#fff">OM</div>
+          <span class="pm-item-name">Orange Money</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Moov_Africa_logo_2022.png/240px-Moov_Africa_logo_2022.png" alt="Moov Money" title="Moov Money"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#00A0DC;color:#fff">Moov</div>
+          <span class="pm-item-name">Moov Money</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Wave_mobile_money_logo.png/240px-Wave_mobile_money_logo.png" alt="Wave" title="Wave"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#1AC8ED;color:#fff">Wave</div>
+          <span class="pm-item-name">Wave</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Airtel_Africa_logo.svg/240px-Airtel_Africa_logo.svg.png" alt="Airtel Money" title="Airtel Money"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#E40000;color:#fff">Airtel</div>
+          <span class="pm-item-name">Airtel Money</span>
+        </div><div class="pm-item-new">
+          <div class="pm-item-fb" style="background:#CD0A00;color:#fff;display:flex">Free</div>
+          <span class="pm-item-name">Free Money</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/240px-Visa_Inc._logo.svg.png" alt="Visa" title="Visa"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#1A1F71;color:#fff">VISA</div>
+          <span class="pm-item-name">Visa</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/240px-Mastercard-logo.svg.png" alt="Mastercard" title="Mastercard"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#EB001B;color:#fff">MC</div>
+          <span class="pm-item-name">Mastercard</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/New-mtn-logo.jpg/240px-New-mtn-logo.jpg" alt="MTN MoMo" title="MTN MoMo"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#FFCC00;color:#000">MTN</div>
+          <span class="pm-item-name">MTN MoMo</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/240px-Orange_logo.svg.png" alt="Orange Money" title="Orange Money"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#FF6600;color:#fff">OM</div>
+          <span class="pm-item-name">Orange Money</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Moov_Africa_logo_2022.png/240px-Moov_Africa_logo_2022.png" alt="Moov Money" title="Moov Money"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#00A0DC;color:#fff">Moov</div>
+          <span class="pm-item-name">Moov Money</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Wave_mobile_money_logo.png/240px-Wave_mobile_money_logo.png" alt="Wave" title="Wave"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#1AC8ED;color:#fff">Wave</div>
+          <span class="pm-item-name">Wave</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Airtel_Africa_logo.svg/240px-Airtel_Africa_logo.svg.png" alt="Airtel Money" title="Airtel Money"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#E40000;color:#fff">Airtel</div>
+          <span class="pm-item-name">Airtel Money</span>
+        </div><div class="pm-item-new">
+          <div class="pm-item-fb" style="background:#CD0A00;color:#fff;display:flex">Free</div>
+          <span class="pm-item-name">Free Money</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/240px-Visa_Inc._logo.svg.png" alt="Visa" title="Visa"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#1A1F71;color:#fff">VISA</div>
+          <span class="pm-item-name">Visa</span>
+        </div><div class="pm-item-new">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/240px-Mastercard-logo.svg.png" alt="Mastercard" title="Mastercard"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pm-item-fb" style="background:#EB001B;color:#fff">MC</div>
+          <span class="pm-item-name">Mastercard</span>
+        </div></div></div>
+  <div class="pm-wa-box">
+    <div class="pm-wa-text">Ton moyen de paiement n'apparaît pas dans la liste ? Écris-nous sur WhatsApp, on trouve une solution dans la minute.</div>
+    <button class="btn-wa" onclick="App.openWa()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+      Contacter sur WhatsApp
+    </button>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section-dark rv" id="prix">
+  <div class="section-w-inner center">
+    <div class="sec-label sec-label-dark center" style="margin-bottom:12px">Tarification</div>
+    <h2 class="sec-title sec-title-dark center">Un seul prix. <em>Une seule fois.</em> Pour toujours.</h2>
+    <p class="sec-sub sec-sub-dark center" style="margin-bottom:48px">Pas de surprise. Pas d'abonnement caché. Pas de renouvellement automatique. 5 000 FCFA une seule fois, accès à tout pour toujours.</p>
+
+    <div class="price-card">
+      <div class="price-label">AKOLABS — Accès à Vie Complet</div>
+      <div class="price-amount-row">
+        <span class="price-big">5 000</span>
+        <span class="price-currency">FCFA</span>
+      </div>
+      <div style="text-align:center;margin-bottom:12px">
+        <div class="price-once">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
+          Paiement unique · Accès à vie · Jamais de renouvellement
+        </div>
+      </div>
+      <div class="price-feats">
+        <div class="pf"><div class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg></div><div class="pf-txt"><strong>Vidéos IA illimitées</strong>Veo 3.1, xAI Grok. Full HD 1080p. 9:16 & 16:9.</div></div>
+        <div class="pf"><div class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="pf-txt"><strong>Images IA illimitées</strong>Nano Banana Pro, Imagen 4. Jusqu'à 2K. 10 formats.</div></div>
+        <div class="pf"><div class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z" fill="currentColor" stroke="none" opacity=".7"/><circle cx="12" cy="12" r="10"/></svg></div><div class="pf-txt"><strong>Vidéo depuis image</strong>Anime tes visuels et photos avec l'IA.</div></div>
+        <div class="pf"><div class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg></div><div class="pf-txt"><strong>Génération illimitée</strong>Via pub ou bloqueur de pub. 0 FCFA par génération.</div></div>
+        <div class="pf"><div class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="pf-txt"><strong>Android & iOS</strong>Application native. Interface en français.</div></div>
+        <div class="pf"><div class="pf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div class="pf-txt"><strong>Accès immédiat</strong>Lien envoyé dès confirmation du paiement.</div></div>
+      </div>
+      <div class="price-cta">
+        <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta style="display:inline-flex;max-width:100%;font-size:14px;height:52px;padding:0 20px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18" style="flex-shrink:0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Obtenir mon accès maintenant
+        </a>
+      </div>
+      <div class="price-reassure">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Paiement sécurisé via Genius Pay</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Accès garanti</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Support WhatsApp</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section rv" id="faq">
+  <div class="sec-label center">FAQ</div>
+  <h2 class="sec-title center">Tes questions, <em>nos réponses</em></h2>
+  <p class="sec-sub center">Tout ce que tu veux savoir avant de passer à l'action.</p>
+
+  <div class="faq-list">
+    <div class="faq-item open">
+      <button class="faq-btn" type="button">
+        <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg></div>
+        C'est vraiment illimité ? Il n'y a pas de quota caché ?
+        <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-answer">Oui, c'est vraiment illimité. Aucun quota journalier, aucun crédit, aucun plafond mensuel. Tu génères autant que tu veux. Méthode 1 : regarde une pub de 15 à 30 secondes → génération gratuite. Méthode 2 : active un bloqueur de pub sur ton téléphone → génère sans voir aucune publicité. Dans les deux cas : zéro franc supplémentaire après ton accès initial.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" type="button">
+        <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        Le bloqueur de pub, ça marche vraiment pour générer sans pub ?
+        <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-answer">Oui. Quand tu actives un bloqueur de pub — AdGuard, DNS66 sur Android ou les options intégrées sur iOS — l'application détecte que la publicité ne peut pas se charger et te laisse quand même générer. C'est une fonctionnalité connue de l'app. Tu génères sans aucune interruption.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" type="button">
+        <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        Pourquoi payer 5 000 FCFA si la génération est gratuite après ?
+        <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-answer">Ce paiement unique correspond au coût d'accès à la plateforme AKOLABS — qui te fournit le lien de téléchargement officiel de l'application et un support dédié. Une fois l'app installée, toutes tes générations sont gratuites pour toujours. Tu paies une fois, tu génères à vie.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" type="button">
+        <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z" fill="currentColor" stroke="none" opacity=".5"/><circle cx="12" cy="12" r="10"/></svg></div>
+        Je peux générer une vidéo à partir d'une image ?
+        <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-answer">Oui. L'application te permet d'importer une image — photo personnelle ou image générée par l'IA — et de la transformer en vidéo animée. Tu peux ainsi donner vie à n'importe quel visuel. Idéal pour les publicités, les contenus créatifs et les posts viraux.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" type="button">
+        <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        Sur quels téléphones ça fonctionne ?
+        <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-answer">L'application fonctionne sur Android (APK direct) et iOS (App Store). Poids : environ 60 Mo. Android 6.0+ et iOS 15.6+ recommandés. Une connexion internet normale suffit pour générer.</div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-btn" type="button">
+        <div class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        Comment je reçois mon accès après le paiement ?
+        <svg class="faq-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="faq-answer">Dès que ton paiement est confirmé sur Genius Pay, tu reçois immédiatement le lien de téléchargement. Si tu rencontres le moindre problème, notre équipe WhatsApp est disponible et te répond rapidement.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final-sec rv">
+  <div class="final-inner">
+    <div class="sec-label center" style="margin-bottom:16px">Dernière chance d'hésiter</div>
+    <h2 class="final-title">Tu attends quoi ? <em>L'avenir, c'est maintenant.</em></h2>
+    <p class="final-sub">Des créateurs africains génèrent déjà des vidéos et images IA pendant que tu lis ces lignes. Pour 5 000 FCFA — le prix d'un repas — tu accèdes à la même technologie que les studios professionnels. Une seule fois. Pour toujours.</p>
+    <a class="hero-cta-main" href="#" onclick="event.preventDefault();App.openPay()" data-cta style="display:inline-flex;max-width:420px;font-size:15px;height:56px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Obtenir mon accès — 5 000 FCFA
+    </a>
+    <div class="final-proof">
+      <span class="fpill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Paiement sécurisé</span>
+      <span class="fpill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>Accès à vie</span>
+      <span class="fpill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Accès immédiat</span>
+      <span class="fpill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Support WhatsApp</span>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">AKOLABS</div>
+  <div class="footer-sub">Génération Vidéo & Image IA · Google Veo 3.1 · xAI Grok · Imagen 4 · Nano Banana Pro<br>5 000 FCFA · Paiement unique · Accès à vie · Génération illimitée<br><br>© 2026 AKOLABS · Tous droits réservés</div>
+</footer>
+
+<!-- FLOATING CTA -->
+<div class="float-cta" id="float-cta">
+  <a href="#" onclick="event.preventDefault();App.openPay()" data-cta>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Obtenir l'accès — 5 000 FCFA
+  </a>
+</div>
+
+<!-- WA FLOAT -->
+<button class="wa-float" onclick="App.openWa()" title="WhatsApp AKOLABS">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+</button>
+
+<!-- DOWNLOAD SUCCESS MODAL -->
+<div id="dl-ov" class="dl-ov">
+  <div class="dl-modal">
+    <div class="dl-top">
+      <div class="dl-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <div class="dl-check-ring"></div>
+      </div>
+      <div class="dl-title">Paiement confirmé !</div>
+      <div class="dl-sub">Ton accès AKOLABS est activé. Télécharge l'application et commence à générer.</div>
+      <div class="dl-details">
+        <div class="dl-detail-row"><span class="dl-detail-lbl">Produit</span><span class="dl-detail-val">AKOLABS — Accès à vie</span></div>
+        <div class="dl-detail-row"><span class="dl-detail-lbl">Montant payé</span><span class="dl-detail-val">5 000 FCFA</span></div>
+        <div class="dl-detail-row"><span class="dl-detail-lbl">Référence</span><span class="dl-detail-val" id="dl-ref">—</span></div>
+        <div class="dl-detail-row"><span class="dl-detail-lbl">Statut</span><span class="dl-detail-val" style="color:#22C55E">✓ Confirmé</span></div>
+      </div>
+    </div>
+    <div class="dl-body">
+      <div class="dl-body-title">Télécharge l'application sur ton téléphone</div>
+      <div class="dl-stores">
+        <a class="dl-store-btn android" href="https://play.google.com/store/apps/details?id=com.ainate.ai.video.generate" target="_blank" rel="noopener">
+          <div class="dl-store-icon android-ic">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.341l-.991-1.716a6.018 6.018 0 0 0-.03-7.252L17.5 4.66a.435.435 0 0 0-.757-.433l-1.012 1.752a5.982 5.982 0 0 0-7.462 0L7.257 4.227a.435.435 0 0 0-.757.433l.998 1.729A6.017 6.017 0 0 0 7.467 13.6l-.99 1.714a.435.435 0 0 0 .757.433l.978-1.694a5.982 5.982 0 0 0 7.91 0l.978 1.694a.435.435 0 0 0 .757-.433l-.01-.406zM9.5 11.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>
+          </div>
+          <div class="dl-store-info">
+            <div class="dl-store-info-top">Télécharger sur</div>
+            <div class="dl-store-info-name">Google Play</div>
+          </div>
+          <svg class="dl-store-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <a class="dl-store-btn ios" href="https://apps.apple.com/bj/app/genv-ai-video-generator/id6753915440?l=fr-FR" target="_blank" rel="noopener">
+          <div class="dl-store-icon ios-ic">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          </div>
+          <div class="dl-store-info">
+            <div class="dl-store-info-top">Télécharger sur</div>
+            <div class="dl-store-info-name">App Store (iPhone)</div>
+          </div>
+          <svg class="dl-store-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+      <button class="dl-close" onclick="App.closeDl()">Fermer — Bon générateur !</button>
+    </div>
+  </div>
+</div>
+
+<!-- WA MODAL -->
+<!-- PAYMENT MODAL -->
+<div id="pay-ov" class="pay-ov" onclick="App.closePay(event)">
+  <div class="pay-modal" id="pay-modal-box">
+
+    <!-- FORM VIEW -->
+    <div id="pay-form-view">
+      <div class="pay-modal-top">
+        <div class="pay-modal-hd">
+          <div class="pay-modal-title">Obtenir mon accès AKOLABS</div>
+          <button class="wa-close" onclick="App.closePay(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <div class="pay-modal-sub">Remplis tes informations. Tu seras redirigé vers la page de paiement sécurisée Genius Pay.</div>
+        <div class="pay-amount-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color:var(--gold)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="pay-amount-badge-val">5 000 FCFA</span>
+          <span class="pay-amount-badge-lbl">· Paiement unique · Accès à vie</span>
+        </div>
+      </div>
+
+      <div class="pay-modal-body">
+        <div class="pay-error-msg" id="pay-err"></div>
+
+        <div class="pay-field-group">
+          <div>
+            <label class="pay-lbl">Prénom</label>
+            <input type="text" class="pay-input" id="pay-fname" placeholder="Ex : Aminata" autocomplete="given-name"/>
+          </div>
+          <div>
+            <label class="pay-lbl">Nom</label>
+            <input type="text" class="pay-input" id="pay-lname" placeholder="Ex : Koné" autocomplete="family-name"/>
+          </div>
+        </div>
+
+        <label class="pay-lbl">Adresse email</label>
+        <input type="email" class="pay-input" id="pay-email" placeholder="exemple@gmail.com" autocomplete="email"/>
+        <div class="pay-hint">Le lien de téléchargement sera envoyé à cet email.</div>
+
+        <label class="pay-lbl">Numéro de téléphone (format international)</label>
+        <input type="tel" class="pay-input" id="pay-phone" placeholder="+229 01 23 45 67" autocomplete="tel"/>
+        <div class="pay-hint">Utilisé pour le paiement Mobile Money. Inclure l'indicatif pays (+229, +225, +221…)</div>
+
+        <button class="pay-btn" id="pay-btn" onclick="App.initPayment()">
+          <svg id="pay-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <div class="pay-btn-loading" id="pay-btn-spin"></div>
+          <span id="pay-btn-txt">Procéder au paiement</span>
+        </button>
+        <button class="pay-cancel" onclick="App.closePay(null)">Annuler</button>
+        <div class="pay-secure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Paiement sécurisé via Genius Pay · 20+ pays africains couverts
+        </div>
+      </div>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div class="pay-success" id="pay-success-view">
+      <div class="pay-success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="pay-success-title">Redirection en cours…</div>
+      <div class="pay-success-sub">Tu vas être redirigé vers la page de paiement Genius Pay. Si la redirection ne se fait pas automatiquement, clique sur le bouton ci-dessous.</div>
+      <a class="hero-cta-main" id="pay-redirect-btn" href="#" target="_blank" style="display:inline-flex;max-width:320px;font-size:14px;height:48px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Aller sur la page de paiement
+      </a>
+      <button class="pay-cancel" onclick="App.closePay(null)">Fermer</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="wa-ov" class="wa-ov" onclick="App.closeWa(event)">
+  <div class="wa-modal">
+    <div class="wa-modal-hd">
+      <div class="wa-modal-title">Contacter AKOLABS</div>
+      <button class="wa-close" onclick="App.closeWa(null)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="wa-modal-sub">On répond rapidement à tout : accès, paiement, problème technique ou question.</div>
+    <label class="wa-lbl">Ton prénom</label>
+    <input type="text" class="wa-input" id="wa-name" placeholder="Ex : Aminata"/>
+    <label class="wa-lbl">Sujet</label>
+    <select class="wa-input" id="wa-subject">
+      <option value="">— Choisir un sujet —</option>
+      <option>Question avant achat</option>
+      <option>Moyen de paiement indisponible</option>
+      <option>Problème d'accès après paiement</option>
+      <option>Question sur la génération vidéo</option>
+      <option>Question sur la génération d'images</option>
+      <option>Question sur le bloqueur de pub</option>
+      <option>Autre question</option>
+    </select>
+    <label class="wa-lbl">Message (optionnel)</label>
+    <textarea class="wa-input" id="wa-msg" placeholder="Décris ton besoin…"></textarea>
+    <button class="wa-send" onclick="App.sendWa()">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+      Envoyer sur WhatsApp
+    </button>
+    <button class="wa-cancel" onclick="App.closeWa(null)">Annuler</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const App = {
+  // ═══════════════════════════════════════════════════════════
+  // ⚙️  CONFIGURATION — Remplace ces valeurs par les tiennes
+  // ═══════════════════════════════════════════════════════════
+  GP_API_KEY:    'pk_live_REMPLACE_PAR_TA_CLE_PUBLIQUE',  // ← Genius Pay Dashboard → Paramètres → API
+  GP_BACKEND:    'https://akolabs-pay-backend-production.up.railway.app',         // ← URL de ton backend (voir pay-backend.js)
+  AMOUNT:        5000,
+  CURRENCY:      'XOF',
+  PRODUCT:       'AKOLABS — Accès à vie Vidéo & Image IA',
+  SUCCESS_URL:   window.location.origin + window.location.pathname + '?payment=success',   // ← Genius Pay redirige ici après succès
+  ERROR_URL:     window.location.origin + '/erreur.html',  // ← Page affichée après échec
+  WA:            '2290155956693',                           // ← Ton numéro WhatsApp
+  // ═══════════════════════════════════════════════════════════
+
+  FLAGS: [
+    {n:'Bénin',e:'🇧🇯'},{n:'Sénégal',e:'🇸🇳'},{n:"Côte d'Ivoire",e:'🇨🇮'},{n:'Cameroun',e:'🇨🇲'},
+    {n:'Mali',e:'🇲🇱'},{n:'Burkina Faso',e:'🇧🇫'},{n:'Togo',e:'🇹🇬'},{n:'Niger',e:'🇳🇪'},
+    {n:'Maroc',e:'🇲🇦'},{n:'Algérie',e:'🇩🇿'},{n:'Tunisie',e:'🇹🇳'},{n:'RDC',e:'🇨🇩'},
+    {n:'Congo',e:'🇨🇬'},{n:'Gabon',e:'🇬🇦'},{n:'Madagascar',e:'🇲🇬'},{n:'Rwanda',e:'🇷🇼'},
+    {n:'Guinée',e:'🇬🇳'},{n:'Mauritanie',e:'🇲🇷'},{n:'Tchad',e:'🇹🇩'},{n:'Djibouti',e:'🇩🇯'},
+    {n:'Comores',e:'🇰🇲'},{n:'Maurice',e:'🇲🇺'},
+  ],
+
+  PM: [
+    {name:'MTN MoMo'},{name:'Orange Money'},{name:'Moov Money'},{name:'Wave'},
+    {name:'Airtel Money'},{name:'Visa'},{name:'Mastercard'},{name:'M-Pesa'},
+    {name:'Free Money'},{name:'Sama Money'},{name:'CeltiCash'},{name:'Flooz'},
+  ],
+
+  _toast: null,
+
+  init() {
+    this.setupFloat();
+    this.setupFAQ();
+    this.setupReveal();
+    this.setupSmooth();
+    this.setupVideo();
+    this.renderFlags();
+    this.checkUrlParams();
+  },
+
+  openDl(reference) {
+    if (reference) document.getElementById('dl-ref').textContent = reference;
+    document.getElementById('dl-ov')?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  },
+
+  closeDl() {
+    document.getElementById('dl-ov')?.classList.remove('open');
+    document.body.style.overflow = '';
+  },
+
+  checkUrlParams() {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('payment') === 'success') {
+      const ref = p.get('ref') || p.get('reference') || '—';
+      setTimeout(() => this.openDl(ref), 600);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  },
+
+  // ─── PAYMENT FLOW ──────────────────────────────────────────
+
+  openPay() {
+    document.getElementById('pay-ov')?.classList.add('open');
+    document.getElementById('pay-form-view').style.display = 'block';
+    document.getElementById('pay-success-view').classList.remove('show');
+    document.getElementById('pay-err').classList.remove('show');
+    document.body.style.overflow = 'hidden';
+  },
+
+  closePay(ev) {
+    const m = document.getElementById('pay-ov');
+    if (!m) return;
+    if (ev && ev.target !== m) return;
+    m.classList.remove('open');
+    document.body.style.overflow = '';
+  },
+
+  _validate() {
+    const fname = document.getElementById('pay-fname')?.value.trim();
+    const lname = document.getElementById('pay-lname')?.value.trim();
+    const email = document.getElementById('pay-email')?.value.trim();
+    const phone = document.getElementById('pay-phone')?.value.trim();
+    if (!fname || !lname) return 'Merci d\'entrer ton prénom et ton nom.';
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Adresse email invalide.';
+    if (!phone || phone.length < 8) return 'Numéro de téléphone invalide. Inclure l\'indicatif pays (+229…)';
+    return null;
+  },
+
+  _setLoading(state) {
+    const btn  = document.getElementById('pay-btn');
+    const icon = document.getElementById('pay-btn-icon');
+    const spin = document.getElementById('pay-btn-spin');
+    const txt  = document.getElementById('pay-btn-txt');
+    btn.disabled = state;
+    icon.style.display = state ? 'none' : 'block';
+    spin.style.display = state ? 'block' : 'none';
+    txt.textContent = state ? 'Connexion à Genius Pay…' : 'Procéder au paiement';
+  },
+
+  _showErr(msg) {
+    const el = document.getElementById('pay-err');
+    el.textContent = msg;
+    el.classList.add('show');
+  },
+
+  async initPayment() {
+    const err = this._validate();
+    if (err) { this._showErr(err); return; }
+    document.getElementById('pay-err').classList.remove('show');
+
+    const fname = document.getElementById('pay-fname').value.trim();
+    const lname = document.getElementById('pay-lname').value.trim();
+    const email = document.getElementById('pay-email').value.trim();
+    const phone = document.getElementById('pay-phone').value.trim();
+
+    this._setLoading(true);
+
+    try {
+      // ─── Appel au backend (recommandé — clé secrète côté serveur) ───
+      const res = await fetch(this.GP_BACKEND, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          amount:      this.AMOUNT,
+          currency:    this.CURRENCY,
+          description: this.PRODUCT,
+          success_url: this.SUCCESS_URL,
+          error_url:   this.ERROR_URL,
+          customer: {
+            name:  `${fname} ${lname}`,
+            email: email,
+            phone: phone,
+          },
+          metadata: {
+            product: 'akolabs-acces-vie',
+            source:  'landing-page',
+          }
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.checkout_url) {
+        throw new Error(data.message || 'Erreur lors de la création du paiement.');
+      }
+
+      // ─── Redirection vers checkout Genius Pay ───
+      // La SUCCESS_URL doit pointer vers cette page avec ?payment=success&ref={reference}
+      // Le backend doit inclure ?payment=success&ref=MTX-xxx dans success_url
+      document.getElementById('pay-form-view').style.display = 'none';
+      document.getElementById('pay-success-view').classList.add('show');
+      document.getElementById('pay-redirect-btn').href = data.checkout_url;
+      setTimeout(() => { window.location.href = data.checkout_url; }, 1500);
+
+    } catch (e) {
+      this._showErr(e.message || 'Erreur réseau. Réessaie ou contacte-nous sur WhatsApp.');
+    } finally {
+      this._setLoading(false);
+    }
+  },
+
+  // ─── SETUP METHODS ─────────────────────────────────────────
+
+  setupFloat() {
+    const fc = document.getElementById('float-cta');
+    const hero = document.querySelector('.hero');
+    if (!fc || !hero) return;
+    new IntersectionObserver(([e]) => fc.classList.toggle('vis', !e.isIntersecting), {threshold: 0}).observe(hero);
+  },
+
+  setupFAQ() {
+    document.querySelectorAll('.faq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+      });
+    });
+  },
+
+  setupReveal() {
+    const els = document.querySelectorAll('.rv');
+    if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, {threshold: 0.07, rootMargin: '0px 0px -4% 0px'});
+    els.forEach(e => io.observe(e));
+  },
+
+  setupSmooth() {
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const t = document.querySelector(a.getAttribute('href') || '');
+        if (!t) return; e.preventDefault();
+        t.scrollIntoView({behavior: 'smooth', block: 'start'});
+      });
+    });
+  },
+
+  setupVideo() {
+    const v = document.getElementById('demo-vid');
+    const ph = document.getElementById('vph');
+    if (!v || !ph) return;
+    v.addEventListener('error', () => { v.style.display = 'none'; ph.style.display = 'flex'; });
+    v.addEventListener('loadeddata', () => { ph.style.display = 'none'; v.style.display = 'block'; });
+    ph.style.display = 'flex';
+  },
+
+  renderFlags() {
+    const t = document.getElementById('flags-track');
+    if (!t) return;
+    const html = this.FLAGS.map(f =>
+      `<span class="flag-item"><span class="flag-em">${f.e}</span>${this.esc(f.n)}</span>`
+    ).join('');
+    t.innerHTML = html + html;
+  },
+
+  // renderPM: now hardcoded in HTML with real logos
+
+  openWa() {
+    document.getElementById('wa-ov')?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  },
+
+  closeWa(ev) {
+    const m = document.getElementById('wa-ov');
+    if (!m) return;
+    if (ev && ev.target !== m) return;
+    m.classList.remove('open');
+    document.body.style.overflow = '';
+  },
+
+  sendWa() {
+    const name = (document.getElementById('wa-name')?.value || '').trim();
+    const subj = document.getElementById('wa-subject')?.value || '';
+    const msg  = (document.getElementById('wa-msg')?.value || '').trim();
+    if (!subj) { this.showToast('Choisis un sujet avant envoi.'); return; }
+    let txt = 'Bonjour AKOLABS !\n';
+    if (name) txt += `Je m\'appelle ${name}.\n`;
+    txt += `Sujet : ${subj}`;
+    if (msg) txt += `\n\n${msg}`;
+    txt += '\n\n(Via la page AKOLABS)';
+    window.open(`https://wa.me/${this.WA}?text=${encodeURIComponent(txt)}`, '_blank');
+    this.closeWa(null);
+  },
+
+  showToast(msg, d = 3000) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(this._toast);
+    this._toast = setTimeout(() => t.classList.remove('show'), d);
+  },
+
+  esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>
