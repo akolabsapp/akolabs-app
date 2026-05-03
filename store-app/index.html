@@ -1033,8 +1033,32 @@ textarea.wa-input{resize:vertical;min-height:90px}
   <div style="max-width:380px;margin:0 auto;background:var(--white);border:1px solid var(--border);border-radius:24px;padding:16px;box-shadow:0 20px 60px rgba(75,0,130,0.08)">
     <div style="width:100%;aspect-ratio:9/16;border-radius:16px;overflow:hidden;background:var(--ink);position:relative;border:1px solid var(--border)">
       <video controls playsinline preload="metadata" id="demo-vid" style="width:100%;height:100%;object-fit:cover;display:none">
-        <source src="../assets/videos/genv-demo.mp4" type="video/mp4"/>
+        <source src="../assets/genv-demo.mp4" type="video/mp4"/>
       </video>
+      <canvas id="demo-poster-canvas" style="display:none"></canvas>
+      <script>
+      (function(){
+        var vid = document.getElementById('demo-vid');
+        var canvas = document.getElementById('demo-poster-canvas');
+        if (!vid || !canvas) return;
+        function captureLastFrame() {
+          vid.currentTime = Math.max(0, vid.duration - 0.1);
+        }
+        function drawFrame() {
+          try {
+            canvas.width  = vid.videoWidth  || 640;
+            canvas.height = vid.videoHeight || 360;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+            var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            vid.setAttribute('poster', dataUrl);
+          } catch(e) {}
+        }
+        vid.addEventListener('loadedmetadata', captureLastFrame);
+        vid.addEventListener('seeked', drawFrame);
+        vid.load();
+      })();
+      </script>
       <div id="vph" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center">
         <div style="width:72px;height:72px;border-radius:20px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center">
           <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="rgba(201,168,76,0.9)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="rgba(201,168,76,0.9)" stroke="none"/></svg>
@@ -1523,12 +1547,12 @@ const App = {
   // ═══════════════════════════════════════════════════════════
   // ⚙️  CONFIGURATION — Remplace ces valeurs par les tiennes
   // ═══════════════════════════════════════════════════════════
-  GP_API_KEY:    'pk_live_fb5Yal0gDefCjOxl5t2EhIIpFlB1LWBy',  // ← Genius Pay Dashboard → Paramètres → API
+  GP_API_KEY:    'pk_sandbox_bM3xdt9lBmsX3szt0FUeztB05GjiTE1R',  // ← Genius Pay Dashboard → Paramètres → API
   GP_BACKEND:    'https://akolabs-pay-backend-production.up.railway.app',         // ← URL de ton backend (voir pay-backend.js)
-  AMOUNT:        200,
+  AMOUNT:        5000,
   CURRENCY:      'XOF',
   PRODUCT:       'AKOLABS — Accès à vie Vidéo & Image IA',
-  SUCCESS_URL:   window.location.origin + window.location.pathname + '?payment=success',   // ← Genius Pay redirige ici après succès
+  SUCCESS_URL:   window.location.origin + window.location.pathname + '?payment=success&ref={reference}',
   ERROR_URL:     window.location.origin + '/erreur.html',  // ← Page affichée après échec
   WA:            '2290155956693',                           // ← Ton numéro WhatsApp
   // ═══════════════════════════════════════════════════════════
@@ -1662,7 +1686,7 @@ const App = {
     const lname = document.getElementById('pay-lname').value.trim();
     const email = document.getElementById('pay-email').value.trim();
     const dial  = document.getElementById('pay-dial').value;
-    const phoneRaw = document.getElementById('pay-phone').value.trim();
+    const phoneRaw = document.getElementById('pay-phone').value.trim().replace(/^0+/, '');
     const phone = dial + phoneRaw; // ex: +22901900000
 
     // ── Sauvegarder le panier abandonné dès maintenant ──
