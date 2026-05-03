@@ -1686,7 +1686,7 @@ const App = {
     const lname = document.getElementById('pay-lname').value.trim();
     const email = document.getElementById('pay-email').value.trim();
     const dial  = document.getElementById('pay-dial').value;
-    const phoneRaw = document.getElementById('pay-phone').value.trim().replace(/^0+/, '');
+    const phoneRaw = document.getElementById('pay-phone').value.trim();
     const phone = dial + phoneRaw; // ex: +22901900000
 
     // ── Sauvegarder le panier abandonné dès maintenant ──
