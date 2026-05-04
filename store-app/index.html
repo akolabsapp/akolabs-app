@@ -27,7 +27,7 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"/></n
 (function() {
   // ─── CONFIG ─────────────────────────────────────────────────
   var SUPABASE_URL  = 'https://cwjnjmawjcphtajfzlod.supabase.co';  // ← ton URL Supabase
-  var SUPABASE_KEY  = 'sb_publishable_UJ_ykbUaJsnBqKzgvbSmoQ_scUnivc8';                   // ← ta clé anon publique
+  var SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3am5qbWF3amNwaHRhamZ6bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzY2OTAsImV4cCI6MjA4ODMxMjY5MH0.sC3ggUFUbW6ZeFR2KKj5dpBAqy10EVLmNA6kRjMVEDY';                   // ← ta clé anon publique
   var TABLE         = 'genv_page_stats';
   // ────────────────────────────────────────────────────────────
 
@@ -159,11 +159,18 @@ src="https://www.facebook.com/tr?id=978376714855213&ev=PageView&noscript=1"/></n
           'Prefer':        'return=representation'
         },
         body: JSON.stringify(payload)
-      }).then(function(r){ return r.json(); }).then(function(rows){
+      }).then(function(r){
+        if (!r.ok) {
+          r.text().then(function(t){ console.error('[AKO] Cart save erreur HTTP ' + r.status + ':', t); });
+          return [];
+        }
+        return r.json();
+      }).then(function(rows){
         if (rows && rows[0] && rows[0].id) {
+          console.log('[AKO] Panier abandonné sauvegardé:', rows[0].id);
           try { sessionStorage.setItem('ako_cart_id', rows[0].id); } catch(e) {}
         }
-      }).catch(function(){});
+      }).catch(function(e){ console.error('[AKO] Cart save fetch error:', e); });
     },
 
     // ── Marquer le panier comme converti ──
@@ -1560,7 +1567,7 @@ const App = {
   // ═══════════════════════════════════════════════════════════
   GP_API_KEY:    'pk_sandbox_bM3xdt9lBmsX3szt0FUeztB05GjiTE1R',  // ← Genius Pay Dashboard → Paramètres → API
   GP_BACKEND:    'https://akolabs-pay-backend-production.up.railway.app',         // ← URL de ton backend (voir pay-backend.js)
-  AMOUNT:        5000,
+  AMOUNT:        5250,
   CURRENCY:      'XOF',
   PRODUCT:       'AKOLABS — Accès à vie Vidéo & Image IA',
   SUCCESS_URL:   window.location.origin + window.location.pathname + '?payment=success',
