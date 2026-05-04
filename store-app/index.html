@@ -467,6 +467,31 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .btn-wa{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;background:#25D366;color:#fff;font-family:var(--fh);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s}
 .btn-wa:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,0.35)}
 .btn-wa svg{width:18px;height:18px}
+.btn-chariow{display:inline-flex;align-items:center;gap:10px;padding:13px 28px;border-radius:12px;background:#F5C300;color:#1A1200;font-family:var(--fh);font-size:15px;font-weight:800;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s;width:100%;justify-content:center}
+.btn-chariow:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,195,0,0.45)}
+.btn-chariow svg{width:20px;height:20px;flex-shrink:0}
+/* Chariow modal */
+.chariow-ov{display:none;position:fixed;inset:0;z-index:700;background:rgba(14,1,24,0.88);backdrop-filter:blur(12px);align-items:flex-end;justify-content:center}
+.chariow-ov.open{display:flex}
+.chariow-modal{background:#fff;border-radius:24px 24px 0 0;max-width:480px;width:100%;overflow-y:auto;max-height:90svh}
+.chariow-top{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.chariow-badge{display:inline-flex;align-items:center;gap:8px;background:#FFF9D6;border:1.5px solid #F5C300;border-radius:10px;padding:6px 14px}
+.chariow-badge-dot{width:8px;height:8px;border-radius:50%;background:#F5C300}
+.chariow-badge-txt{font-size:12px;font-weight:700;color:#8A6F00}
+.chariow-close{width:32px;height:32px;border-radius:50%;background:#F5F3FA;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9B8AB0}
+.chariow-close svg{width:16px;height:16px}
+.chariow-body{padding:20px 20px 32px}
+.chariow-title{font-family:var(--fh);font-size:20px;font-weight:800;color:#1A012E;margin:0 0 6px;letter-spacing:-.3px}
+.chariow-sub{font-size:14px;color:#8B6BAE;line-height:1.6;margin:0 0 24px}
+.chariow-steps{display:flex;flex-direction:column;gap:0;margin-bottom:24px}
+.chariow-step{display:flex;gap:14px;align-items:flex-start;position:relative}
+.chariow-step:not(:last-child)::after{content:'';position:absolute;left:19px;top:40px;width:2px;height:calc(100% - 8px);background:linear-gradient(to bottom,rgba(245,195,0,0.3),transparent)}
+.chariow-step-num{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#F5C300,#e6b800);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:15px;font-weight:800;color:#1A1200;flex-shrink:0;margin-bottom:16px}
+.chariow-step-content{padding-top:6px;padding-bottom:16px}
+.chariow-step-title{font-family:var(--fh);font-size:14px;font-weight:700;color:#1A012E;margin:0 0 3px}
+.chariow-step-desc{font-size:13px;color:#8B6BAE;line-height:1.5;margin:0}
+.chariow-note{background:#FFFBEB;border:1px solid rgba(245,195,0,0.3);border-radius:12px;padding:12px 16px;font-size:12px;color:#92720A;line-height:1.6;margin-bottom:20px;display:flex;gap:8px;align-items:flex-start}
+.chariow-note svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;color:#F5C300}
 
 /* ═══ PRICING ═══ */
 .price-card{position:relative;border-radius:24px;background:linear-gradient(160deg,#1a0035,#2D0060 40%,#3d0080);overflow:hidden;padding:32px 20px;max-width:720px;margin:0 auto}
@@ -1206,10 +1231,10 @@ textarea.wa-input{resize:vertical;min-height:90px}
           <span class="pm-item-name">Mastercard</span>
         </div></div></div>
   <div class="pm-wa-box">
-    <div class="pm-wa-text">Ton moyen de paiement n'apparaît pas dans la liste ? Écris-nous sur WhatsApp, on trouve une solution dans la minute.</div>
-    <button class="btn-wa" onclick="App.openWa()">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
-      Contacter sur WhatsApp
+    <div class="pm-wa-text">Ton moyen de paiement n'apparaît pas dans la liste ? Paye directement via <strong style="color:#1A012E;">Chariow</strong> — accepte la plupart des moyens de paiement locaux.</div>
+    <button class="btn-chariow" onclick="App.openChariow()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Payer via Chariow
     </button>
   </div>
 </section>
@@ -1558,6 +1583,67 @@ textarea.wa-input{resize:vertical;min-height:90px}
   </div>
 </div>
 
+<!-- CHARIOW MODAL -->
+<div id="chariow-ov" class="chariow-ov" onclick="App.closeChariow(event)">
+  <div class="chariow-modal">
+
+    <div class="chariow-top">
+      <div class="chariow-badge">
+        <div class="chariow-badge-dot"></div>
+        <span class="chariow-badge-txt">Paiement alternatif</span>
+      </div>
+      <button class="chariow-close" onclick="App.closeChariow(null)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="chariow-body">
+      <h2 class="chariow-title">Payer via Chariow</h2>
+      <p class="chariow-sub">Suis ces 3 étapes simples pour obtenir ton accès AKOLABS via la plateforme Chariow.</p>
+
+      <div class="chariow-steps">
+        <div class="chariow-step">
+          <div class="chariow-step-num">1</div>
+          <div class="chariow-step-content">
+            <p class="chariow-step-title">Tu es redirigé vers la page de paiement Chariow</p>
+            <p class="chariow-step-desc">Une page de checkout sécurisée s'ouvre. Tu y trouveras plusieurs moyens de paiement disponibles selon ton pays.</p>
+          </div>
+        </div>
+        <div class="chariow-step">
+          <div class="chariow-step-num">2</div>
+          <div class="chariow-step-content">
+            <p class="chariow-step-title">Tu effectues ton paiement de 5 000 FCFA</p>
+            <p class="chariow-step-desc">Choisis ton moyen de paiement préféré et finalise la transaction. Tu reçois une confirmation immédiate.</p>
+          </div>
+        </div>
+        <div class="chariow-step">
+          <div class="chariow-step-num">3</div>
+          <div class="chariow-step-content">
+            <p class="chariow-step-title">Clique sur le lien de redirection affiché</p>
+            <p class="chariow-step-desc">Après le paiement, Chariow affiche un lien. Clique dessus — tu arrives directement sur la page de téléchargement avec les boutons <strong style="color:#1A012E;">Google Play</strong> et <strong style="color:#1A012E;">App Store</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chariow-note">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span>Si tu ne vois pas le lien automatiquement après paiement, actualise la page Chariow ou reviens sur <strong>akolabs.store</strong> — ton accès est activé dès que le paiement est confirmé.</span>
+      </div>
+
+      <a href="https://akolabs.mychariow.shop/prd_r0r8lc/checkout"
+         target="_blank"
+         class="btn-chariow"
+         style="text-decoration:none;"
+         onclick="App.closeChariow(null)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Aller sur la page de paiement Chariow
+      </a>
+      <button onclick="App.closeChariow(null)" style="width:100%;padding:12px;background:transparent;color:#9B8AB0;border:none;cursor:pointer;font-size:13px;margin-top:8px;font-family:var(--fb);">Annuler</button>
+    </div>
+
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1843,6 +1929,19 @@ const App = {
 
   closeWa(ev) {
     const m = document.getElementById('wa-ov');
+    if (!m) return;
+    if (ev && ev.target !== m) return;
+    m.classList.remove('open');
+    document.body.style.overflow = '';
+  },
+
+  openChariow() {
+    document.getElementById('chariow-ov')?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  },
+
+  closeChariow(ev) {
+    const m = document.getElementById('chariow-ov');
     if (!m) return;
     if (ev && ev.target !== m) return;
     m.classList.remove('open');
