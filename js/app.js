@@ -240,7 +240,12 @@ var App = {
 
             var profile = profileResult.data;
 
-            if (!profile.is_app_purchased) {
+            // ── ACCÈS : anciens membres (is_app_purchased) OU nouveaux (free_trial/monthly/quarterly)
+            var plan = profile.subscription_plan || 'lifetime';
+            var isNewPlan = (plan === 'free_trial' || plan === 'monthly' || plan === 'quarterly');
+            var isLegacy  = isLegacyPlan ? isLegacyPlan(plan) : (['lifetime','starter','pro','premium'].indexOf(plan) !== -1 || plan.indexOf('expired_') === 0);
+
+            if (!profile.is_app_purchased && !isNewPlan) {
                 console.log('[App] Acces non achete');
                 await db.auth.signOut();
                 App.hideSplash();
@@ -249,14 +254,24 @@ var App = {
             }
 
             // ── VÉRIFICATION ABONNEMENT ──
-            // Les anciens membres (lifetime) ont subscription_plan = 'lifetime' ou null
-            // Pro/Premium : vérifier expiration
-            var plan = profile.subscription_plan || 'lifetime';
             var expiresAt = profile.subscription_expires_at ? new Date(profile.subscription_expires_at) : null;
             var now = new Date();
 
+            // Anciens plans expirés (pro/premium)
             if ((plan === 'pro' || plan === 'premium') && expiresAt && expiresAt < now) {
-                // Abonnement expiré → rétrograder en starter
+                console.log('[App] Abonnement legacy', plan, 'expiré');
+                try {
+                    await db.from('users')
+                        .update({ subscription_plan: 'expired_' + plan })
+                        .eq('id', profile.id);
+                    profile.subscription_plan = 'expired_' + plan;
+                    profile._subscription_expired = true;
+                    profile._expired_plan = plan;
+                } catch(e) { console.warn('[App] Update expiration:', e); }
+            }
+
+            // Nouveaux plans expirés (monthly/quarterly)
+            if ((plan === 'monthly' || plan === 'quarterly') && expiresAt && expiresAt < now) {
                 console.log('[App] Abonnement', plan, 'expiré le', expiresAt);
                 try {
                     await db.from('users')
@@ -266,6 +281,19 @@ var App = {
                     profile._subscription_expired = true;
                     profile._expired_plan = plan;
                 } catch(e) { console.warn('[App] Update expiration:', e); }
+            }
+
+            // Essai gratuit expiré (30 jours)
+            if (plan === 'free_trial') {
+                var trialStart = profile.free_trial_started_at
+                    ? new Date(profile.free_trial_started_at)
+                    : new Date(profile.created_at || Date.now());
+                var trialDaysLeft = 30 - Math.floor((now - trialStart) / (1000 * 60 * 60 * 24));
+                if (trialDaysLeft <= 0) {
+                    console.log('[App] Essai gratuit expiré');
+                    profile._trial_expired = true;
+                }
+                profile._trial_days_left = Math.max(0, trialDaysLeft);
             }
 
             // Calculer jours restants et exposer globalement
@@ -562,8 +590,11 @@ var App = {
         h += '<span class="btn-text">Se connecter</span>';
         h += '</button>';
         h += '<div class="login-divider">ou</div>';
-        h += '<button class="btn btn-outline btn-block" onclick="window.open(\'' + CONFIG.LANDING_URL + '\', \'_blank\')">';
-        h += '<i class="fas fa-shopping-cart"></i> Acheter l\'acces';
+        h += '<button class="btn btn-outline btn-block" onclick="App.showFreeRegisterPage()" style="border-color:rgba(61,219,125,0.4);color:#3DDB7D;">';
+        h += '<i class="fas fa-gift"></i> Essayer gratuitement — 30 jours';
+        h += '</button>';
+        h += '<button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="window.open(\'' + CONFIG.LANDING_URL + '\', \'_blank\')">';
+        h += '<i class="fas fa-crown"></i> Voir les plans (3 500 F / mois)';
         h += '</button>';
         h += '</div>';
 
@@ -649,10 +680,194 @@ var App = {
             if (App.sessionCheckTimer) clearInterval(App.sessionCheckTimer);
         } catch (e) {}
         window.location.reload();
+    },
+
+    // ---- INSCRIPTION GRATUITE (Essai 30 jours) ----
+    showFreeRegisterPage: function() {
+        var existing = document.getElementById('login-page');
+        if (existing) existing.remove();
+
+        var page = document.createElement('div');
+        page.id = 'login-page';
+        page.className = 'login-container';
+
+        var countryOptions = '';
+        var codes = CONFIG.COUNTRY_DIAL_CODES || {};
+        Object.keys(codes).forEach(function(code) {
+            var c = codes[code];
+            countryOptions += '<option value="' + code + '" data-dial="' + c.dial + '">' + c.flag + ' ' + c.name + ' (' + c.dial + ')</option>';
+        });
+
+        var h = '';
+        h += '<div class="login-card" style="max-height:90vh;overflow-y:auto;">';
+        h += '<img src="assets/images/logo.png" alt="AKOLABS" class="login-logo" onerror="this.style.display:none">';
+        h += '<h1 class="login-title" style="font-size:18px;">Essai Gratuit — 30 jours</h1>';
+        h += '<p class="login-subtitle" style="font-size:12px;color:#3DDB7D;">Accès aux sections gratuites. Aucune carte requise.</p>';
+
+        h += '<div class="input-group">';
+        h += '<label class="input-label">Nom complet *</label>';
+        h += '<input type="text" class="input-field" id="reg-name" placeholder="Ex: Jean Dupont">';
+        h += '</div>';
+
+        h += '<div class="input-group">';
+        h += '<label class="input-label">Email *</label>';
+        h += '<input type="email" class="input-field" id="reg-email" placeholder="votre@email.com">';
+        h += '</div>';
+
+        h += '<div class="input-group">';
+        h += '<label class="input-label">Pays *</label>';
+        h += '<select class="input-field" id="reg-country" onchange="App.onCountryChange(this)" style="appearance:none;background-color:#1A1A2E;">';
+        h += '<option value="">-- Choisir le pays --</option>';
+        h += countryOptions;
+        h += '</select>';
+        h += '</div>';
+
+        h += '<div class="input-group">';
+        h += '<label class="input-label">Numéro WhatsApp *</label>';
+        h += '<div style="display:flex;gap:8px;">';
+        h += '<input type="text" class="input-field" id="reg-dial" value="+229" readonly style="width:90px;flex-shrink:0;text-align:center;background:rgba(255,255,255,0.05);">';
+        h += '<input type="tel" class="input-field" id="reg-whatsapp" placeholder="XX XX XX XX" style="flex:1;">';
+        h += '</div>';
+        h += '</div>';
+
+        h += '<div class="input-group">';
+        h += '<label class="input-label">Mot de passe *</label>';
+        h += '<input type="password" class="input-field" id="reg-pass" placeholder="Minimum 6 caractères">';
+        h += '</div>';
+
+        h += '<div class="input-group">';
+        h += '<label class="input-label">Confirmer le mot de passe *</label>';
+        h += '<input type="password" class="input-field" id="reg-pass2" placeholder="Retapez votre mot de passe">';
+        h += '</div>';
+
+        h += '<button class="btn btn-primary btn-block btn-lg mt-lg" id="btn-register" onclick="App.handleFreeRegister()">';
+        h += '<i class="fas fa-gift"></i> <span class="btn-text">Créer mon compte gratuit</span>';
+        h += '</button>';
+
+        h += '<button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="App.showLoginPage()">';
+        h += '<i class="fas fa-arrow-left"></i> Retour à la connexion';
+        h += '</button>';
+        h += '</div>';
+
+        page.innerHTML = h;
+        document.body.appendChild(page);
+    },
+
+    onCountryChange: function(select) {
+        var opt = select.options[select.selectedIndex];
+        var dial = opt ? opt.getAttribute('data-dial') : '+229';
+        var dialInput = document.getElementById('reg-dial');
+        if (dialInput && dial) dialInput.value = dial;
+    },
+
+    handleFreeRegister: async function() {
+        var name     = (document.getElementById('reg-name') || {}).value || '';
+        var email    = (document.getElementById('reg-email') || {}).value || '';
+        var country  = (document.getElementById('reg-country') || {}).value || '';
+        var dial     = (document.getElementById('reg-dial') || {}).value || '';
+        var waPhone  = (document.getElementById('reg-whatsapp') || {}).value || '';
+        var pass     = (document.getElementById('reg-pass') || {}).value || '';
+        var pass2    = (document.getElementById('reg-pass2') || {}).value || '';
+        var btn      = document.getElementById('btn-register');
+
+        name    = name.trim();
+        email   = email.trim();
+        waPhone = waPhone.trim();
+
+        if (!name || name.length < 2) { Utils.showToast('Entrez votre nom complet', 'warning'); return; }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { Utils.showToast('Email invalide', 'warning'); return; }
+        if (!country) { Utils.showToast('Choisissez votre pays', 'warning'); return; }
+        if (!waPhone || waPhone.replace(/\D/g, '').length < 6) { Utils.showToast('Numéro WhatsApp invalide', 'warning'); return; }
+        if (!pass || pass.length < 6) { Utils.showToast('Mot de passe: minimum 6 caractères', 'warning'); return; }
+        if (pass !== pass2) { Utils.showToast('Les mots de passe ne correspondent pas', 'error'); return; }
+
+        var whatsappFull = dial + waPhone.replace(/\D/g, '');
+
+        if (btn) { btn.classList.add('btn-loading'); btn.disabled = true; }
+
+        try {
+            // Vérifier si email existe
+            var checkRes = await db.from('users').select('id').eq('email', email).maybeSingle();
+            if (checkRes.data) {
+                Utils.showToast('Cet email est déjà utilisé. Connectez-vous.', 'error');
+                if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
+                return;
+            }
+
+            // Créer le compte
+            var signUpRes = await db.auth.signUp({
+                email: email,
+                password: pass,
+                options: {
+                    data: {
+                        full_name: name,
+                        phone: whatsappFull,
+                        whatsapp_number: whatsappFull,
+                        country: country,
+                        subscription_plan: 'free_trial'
+                    }
+                }
+            });
+
+            if (signUpRes.error) throw signUpRes.error;
+
+            var userId = signUpRes.data.user ? signUpRes.data.user.id : null;
+
+            // Attendre le trigger Supabase
+            await new Promise(function(r) { setTimeout(r, 2000); });
+
+            // Mettre à jour le profil
+            if (userId) {
+                await db.from('users').update({
+                    whatsapp_number: whatsappFull,
+                    country: country,
+                    country_code: dial,
+                    subscription_plan: 'free_trial',
+                    free_trial_started_at: new Date().toISOString(),
+                    is_app_purchased: false
+                }).eq('id', userId).catch(function(e) { console.warn('[FreeReg] Update:', e); });
+            }
+
+            Utils.showToast('Compte créé avec succès ! Connexion...', 'success', 3000);
+
+            // Connexion automatique
+            var signInRes = await db.auth.signInWithPassword({ email: email, password: pass });
+            if (signInRes.error) {
+                console.warn('[FreeReg] Auto-login:', signInRes.error);
+                Utils.showToast('Compte créé ! Connectez-vous.', 'success');
+                App.showLoginPage();
+            } else {
+                setTimeout(function() { window.location.reload(); }, 1200);
+            }
+
+        } catch (err) {
+            console.error('[FreeReg] Erreur:', err);
+            var msg = err.message || 'Erreur lors de l\'inscription';
+            if (msg.toLowerCase().indexOf('already') !== -1) {
+                msg = 'Cet email est déjà utilisé. Connectez-vous.';
+            }
+            Utils.showToast(msg, 'error');
+        }
+
+        if (btn) { btn.classList.remove('btn-loading'); btn.disabled = false; }
     }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Gérer le hash #free-register (venant de la landing page)
+    if (window.location.hash === '#free-register') {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Laisser App.init() démarrer normalement, puis afficher l'inscription
+        var origInit = App.init;
+        App.init = async function() {
+            await origInit.call(App);
+            // Si pas connecté, montrer directement l'inscription gratuite
+            var session = await db.auth.getSession();
+            if (!session.data || !session.data.session) {
+                App.showFreeRegisterPage();
+            }
+        };
+    }
     App.init();
 });
 // ============================================================
