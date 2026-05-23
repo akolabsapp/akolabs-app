@@ -470,13 +470,9 @@ var HomePage = {
             usersHTML = '<span class="section-card-users"><i class="fas fa-users"></i> ' + section.total_users + '</span>';
         }
 
-        // Route — APK va toujours sur /section/ (page détail avec bouton download)
-        var route;
-        if (section.type === 'apk') {
-            route = '/section/' + section.id;
-        } else {
-            route = (hasAccess || isFree) ? '/webview/' + section.id : '/section/' + section.id;
-        }
+        // Route — TOUS les types passent par /section/ d'abord (page descriptive obligatoire)
+        // L'accès direct webview/formation se fait depuis la page de détail
+        var route = '/section/' + section.id;
 
         // Bouton APK spécifique
         if (section.type === 'apk') {

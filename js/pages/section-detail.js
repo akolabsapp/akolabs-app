@@ -253,10 +253,9 @@ var SectionDetail = {
         var h = '';
         h += '<div class="access-granted-box">';
         h += '<div class="access-granted-icon"><i class="fas fa-check-circle"></i></div>';
-        h += '<div class="access-granted-title">Acces debloque !</div>';
+        h += '<div class="access-granted-title">Accès débloqué !</div>';
 
         if (s.type === 'apk') {
-            // Bouton téléchargement APK
             var apkUrl = s.download_url || '';
             h += '<div class="access-granted-desc">Votre accès est confirmé. Téléchargez l\'application ci-dessous.</div>';
             if (apkUrl) {
@@ -274,23 +273,53 @@ var SectionDetail = {
             }
 
         } else if (s.type === 'webview') {
-            h += '<div class="access-granted-desc">Vous avez acces a cette section. Profitez-en !</div>';
+            h += '<div class="access-granted-desc">Cliquez sur le bouton ci-dessous pour accéder à cet outil.</div>';
             if (s.open_in_browser && s.site_url) {
-                h += '<button class="btn btn-success btn-lg btn-block" onclick="window.open(\'' + (s.site_url||'') + '\',\'_blank\')">';
-                h += '<i class="fas fa-external-link-alt"></i> Ouvrir l\'outil</button>';
+                h += '<button class="btn btn-success btn-lg btn-block" onclick="SectionDetail.navigateToContent()">';
+                h += '<i class="fas fa-external-link-alt"></i> Accéder à l\'outil</button>';
             } else {
-                h += '<button class="btn btn-success btn-lg btn-block" onclick="Router.navigate(\'/webview/' + s.id + '\')">';
-                h += '<i class="fas fa-external-link-alt"></i> Ouvrir l\'outil</button>';
+                h += '<button class="btn btn-success btn-lg btn-block" onclick="SectionDetail.navigateToContent()">';
+                h += '<i class="fas fa-external-link-alt"></i> Accéder à l\'outil</button>';
             }
 
         } else {
-            h += '<div class="access-granted-desc">Vous avez acces a cette formation. Profitez-en !</div>';
-            h += '<button class="btn btn-success btn-lg btn-block" onclick="Router.navigate(\'/formation/' + s.id + '\')">';
-            h += '<i class="fas fa-graduation-cap"></i> Acceder a la formation</button>';
+            h += '<div class="access-granted-desc">Cliquez sur le bouton ci-dessous pour accéder à la formation.</div>';
+            h += '<button class="btn btn-success btn-lg btn-block" onclick="SectionDetail.navigateToContent()">';
+            h += '<i class="fas fa-graduation-cap"></i> Accéder à la formation</button>';
         }
 
         h += '</div>';
         return h;
+    },
+
+    // ---- NAVIGATION VERS LE CONTENU ----
+    navigateToContent: function() {
+        var s = SectionDetail.section;
+        if (!s) return;
+
+        var plan = App.profile ? (App.profile.subscription_plan || 'lifetime') : 'lifetime';
+        var isFreeTrialExpired = (plan === 'free_trial' && App.profile && App.profile._trial_expired);
+        var isExpiredSub = plan && (plan.indexOf('expired_') === 0);
+
+        // Section payante + utilisateur essai gratuit ou expiré → ouvrir modal abonnement
+        if (!s.is_free && (plan === 'free_trial' || isFreeTrialExpired || isExpiredSub)) {
+            if (typeof SubscriptionModal !== 'undefined') {
+                SubscriptionModal.show(s.title);
+            } else {
+                window.open(CONFIG.LANDING_URL, '_blank');
+            }
+            return;
+        }
+
+        if (s.type === 'webview') {
+            if (s.open_in_browser && s.site_url) {
+                window.open(s.site_url, '_blank');
+            } else {
+                Router.navigate('/webview/' + s.id);
+            }
+        } else {
+            Router.navigate('/formation/' + s.id);
+        }
     },
 
     // ---- MODULE D'ACHAT ----
