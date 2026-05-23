@@ -1536,13 +1536,6 @@ const PLANS = {
         subscriptionMonths: null
     }
 };
-            'Support prioritaire WhatsApp'
-        ],
-        excludedSlugs: [],
-        excludedTitles: [],
-        subscriptionMonths: 3
-    }
-};
 
 const LandingApp = {
     currentPlan: null,
@@ -2080,8 +2073,6 @@ const LandingApp = {
                 if (purchaseResult.error) console.error('[Landing] Erreur insert achat:', purchaseResult.error);
                 else { LandingApp.trackConversion(); console.log('[Landing] Achat enregistré'); }
             } catch(e) { console.error('[Landing] Insert achat exception:', e); }
-                });
-            } catch(e) {}
 
             // 10. Email AVANT signOut
             try {
