@@ -11,15 +11,17 @@ var CONFIG = {
     CLOUDINARY_CLOUD_NAME: 'dtowyvewa',
     CLOUDINARY_UPLOAD_PRESET: 'akolabs_uploads',
 
-    // ---- PAIEMENT — 100% via Supabase Edge Functions --------
-    // ⚠️  NE JAMAIS mettre de clés secrètes ici !
-    // Toutes les clés sont dans Supabase → Edge Functions → Secrets :
-    //   FEEXPAY_TOKEN, FEEXPAY_STORE, GP_SECRET_KEY, GP_API_BASE,
-    //   RESEND_API_KEY, EMAIL_FROM, SUPABASE_SERVICE_KEY
-    PAYMENT_EDGE_FN:  'https://cwjnjmawjcphtajfzlod.supabase.co/functions/v1/create-payment',
-    EMAIL_EDGE_FN:    'https://cwjnjmawjcphtajfzlod.supabase.co/functions/v1/send-email',
+    // ---- PAIEMENT -----------------------------------------------
+    // FeexPay : clés publiques (client-side SDK — safe dans le front)
+    FEEXPAY_TOKEN:    'fp_Q0xDAmiPXr2By3u6ssdl7QEh57lbhDdpfahYKqzHjsl232IaxJJqECaaoGPjIs0w',
+    FEEXPAY_STORE:    '69d491975c79429d57e5ffa2',
     FEEXPAY_CALLBACK_URL: 'https://akolabs.store/',
     FEEXPAY_CURRENCY: 'XOF',
+
+    // GeniusPay : clé secrète → NE JAMAIS mettre ici → stockée dans Supabase Secrets
+    // Appel via Edge Function uniquement :
+    PAYMENT_EDGE_FN:  'https://cwjnjmawjcphtajfzlod.supabase.co/functions/v1/create-payment',
+    EMAIL_EDGE_FN:    'https://cwjnjmawjcphtajfzlod.supabase.co/functions/v1/send-email',
 
     // ---- Pays routés vers FeexPay (les autres → GeniusPay) ----
     FEEXPAY_COUNTRIES: ['BJ', 'CI', 'TG', 'SN'],
