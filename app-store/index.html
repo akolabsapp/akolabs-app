@@ -812,7 +812,7 @@ body.landing-body {
         <img src="../assets/images/logo.png" alt="AKOLABS" onerror="this.style.display='none'">
         AKOLABS
     </div>
-    <button onclick="LandingApp.openPlanModal('pro')" class="lnav-cta">
+    <button onclick="LandingApp.openPlanModal('monthly')" class="lnav-cta">
         <i class="fas fa-bolt"></i> Obtenir l'accès
     </button>
 </nav>
@@ -1115,40 +1115,37 @@ body.landing-body {
 <!-- PLANS D'ABONNEMENT -->
 <section class="lsec plans-section" id="plans">
     <h2 class="lsec-title">Choisis ton <span class="accent">plan</span></h2>
-    <p class="lsec-sub">Commence avec ce qui te convient. Upgrade quand tu veux.</p>
+    <p class="lsec-sub">Commence gratuitement. Upgrade en un clic quand tu es prêt.</p>
 
     <div class="plans-grid">
-        <!-- STARTER -->
+        <!-- ESSAI GRATUIT -->
         <div class="plan-card">
-            <div class="plan-name">Starter</div>
-            <div class="plan-duration">Accès limité — 1 mois</div>
+            <div class="plan-name" style="color:#FFB347;">🎁 Essai Gratuit</div>
+            <div class="plan-duration">30 jours — Sections gratuites</div>
             <div class="plan-price-wrap">
-                <div class="plan-price-old">5 000 F</div>
-                <div class="plan-price">2 000 F <span>paiement unique</span></div>
+                <div class="plan-price" style="color:#FFB347;">0 F <span>aucune carte requise</span></div>
             </div>
             <ul class="plan-features">
-                <li><i class="fas fa-check pf-check"></i> AKOLABS Universe (outils IA)</li>
-                <li><i class="fas fa-check pf-check"></i> AKOLABS Learning (formations)</li>
-                <li><i class="fas fa-check pf-check"></i> Système d'affiliation</li>
-                <li><i class="fas fa-check pf-check"></i> Accès à vie aux contenus inclus</li>
-                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS App Prime</li>
+                <li><i class="fas fa-check pf-check"></i> Sections gratuites du catalogue</li>
+                <li><i class="fas fa-check pf-check"></i> Accès à AKOLABS App pendant 30j</li>
+                <li><i class="fas fa-check pf-check"></i> Système d'affiliation 10%</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS App Prime (APKs)</li>
                 <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS IA 2</li>
                 <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Ebook</li>
-                <li class="excluded"><i class="fas fa-times pf-x"></i> AKOLABS Learning Premium</li>
+                <li class="excluded"><i class="fas fa-times pf-x"></i> Learning Premium</li>
             </ul>
-            <button onclick="LandingApp.openPlanModal('starter')" class="btn-plan btn-plan-secondary">
-                <i class="fas fa-arrow-right"></i> Commencer avec Starter
+            <button onclick="LandingApp.openFreeRegister()" class="btn-plan btn-plan-secondary" style="border-color:rgba(255,179,71,0.5);color:#FFB347;">
+                <i class="fas fa-gift"></i> Essayer gratuitement
             </button>
         </div>
 
-        <!-- PRO -->
+        <!-- MENSUEL -->
         <div class="plan-card plan-featured">
             <div class="plan-badge">⚡ Populaire</div>
-            <div class="plan-name">Pro</div>
-            <div class="plan-duration">Accès complet — 1 mois</div>
+            <div class="plan-name">Mensuel</div>
+            <div class="plan-duration">Accès complet — 30 jours</div>
             <div class="plan-price-wrap">
-                <div class="plan-price-old">15 000 F</div>
-                <div class="plan-price">3 000 F <span>/ mois</span></div>
+                <div class="plan-price">3 500 F <span>/ mois</span></div>
             </div>
             <ul class="plan-features">
                 <li><i class="fas fa-check pf-check"></i> <strong>Tout le catalogue AKOLABS</strong></li>
@@ -1159,32 +1156,31 @@ body.landing-body {
                 <li><i class="fas fa-check pf-check"></i> Affiliation 10% de commission</li>
                 <li><i class="fas fa-check pf-check"></i> Nouvelles sections incluses</li>
             </ul>
-            <button onclick="LandingApp.openPlanModal('pro')" class="btn-plan btn-plan-primary">
-                <i class="fas fa-rocket"></i> Obtenir l'accès Pro
+            <button onclick="LandingApp.openPlanModal('monthly')" class="btn-plan btn-plan-primary">
+                <i class="fas fa-rocket"></i> S'abonner — 3 500 F / mois
             </button>
         </div>
 
-        <!-- PREMIUM -->
+        <!-- TRIMESTRIEL -->
         <div class="plan-card">
             <div class="plan-badge" style="background:linear-gradient(135deg,#6A1B9A,#4B0082);color:#C9A84C;border:1px solid #C9A84C;">💎 Best value</div>
-            <div class="plan-name">Premium</div>
+            <div class="plan-name">Trimestriel</div>
             <div class="plan-duration">Accès complet — 3 mois</div>
             <div class="plan-price-wrap">
-                <div class="plan-price-old">45 000 F</div>
-                <div class="plan-price">5 500 F <span>/ 3 mois</span></div>
+                <div class="plan-price">7 500 F <span>/ 3 mois</span></div>
             </div>
             <div style="background:rgba(61,219,125,0.08);border:1px solid rgba(61,219,125,0.2);border-radius:10px;padding:10px;margin-bottom:14px;text-align:center;">
-                <span style="font-size:12px;color:#3DDB7D;font-weight:600;">🎁 Économise 3 000 F vs 3× Pro</span>
+                <span style="font-size:12px;color:#3DDB7D;font-weight:600;">🎁 Économise 3 000 F vs 3× Mensuel</span>
             </div>
             <ul class="plan-features">
-                <li><i class="fas fa-check pf-check"></i> <strong>Tout ce que contient Pro</strong></li>
+                <li><i class="fas fa-check pf-check"></i> <strong>Tout ce que contient Mensuel</strong></li>
                 <li><i class="fas fa-check pf-check"></i> 3 mois d'accès complet garanti</li>
-                <li><i class="fas fa-check pf-check"></i> Économie de 3 000 F sur le Pro</li>
+                <li><i class="fas fa-check pf-check"></i> Économie de 3 000 F vs mensuel</li>
                 <li><i class="fas fa-check pf-check"></i> Priorité sur les nouveautés</li>
                 <li><i class="fas fa-check pf-check"></i> Support prioritaire WhatsApp</li>
             </ul>
-            <button onclick="LandingApp.openPlanModal('premium')" class="btn-plan btn-plan-secondary">
-                <i class="fas fa-gem"></i> Choisir Premium
+            <button onclick="LandingApp.openPlanModal('quarterly')" class="btn-plan btn-plan-secondary">
+                <i class="fas fa-gem"></i> Choisir Trimestriel — 7 500 F
             </button>
         </div>
     </div>
@@ -1206,11 +1202,11 @@ body.landing-body {
 
     <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-            <span>Quelle différence entre Starter, Pro et Premium ?</span>
+            <span>Quelle différence entre Essai Gratuit, Mensuel et Trimestriel ?</span>
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>Le <strong>Starter à 2 000F</strong> donne accès à la majorité du catalogue (Universe + Learning de base) sans durée limite. Le <strong>Pro à 3 000F/mois</strong> débloque tout le catalogue pendant 1 mois. Le <strong>Premium à 5 500F</strong> donne accès complet pendant 3 mois avec une économie de 3 000F par rapport à 3 mois de Pro.</p>
+            <p>L'<strong>Essai Gratuit</strong> est 100% gratuit, sans carte requise — il donne accès aux sections gratuites pendant 30 jours. Le <strong>Mensuel à 3 500F</strong> débloque tout le catalogue pendant 1 mois. Le <strong>Trimestriel à 7 500F</strong> donne accès complet pendant 3 mois avec une économie de 3 000F par rapport à 3 mois de mensuel.</p>
         </div>
     </div>
 
@@ -1226,11 +1222,11 @@ body.landing-body {
 
     <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-            <span>Que se passe-t-il quand mon abonnement Pro/Premium expire ?</span>
+            <span>Que se passe-t-il quand mon abonnement expire ?</span>
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>Quand ton abonnement expire, tu passes automatiquement sur le niveau Starter — tu gardes l'accès à ton compte et aux contenus Starter. Tu peux renouveler à tout moment depuis l'app pour retrouver l'accès complet.</p>
+            <p>Quand ton abonnement Mensuel ou Trimestriel expire, tu retrouves automatiquement le niveau Essai Gratuit — accès limité aux sections gratuites. Tu peux renouveler à tout moment directement dans l'app en un clic pour retrouver l'accès complet instantanément.</p>
         </div>
     </div>
 
@@ -1240,7 +1236,7 @@ body.landing-body {
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>Dès ton inscription, tu reçois un lien d'affiliation unique. Chaque personne qui achète AKOLABS via ton lien te rapporte 10% de commission. Certains membres ont déjà rentabilisé leur accès en 48h simplement en partageant dans leurs groupes WhatsApp.</p>
+            <p>Dès ton inscription, tu reçois un lien d'affiliation unique. Chaque personne qui s'abonne à AKOLABS via ton lien te rapporte 10% de commission. Certains membres ont déjà rentabilisé leur abonnement en 48h simplement en partageant dans leurs groupes WhatsApp.</p>
         </div>
     </div>
 
@@ -1256,11 +1252,11 @@ body.landing-body {
 
     <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('active')">
-            <span>Comment puis-je accéder à AKOLABS après l'achat ?</span>
+            <span>Comment puis-je accéder à AKOLABS après l'abonnement ?</span>
             <i class="fas fa-chevron-down"></i>
         </button>
         <div class="faq-answer">
-            <p>Dès que ton paiement est confirmé, ton compte est créé automatiquement. Tu reçois un email avec tes identifiants et le lien d'accès. Ouvre le lien sur ton téléphone, connecte-toi, et installe l'app sur ton écran d'accueil.</p>
+            <p>Dès que ton paiement est confirmé, ton accès est activé immédiatement. Si tu as déjà un compte (essai gratuit), tu n'as rien à faire — connecte-toi et profite. Si tu es nouveau, ton compte est créé automatiquement avec un email de confirmation.</p>
         </div>
     </div>
 </section>
@@ -1304,26 +1300,59 @@ body.landing-body {
                 <div id="pmodal-includes-list"></div>
             </div>
 
-            <div class="pmodal-form-divider">Créer votre compte</div>
+            <div class="pmodal-form-divider" id="pmodal-form-divider-text">Créer votre compte</div>
 
             <div id="pmodal-form-area">
-                <div class="pmodal-input-group">
+                <div class="pmodal-input-group" id="pm-name-group">
                     <label class="pmodal-input-label">Nom complet *</label>
                     <input type="text" class="pmodal-input" id="pm-name" placeholder="Ex: Jean Dupont">
                 </div>
-                <div class="pmodal-input-group">
+                <div class="pmodal-input-group" id="pm-email-group">
                     <label class="pmodal-input-label">Email *</label>
                     <input type="email" class="pmodal-input" id="pm-email" placeholder="votre@email.com">
                 </div>
+
+                <!-- PAYS (nouveau — déclenche le routage paiement) -->
                 <div class="pmodal-input-group">
-                    <label class="pmodal-input-label">Téléphone *</label>
-                    <input type="tel" class="pmodal-input" id="pm-phone" placeholder="+229 XX XX XX XX">
+                    <label class="pmodal-input-label">Pays *</label>
+                    <select class="pmodal-input" id="pm-country" onchange="LandingApp.onCountryChange(this)" style="appearance:none;background-color:#0D0D1A;color:#F8F9FA;">
+                        <option value="">-- Choisir votre pays --</option>
+                        <option value="BJ" data-dial="+229">🇧🇯 Bénin (+229)</option>
+                        <option value="CI" data-dial="+225">🇨🇮 Côte d'Ivoire (+225)</option>
+                        <option value="TG" data-dial="+228">🇹🇬 Togo (+228)</option>
+                        <option value="SN" data-dial="+221">🇸🇳 Sénégal (+221)</option>
+                        <option value="CM" data-dial="+237">🇨🇲 Cameroun (+237)</option>
+                        <option value="BF" data-dial="+226">🇧🇫 Burkina Faso (+226)</option>
+                        <option value="ML" data-dial="+223">🇲🇱 Mali (+223)</option>
+                        <option value="NE" data-dial="+227">🇳🇪 Niger (+227)</option>
+                        <option value="GN" data-dial="+224">🇬🇳 Guinée (+224)</option>
+                        <option value="CD" data-dial="+243">🇨🇩 RDC (+243)</option>
+                        <option value="CG" data-dial="+242">🇨🇬 Congo (+242)</option>
+                        <option value="GA" data-dial="+241">🇬🇦 Gabon (+241)</option>
+                        <option value="MA" data-dial="+212">🇲🇦 Maroc (+212)</option>
+                        <option value="MR" data-dial="+222">🇲🇷 Mauritanie (+222)</option>
+                        <option value="TD" data-dial="+235">🇹🇩 Tchad (+235)</option>
+                        <option value="MG" data-dial="+261">🇲🇬 Madagascar (+261)</option>
+                        <option value="RW" data-dial="+250">🇷🇼 Rwanda (+250)</option>
+                    </select>
+                    <!-- Indicateur de processeur de paiement -->
+                    <div id="pm-payment-hint" style="margin-top:5px;font-size:11px;color:#8A87A0;display:none;"></div>
                 </div>
+
+                <!-- WhatsApp (avec indicatif auto) -->
                 <div class="pmodal-input-group">
+                    <label class="pmodal-input-label">Numéro WhatsApp *</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="pm-dial" value="+229" readonly class="pmodal-input" style="width:80px;flex-shrink:0;text-align:center;background:rgba(255,255,255,0.05);">
+                        <input type="tel" class="pmodal-input" id="pm-whatsapp" placeholder="XX XX XX XX" style="flex:1;">
+                    </div>
+                </div>
+
+                <div class="pmodal-input-group" id="pm-pass-group">
                     <label class="pmodal-input-label">Mot de passe *</label>
                     <input type="password" class="pmodal-input" id="pm-pass" placeholder="Minimum 6 caractères">
                 </div>
-                <div class="pmodal-input-group">
+                <div class="pmodal-input-group" id="pm-pass2-group">
                     <label class="pmodal-input-label">Confirmer le mot de passe *</label>
                     <input type="password" class="pmodal-input" id="pm-pass2" placeholder="Retapez votre mot de passe">
                 </div>
@@ -1361,7 +1390,7 @@ body.landing-body {
 
                 <div class="pmodal-secure">
                     <i class="fas fa-shield-alt"></i>
-                    <span><strong>Paiement 100% sécurisé</strong> via Mobile Money et Carte bancaire via FeexPay. Données chiffrées et protégées.</span>
+                    <span><strong>Paiement 100% sécurisé</strong> via Mobile Money — FeexPay (BJ/CI/TG/SN) ou GeniusPay (autres pays). Données chiffrées.</span>
                 </div>
             </div>
         </div>
@@ -1409,14 +1438,14 @@ body.landing-body {
 <div id="upsell-modal" class="upsell-overlay" onclick="LandingApp.closeUpsell(event)">
     <div class="upsell-box">
         <div class="upsell-icon">🔓</div>
-        <div class="upsell-title" id="upsell-title">Cette section est réservée au plan Pro</div>
-        <div class="upsell-text" id="upsell-text">Passe au plan Pro pour débloquer tout le catalogue AKOLABS — dès 3 000F/mois.</div>
+        <div class="upsell-title" id="upsell-title">Cette section est réservée aux abonnés</div>
+        <div class="upsell-text" id="upsell-text">Abonne-toi au plan Mensuel pour débloquer tout le catalogue AKOLABS — 3 500F/mois.</div>
         <div class="upsell-actions">
-            <button class="btn-upsell btn-upsell-primary" onclick="LandingApp.closeUpsell(null);LandingApp.openPlanModal('pro')">
-                <i class="fas fa-rocket"></i> Passer au plan Pro — 3 000 F
+            <button class="btn-upsell btn-upsell-primary" onclick="LandingApp.closeUpsell(null);LandingApp.openPlanModal('monthly')">
+                <i class="fas fa-rocket"></i> S'abonner — 3 500 F / mois
             </button>
             <button class="btn-upsell btn-upsell-secondary" onclick="LandingApp.closeUpsell(null)">
-                Rester sur Starter
+                Continuer avec l'essai gratuit
             </button>
         </div>
     </div>
@@ -1436,28 +1465,12 @@ body.landing-body {
 // =============================================
 
 const PLANS = {
-    starter: {
-        id: 'starter',
-        name: 'Starter',
-        price: 2000,
-        duration: null, // pas de durée — accès permanent aux sections incluses
-        durationLabel: 'Accès à vie (sections incluses)',
-        includes: [
-            'AKOLABS Universe (outils IA)',
-            'AKOLABS Learning (formations de base)',
-            'Système d\'affiliation (10% commission)',
-            'Stockage de fichiers dans l\'app'
-        ],
-        excludedSlugs: ['akolabs-app-prime', 'akolabs-ia-2', 'akolabs-ebook', 'akolabs-learning'],
-        excludedTitles: ['AKOLABS App Prime', 'AKOLABS IA 2', 'AKOLABS Ebook', 'AKOLABS Learning'],
-        subscriptionMonths: null
-    },
-    pro: {
-        id: 'pro',
-        name: 'Pro',
-        price: 3000,
+    monthly: {
+        id: 'monthly',
+        name: 'Mensuel',
+        price: 3500,
         duration: 1,
-        durationLabel: 'Accès complet — 1 mois',
+        durationLabel: 'Accès complet — 30 jours',
         includes: [
             'Tout le catalogue AKOLABS',
             'AKOLABS App Prime (APKs premium)',
@@ -1471,17 +1484,58 @@ const PLANS = {
         excludedTitles: [],
         subscriptionMonths: 1
     },
-    premium: {
-        id: 'premium',
-        name: 'Premium',
-        price: 5500,
+    quarterly: {
+        id: 'quarterly',
+        name: 'Trimestriel',
+        price: 7500,
         duration: 3,
         durationLabel: 'Accès complet — 3 mois',
         includes: [
-            'Tout ce que contient Pro',
+            'Tout ce que contient Mensuel',
             '3 mois d\'accès complet garanti',
-            'Économie de 3 000 F vs 3×Pro',
+            'Économie de 3 000 F vs 3× Mensuel',
             'Priorité sur les nouveautés',
+            'Support prioritaire WhatsApp'
+        ],
+        excludedSlugs: [],
+        excludedTitles: [],
+        subscriptionMonths: 3
+    },
+    // ── Plans legacy (anciens membres — pour renouvellement) ──
+    pro: {
+        id: 'pro',
+        name: 'Pro (Legacy)',
+        price: 3000,
+        duration: 1,
+        durationLabel: 'Accès complet — 1 mois (ancien plan)',
+        includes: ['Accès legacy — Tout le catalogue'],
+        excludedSlugs: [],
+        excludedTitles: [],
+        subscriptionMonths: 1
+    },
+    premium: {
+        id: 'premium',
+        name: 'Premium (Legacy)',
+        price: 5500,
+        duration: 3,
+        durationLabel: 'Accès complet — 3 mois (ancien plan)',
+        includes: ['Accès legacy — Tout le catalogue'],
+        excludedSlugs: [],
+        excludedTitles: [],
+        subscriptionMonths: 3
+    },
+    starter: {
+        id: 'starter',
+        name: 'Starter (Legacy)',
+        price: 2000,
+        duration: null,
+        durationLabel: 'Accès limité (ancien plan)',
+        includes: ['Accès legacy Starter'],
+        excludedSlugs: [],
+        excludedTitles: [],
+        subscriptionMonths: null
+    }
+};
             'Support prioritaire WhatsApp'
         ],
         excludedSlugs: [],
@@ -1710,27 +1764,68 @@ const LandingApp = {
     },
 
     // =====================
+    // COUNTRY CHANGE
+    // =====================
+    onCountryChange(select) {
+        const opt  = select.options[select.selectedIndex];
+        const dial = opt ? opt.getAttribute('data-dial') : '+229';
+        const dialInput = document.getElementById('pm-dial');
+        if (dialInput && dial) dialInput.value = dial;
+
+        const country = select.value;
+        const hint    = document.getElementById('pm-payment-hint');
+        if (hint && country) {
+            const feexCountries = ['BJ','CI','TG','SN'];
+            if (feexCountries.includes(country)) {
+                hint.textContent = '💳 Paiement via FeexPay (Mobile Money)';
+                hint.style.color = '#C9A84C';
+            } else {
+                hint.textContent = '💳 Paiement via GeniusPay (Mobile Money)';
+                hint.style.color = '#6BB5FF';
+            }
+            hint.style.display = 'block';
+        }
+    },
+
+    // =====================
+    // ESSAI GRATUIT (landing)
+    // =====================
+    openFreeRegister() {
+        // Rediriger vers l'app avec le hash de register
+        window.location.href = '/index.html#free-register';
+        // Ou si l'app est sur la même origine, naviguer directement
+        // Pour la landing page, on redirige vers l'app
+    },
+
+    // =====================
     // HANDLE PURCHASE
     // =====================
     async handlePurchase() {
         const plan = this.currentPlan;
         if (!plan) { this.showToast('Sélectionne un plan', 'warning'); return; }
 
-        const name = document.getElementById('pm-name')?.value?.trim();
-        const email = document.getElementById('pm-email')?.value?.trim();
-        const phone = document.getElementById('pm-phone')?.value?.trim();
+        const name     = document.getElementById('pm-name')?.value?.trim();
+        const email    = document.getElementById('pm-email')?.value?.trim();
+        const country  = document.getElementById('pm-country')?.value;
+        const dial     = document.getElementById('pm-dial')?.value || '';
+        const waPhone  = document.getElementById('pm-whatsapp')?.value?.trim();
         const password = document.getElementById('pm-pass')?.value;
-        const password2 = document.getElementById('pm-pass2')?.value;
-        const promo = document.getElementById('pm-promo')?.value?.trim().toUpperCase();
-        const terms = document.getElementById('pm-terms')?.checked;
-        const btn = document.getElementById('btn-pmodal-pay');
+        const password2= document.getElementById('pm-pass2')?.value;
+        const promo    = document.getElementById('pm-promo')?.value?.trim().toUpperCase();
+        const terms    = document.getElementById('pm-terms')?.checked;
+        const btn      = document.getElementById('btn-pmodal-pay');
 
-        if (!name || name.length < 2) { this.showToast('Entrez votre nom complet', 'warning'); return; }
+        if (!name || name.length < 2)  { this.showToast('Entrez votre nom complet', 'warning'); return; }
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { this.showToast('Email invalide', 'warning'); return; }
-        if (!phone || phone.length < 8) { this.showToast('Numéro de téléphone invalide', 'warning'); return; }
+        if (!country) { this.showToast('Choisissez votre pays', 'warning'); return; }
+        if (!waPhone || waPhone.replace(/\D/g,'').length < 6) { this.showToast('Numéro WhatsApp invalide', 'warning'); return; }
         if (!password || password.length < 6) { this.showToast('Mot de passe: minimum 6 caractères', 'warning'); return; }
         if (password !== password2) { this.showToast('Les mots de passe ne correspondent pas', 'error'); return; }
         if (!terms) { this.showToast('Accepte les conditions d\'utilisation', 'warning'); return; }
+
+        const whatsappFull = dial + waPhone.replace(/\D/g,'');
+        const feexCountries = ['BJ','CI','TG','SN'];
+        const useFeexPay = feexCountries.includes(country.toUpperCase());
 
         btn.disabled = true;
         btn.innerHTML = '<span class="ak-spinner"></span> Vérification...';
@@ -1745,18 +1840,25 @@ const LandingApp = {
             }
 
             const purchaseData = {
-                name, email, phone, password, promo,
+                name, email,
+                phone: whatsappFull,
+                whatsapp_number: whatsappFull,
+                country, country_code: dial,
+                password, promo,
                 amount: this.finalPrice,
                 planId: plan.id,
                 planName: plan.name,
                 subscriptionMonths: plan.subscriptionMonths,
-                promoData: this.promoData
+                promoData: this.promoData,
+                useFeexPay
             };
 
             if (CONFIG.TEST_MODE) {
                 this.simulatePayment(purchaseData);
-            } else {
+            } else if (useFeexPay) {
                 this.openFeexPay(purchaseData);
+            } else {
+                await this.openGeniusPay(purchaseData);
             }
         } catch(error) {
             console.error('[Landing] Erreur:', error);
@@ -1777,7 +1879,59 @@ const LandingApp = {
     },
 
     // =====================
-    // FEEXPAY
+    // GENIUSPAY (autres pays)
+    // =====================
+    async openGeniusPay(purchaseData) {
+        const btn = document.getElementById('btn-pmodal-pay');
+        this._tempPurchaseData = purchaseData;
+
+        const reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2,7).toUpperCase();
+        const successUrl = window.location.origin + window.location.pathname + '?feexpay=success&ref=' + reference;
+        const errorUrl   = window.location.origin + window.location.pathname + '?feexpay=error';
+
+        if (btn) btn.innerHTML = '<span class="ak-spinner"></span> Connexion GeniusPay...';
+
+        try {
+            // ─── Supabase Edge Function (plus Railway) ───
+            const resp = await fetch(CONFIG.PAYMENT_EDGE_FN, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY,
+                },
+                body: JSON.stringify({
+                    amount: purchaseData.amount,
+                    currency: 'XOF',
+                    description: 'AKOLABS Plan ' + purchaseData.planName,
+                    success_url: successUrl + '&plan=' + purchaseData.planId,
+                    error_url: errorUrl,
+                    reference: reference,
+                    customer: {
+                        name: purchaseData.name,
+                        email: purchaseData.email,
+                        phone: purchaseData.phone
+                    },
+                    metadata: { plan: purchaseData.planId, reference }
+                    // Pas de "country" → Edge Function route vers GeniusPay par défaut
+                })
+            });
+
+            const data = await resp.json();
+            if (!resp.ok || !data.checkout_url) throw new Error(data.error || data.message || 'Erreur GeniusPay');
+
+            localStorage.setItem('ako_feex_ref', reference);
+            localStorage.setItem('ako_feex_data', JSON.stringify(purchaseData));
+            window.location.href = data.checkout_url;
+
+        } catch(e) {
+            console.error('[GeniusPay]', e);
+            this.showToast('Erreur paiement GeniusPay. Réessayez.', 'error');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> <span>Payer maintenant</span>'; }
+        }
+    },
+
+    // =====================
+    // FEEXPAY (BJ/CI/TG/SN)
     // =====================
     openFeexPay(purchaseData) {
         const btn = document.getElementById('btn-pmodal-pay');
@@ -1792,14 +1946,13 @@ const LandingApp = {
                 id: CONFIG.FEEXPAY_STORE,
                 amount: purchaseData.amount,
                 token: CONFIG.FEEXPAY_TOKEN,
-                callback_url: window.location.origin + window.location.pathname + '?feexpay=success&ref=' + reference,
+                callback_url: window.location.origin + window.location.pathname + '?feexpay=success&ref=' + reference + '&plan=' + purchaseData.planId,
                 error_callback_url: window.location.origin + window.location.pathname + '?feexpay=error',
                 mode: 'LIVE',
                 custom_id: reference,
                 description: 'AKOLABS Plan ' + purchaseData.planName
             });
 
-            document.getElementById('pmodal-form-area').querySelector('button').style.display = 'none';
             if (btn) btn.style.display = 'none';
             const instr = document.getElementById('feexpay-instruction');
             if (instr) {
@@ -1841,7 +1994,9 @@ const LandingApp = {
                     emailRedirectTo: null,
                     data: {
                         full_name: purchaseData.name,
-                        phone: purchaseData.phone,
+                        phone: purchaseData.phone || purchaseData.whatsapp_number,
+                        whatsapp_number: purchaseData.whatsapp_number || purchaseData.phone,
+                        country: purchaseData.country || '',
                         is_app_purchased: true,
                         subscription_plan: plan.id,
                         referred_by: (purchaseData.promoData && purchaseData.promoData.is_affiliate_code) ? purchaseData.promo : null
@@ -1885,15 +2040,18 @@ const LandingApp = {
                 subscriptionExpiresAt = expDate.toISOString();
             }
 
-            // 5. Mettre à jour profil avec plan
+            // 5. Mettre à jour profil
             try {
                 await db.from('users').update({
                     is_app_purchased: true,
-                    phone: purchaseData.phone || null,
+                    phone: purchaseData.phone || purchaseData.whatsapp_number || null,
+                    whatsapp_number: purchaseData.whatsapp_number || purchaseData.phone || null,
+                    country: purchaseData.country || null,
+                    country_code: purchaseData.country_code || null,
                     subscription_plan: plan.id,
                     subscription_expires_at: subscriptionExpiresAt
                 }).eq('id', userId);
-                console.log('[Landing] Profil mis à jour avec plan:', plan.id);
+                console.log('[Landing] Profil mis à jour avec plan:', plan.id, '| Expires:', subscriptionExpiresAt);
             } catch(e) { console.warn('[Landing] Update profil:', e); }
 
             // 6. Enregistrer achat
@@ -1901,15 +2059,16 @@ const LandingApp = {
                 const affiliateUserId = (purchaseData.promoData && purchaseData.promoData.affiliate_user_id) ? purchaseData.promoData.affiliate_user_id : null;
                 const commission = affiliateUserId ? Math.round(purchaseData.amount * CONFIG.AFFILIATE_COMMISSION_PERCENT / 100) : 0;
                 const fees = Math.ceil(purchaseData.amount * 3 / 100);
+                const provider = purchaseData.useFeexPay ? 'feexpay' : (CONFIG.TEST_MODE ? 'test' : 'geniuspay');
 
                 const purchaseResult = await db.from('purchases').insert({
                     user_id: userId,
-                    purchase_type: plan.id + '_access',
+                    purchase_type: plan.id + '_subscription',
                     amount: purchaseData.amount,
                     fees: fees,
                     total_paid: purchaseData.amount + fees,
                     payment_ref: String(transactionId || ''),
-                    payment_provider: CONFIG.TEST_MODE ? 'test' : 'feexpay',
+                    payment_provider: provider,
                     promo_code_used: purchaseData.promo || null,
                     discount_amount: plan.price - purchaseData.amount,
                     affiliate_user_id: affiliateUserId,
@@ -1921,36 +2080,6 @@ const LandingApp = {
                 if (purchaseResult.error) console.error('[Landing] Erreur insert achat:', purchaseResult.error);
                 else { LandingApp.trackConversion(); console.log('[Landing] Achat enregistré'); }
             } catch(e) { console.error('[Landing] Insert achat exception:', e); }
-
-            // 7. Accès sections pour Starter (sections exclues bloquées)
-            if (plan.id === 'starter') {
-                // Donner accès à toutes les sections SAUF les exclues
-                try {
-                    const { data: allSections } = await db.from('sections').select('id, title').eq('is_active', true);
-                    if (allSections) {
-                        const allowedSections = allSections.filter(s => 
-                            !plan.excludedTitles.some(excl => s.title.toLowerCase().includes(excl.toLowerCase()))
-                        );
-                        for (const sec of allowedSections) {
-                            await db.from('user_sections').insert({
-                                user_id: userId, section_id: sec.id,
-                                access_type: 'lifetime', granted_by: 'purchase', is_active: true
-                            }).catch(() => {});
-                        }
-                    }
-                } catch(e) { console.warn('[Landing] Sections starter:', e); }
-            }
-
-            // 8. Promo
-            if (purchaseData.promo) {
-                try { await db.rpc('increment_promo_usage', { p_code: purchaseData.promo }); } catch(e) {}
-            }
-
-            // 9. Analytics
-            try {
-                await db.from('app_analytics').insert({
-                    event_type: 'purchase', user_id: userId,
-                    metadata: { plan: plan.id, amount: purchaseData.amount, transaction_id: transactionId }
                 });
             } catch(e) {}
 
