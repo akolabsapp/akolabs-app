@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#4B0082">
-    <meta name="description" content="AKOLABS - Apps premium, IA, formations. Accès complet dès 2000F.">
+    <meta name="description" content="AKOLABS - Apps premium, IA, formations. Accès complet dès 3500F/mois.">
     <title>AKOLABS - Votre Arsenal Digital Premium</title>
     <link rel="icon" type="image/png" href="../assets/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -827,7 +827,7 @@ body.landing-body {
     <h1>Tout ce dont tu as besoin<br>pour <span class="accent">dominer le digital</span></h1>
     <p class="hero-sub">
         Apps premium débloquées, outils IA de pointe, formations complètes — 
-        tout en une seule application. Dès <strong style="color:#C9A84C">2 000 F</strong>.
+        tout en une seule application. Dès <strong style="color:#C9A84C">3 500 F</strong>/mois.
     </p>
     <div class="hero-proof">
         <div class="proof-avatars">
@@ -935,7 +935,7 @@ body.landing-body {
     </div>
 
     <div class="pain-vs">avec AKOLABS, tu peux avoir tout ça pour</div>
-    <div class="pain-ako-price">2 000 F seulement</div>
+    <div class="pain-ako-price">3 500 F / mois</div>
     <div class="pain-ako-label">par mois — ou 5 500 F pour 3 mois complets</div>
 </section>
 
@@ -1274,7 +1274,7 @@ body.landing-body {
 <!-- FLOATING CTA -->
 <div class="floating-cta" id="floating-cta">
     <a href="#plans">
-        <i class="fas fa-bolt"></i> Voir les plans — dès 2 000 F
+        <i class="fas fa-bolt"></i> ⚡ Voir les plans — dès 3 500 F/mois
     </a>
 </div>
 
@@ -2260,8 +2260,8 @@ const LandingApp = {
                 <div class="modal-title">${s.title}</div>
                 <div class="modal-desc">${s.long_description||s.description||''}</div>
                 ${adv.length>0?`<div class="modal-adv-title"><i class="fas fa-gift"></i> Ce que tu obtiens</div>${adv.map(a=>`<div class="modal-adv-item"><i class="fas fa-check-circle"></i><span>${a}</span></div>`).join('')}`:''}
-                <button class="modal-cta" onclick="LandingApp.closeModal(null);LandingApp.openPlanModal('pro')">
-                    <i class="fas fa-rocket"></i> Obtenir l'accès AKOLABS
+                <button class="modal-cta" onclick="LandingApp.closeModal(null);LandingApp.openPlanModal('monthly')">
+                    <i class="fas fa-rocket"></i> S'abonner — dès 3 500 F/mois
                 </button>
             </div>`;
         document.getElementById('section-modal').classList.add('open');
@@ -2428,7 +2428,9 @@ const LandingApp = {
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 e.preventDefault();
-                const t = document.querySelector(a.getAttribute('href'));
+                const href = a.getAttribute('href');
+                if (!href || href === '#') return; // ignorer les liens vides
+                const t = document.querySelector(href);
                 if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
