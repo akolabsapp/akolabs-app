@@ -333,19 +333,97 @@
 
     // ===== USERS =====
     AdminApp.renderUsers = async function(container) {
-        var r = await db.from('users').select('*').order('created_at', { ascending: false }).limit(50);
+        var r = await db.from('users').select('*').order('created_at', { ascending: false }).limit(100);
         var users = r.data || [];
 
-        var h = '<div class="admin-card"><div class="admin-card-header"><div class="admin-card-title">Utilisateurs (' + users.length + ')</div></div>';
-        h += '<div class="admin-table"><table><tr><th>Nom</th><th>Email</th><th>App</th><th>Niveau</th><th>Inscrit</th></tr>';
+        // Stats plans
+        var planCounts = { free_trial: 0, monthly: 0, quarterly: 0, lifetime: 0, legacy: 0, expired: 0 };
+        users.forEach(function(u) {
+            var p = u.subscription_plan || 'lifetime';
+            if (p === 'free_trial') planCounts.free_trial++;
+            else if (p === 'monthly') planCounts.monthly++;
+            else if (p === 'quarterly') planCounts.quarterly++;
+            else if (p === 'lifetime') planCounts.lifetime++;
+            else if (p.indexOf('expired_') === 0) planCounts.expired++;
+            else planCounts.legacy++;
+        });
 
+        var h = '<div class="admin-card">';
+        h += '<div class="admin-card-header"><div class="admin-card-title"><i class="fas fa-users" style="color:#D4AF37;margin-right:8px;"></i>Utilisateurs (' + users.length + ')</div></div>';
+
+        // Stats mini
+        h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 16px 16px;">';
+        [
+            { label: 'Essai gratuit', count: planCounts.free_trial, color: '#FFB347' },
+            { label: 'Mensuel actif', count: planCounts.monthly,    color: '#3DDB7D' },
+            { label: 'Trimestriel',   count: planCounts.quarterly,  color: '#A78BFA' },
+            { label: 'Lifetime',      count: planCounts.lifetime,   color: '#D4AF37' },
+            { label: 'Expirés',       count: planCounts.expired,    color: '#D93B3B' },
+            { label: 'Legacy',        count: planCounts.legacy,     color: '#6BB5FF' }
+        ].forEach(function(stat) {
+            h += '<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px;text-align:center;">';
+            h += '<div style="font-size:18px;font-weight:800;color:' + stat.color + ';">' + stat.count + '</div>';
+            h += '<div style="font-size:10px;color:#8A87A0;">' + stat.label + '</div>';
+            h += '</div>';
+        });
+        h += '</div>';
+
+        h += '<div class="admin-table" style="overflow-x:auto;"><table style="min-width:700px;">';
+        h += '<thead><tr>';
+        h += '<th>Nom</th><th>Email</th><th>WhatsApp</th><th>Pays</th><th>Plan</th><th>Expiration</th><th>Inscrit</th>';
+        h += '</tr></thead><tbody>';
+
+        var now = new Date();
         for (var i = 0; i < users.length; i++) {
             var u = users[i];
-            var appStatus = u.is_app_purchased ? '<span class="status active">Oui</span>' : '<span class="status inactive">Non</span>';
-            h += '<tr><td>' + (u.full_name || '-') + '</td><td style="font-size:11px;">' + u.email + '</td><td>' + appStatus + '</td><td>' + (u.level || 'Bronze') + '</td><td>' + Utils.timeAgo(u.created_at) + '</td></tr>';
+            var plan = u.subscription_plan || 'lifetime';
+            var isExp = plan.indexOf('expired_') === 0;
+            var expiresAt = u.subscription_expires_at ? new Date(u.subscription_expires_at) : null;
+
+            // Badge plan
+            var planColors = { free_trial: '#FFB347', monthly: '#3DDB7D', quarterly: '#A78BFA', lifetime: '#D4AF37', starter: '#6BB5FF', pro: '#3DDB7D', premium: '#A78BFA' };
+            var planColor = isExp ? '#D93B3B' : (planColors[plan] || '#9B97B5');
+            var planLabel = plan.replace('expired_', '⚠️ ').replace('free_trial', '🎁 Essai').replace('monthly', '⚡ Mensuel').replace('quarterly', '💎 Trimestriel').replace('lifetime', '♾️ Lifetime');
+
+            // Expiration
+            var expStr = '—';
+            if (expiresAt) {
+                var dLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                expStr = expiresAt.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'2-digit' });
+                if (dLeft > 0) expStr += ' (' + dLeft + 'j)';
+                else expStr = '<span style="color:#D93B3B;">' + expStr + ' (expiré)</span>';
+            } else if (plan === 'free_trial') {
+                var trialStart = u.free_trial_started_at ? new Date(u.free_trial_started_at) : new Date(u.created_at || now);
+                var tDays = Math.max(0, 30 - Math.floor((now - trialStart) / (1000 * 60 * 60 * 24)));
+                expStr = tDays > 0
+                    ? '<span style="color:#FFB347;">' + tDays + 'j restants</span>'
+                    : '<span style="color:#D93B3B;">Essai expiré</span>';
+            }
+
+            // WhatsApp link
+            var waNum = (u.whatsapp_number || '').replace(/\D/g, '');
+            var waDisplay = u.whatsapp_number || u.phone || '—';
+            var waCell = waNum
+                ? '<a href="https://wa.me/' + waNum + '" target="_blank" style="color:#25D366;text-decoration:none;display:flex;align-items:center;gap:5px;font-size:12px;"><i class="fab fa-whatsapp"></i>' + waDisplay + '</a>'
+                : '<span style="color:#6C6C7E;font-size:12px;">' + waDisplay + '</span>';
+
+            // Pays
+            var countryCode = u.country || '';
+            var countryInfo = (CONFIG && CONFIG.COUNTRY_DIAL_CODES && CONFIG.COUNTRY_DIAL_CODES[countryCode]) || null;
+            var countryDisplay = countryInfo ? (countryInfo.flag + ' ' + countryCode) : (countryCode || '—');
+
+            h += '<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">';
+            h += '<td style="font-weight:600;color:#F8F9FA;white-space:nowrap;">' + (u.full_name || '—') + '</td>';
+            h += '<td style="font-size:11px;color:#9B97B5;word-break:break-all;">' + (u.email || '—') + '</td>';
+            h += '<td>' + waCell + '</td>';
+            h += '<td style="font-size:12px;text-align:center;">' + countryDisplay + '</td>';
+            h += '<td><span style="background:rgba(0,0,0,0.3);border:1px solid ' + planColor + ';color:' + planColor + ';border-radius:8px;padding:3px 8px;font-size:11px;font-weight:700;white-space:nowrap;">' + planLabel + '</span></td>';
+            h += '<td style="font-size:11px;color:#9B97B5;white-space:nowrap;">' + expStr + '</td>';
+            h += '<td style="font-size:11px;color:#6C6C7E;white-space:nowrap;">' + Utils.timeAgo(u.created_at) + '</td>';
+            h += '</tr>';
         }
 
-        h += '</table></div></div>';
+        h += '</tbody></table></div></div>';
         container.innerHTML = h;
     };
 
