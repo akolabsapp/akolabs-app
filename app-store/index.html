@@ -1577,7 +1577,9 @@ const LandingApp = {
                     localStorage.removeItem('ako_feex_ref');
                     localStorage.removeItem('ako_feex_data');
                     // Rouvrir le modal pour afficher succès
-                    this.currentPlan = PLANS[pd.planId] || PLANS['pro'];
+                    this.currentPlan = PLANS[pd.planId] || PLANS['monthly'];
+                    // Ouvrir le modal AVANT completePurchase pour que showSuccessScreen trouve la box
+                    this.openPlanModal(pd.planId || 'monthly');
                     setTimeout(() => LandingApp.completePurchase(pd, ref), 800);
                 } catch(e) {
                     console.error('[FeexPay] Erreur récup:', e);
@@ -1630,10 +1632,16 @@ const LandingApp = {
         document.getElementById('pmodal-form-area').style.display = '';
         document.getElementById('feexpay-instruction').style.display = 'none';
         document.getElementById('pmodal-price-summary').style.display = 'none';
-        ['pm-name','pm-email','pm-phone','pm-pass','pm-pass2','pm-promo'].forEach(id => {
+        ['pm-name','pm-email','pm-whatsapp','pm-pass','pm-pass2','pm-promo'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
+        const dialInput = document.getElementById('pm-dial');
+        if (dialInput) dialInput.value = '+229';
+        const countrySelect = document.getElementById('pm-country');
+        if (countrySelect) countrySelect.value = '';
+        const payHint = document.getElementById('pm-payment-hint');
+        if (payHint) payHint.style.display = 'none';
         const terms = document.getElementById('pm-terms');
         if (terms) terms.checked = false;
 
@@ -1974,7 +1982,7 @@ const LandingApp = {
     // =====================
     async completePurchase(purchaseData, transactionId) {
         const btn = document.getElementById('btn-pmodal-pay');
-        const plan = PLANS[purchaseData.planId] || PLANS['pro'];
+        const plan = PLANS[purchaseData.planId] || PLANS['monthly'];
 
         try {
             this.showToast('Paiement reçu ! Création du compte...', 'success', 2500);
@@ -2437,7 +2445,17 @@ const LandingApp = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => { LandingApp.init(); });
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialiser EmailJS (nécessaire pour l'envoi d'email de bienvenue)
+    try {
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY);
+            console.log('[Landing] EmailJS initialisé');
+        }
+    } catch(e) { console.warn('[Landing] EmailJS init:', e); }
+
+    LandingApp.init();
+});
 </script>
 
 </body>
