@@ -300,8 +300,8 @@ var SubscriptionModal = {
                     amount: plan.price,
                     planId: planId,
                     planName: plan.name,
-                    successUrl: successUrl,
-                    errorUrl: errorUrl,
+                    success_url: successUrl,
+                    error_url: errorUrl,
                     reference: reference,
                     customer: {
                         name: App.profile ? (App.profile.full_name || '') : '',
