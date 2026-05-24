@@ -288,41 +288,49 @@ var SubscriptionModal = {
         var errorUrl   = window.location.origin + window.location.pathname + '?sub_error=1';
 
         try {
-            // Appel à la Edge Function
-            var edgeRes = await fetch(CONFIG.PAYMENT_EDGE_FN, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
-                },
-                body: JSON.stringify({
-                    country: country,
-                    amount: plan.price,
-                    planId: planId,
-                    planName: plan.name,
-                    success_url: successUrl,
-                    error_url: errorUrl,
-                    reference: reference,
-                    customer: {
-                        name: App.profile ? (App.profile.full_name || '') : '',
-                        email: App.profile ? (App.profile.email || App.user.email || '') : '',
-                        phone: whatsappFull
-                    }
-                })
-            });
+            if (useFeexPay) {
+                // ── FeexPay : SDK directement côté navigateur (comme la landing page)
+                // Les clés sont publiques — pas besoin de la Edge Function
+                SubscriptionModal._initFeexPay({
+                    token:    CONFIG.FEEXPAY_TOKEN,
+                    storeId:  CONFIG.FEEXPAY_STORE,
+                    amount:   plan.price,
+                    description: 'AKOLABS Plan ' + plan.name,
+                    callback_url:       successUrl,
+                    error_callback_url: errorUrl
+                }, reference, planId, whatsappFull);
 
-            var edgeData = await edgeRes.json();
+            } else {
+                // ── GeniusPay : clé secrète → passe par la Edge Function
+                var edgeRes = await fetch(CONFIG.PAYMENT_EDGE_FN, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({
+                        country: country,
+                        amount: plan.price,
+                        planId: planId,
+                        planName: plan.name,
+                        success_url: successUrl,
+                        error_url: errorUrl,
+                        reference: reference,
+                        customer: {
+                            name:  App.profile ? (App.profile.full_name || '') : '',
+                            email: App.profile ? (App.profile.email || (App.user ? App.user.email : '') || '') : '',
+                            phone: whatsappFull
+                        }
+                    })
+                });
 
-            if (!edgeRes.ok || edgeData.error) {
-                throw new Error(edgeData.error || 'Erreur paiement');
-            }
+                var edgeData = await edgeRes.json();
 
-            if (edgeData.provider === 'feexpay') {
-                // FeexPay — SDK navigateur
-                SubscriptionModal._initFeexPay(edgeData, reference, planId, whatsappFull);
+                if (!edgeRes.ok || edgeData.error) {
+                    throw new Error(edgeData.error || 'Erreur GeniusPay');
+                }
 
-            } else if (edgeData.provider === 'geniuspay') {
-                // GeniusPay — L'Edge Function a déjà créé le lien, on redirige
+                // GeniusPay — redirection vers checkout_url
                 localStorage.setItem('ako_sub_ref', reference);
                 localStorage.setItem('ako_sub_plan', planId);
                 localStorage.setItem('ako_sub_uid', App.profile ? App.profile.id : '');
