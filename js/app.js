@@ -590,10 +590,10 @@ var App = {
         h += '<span class="btn-text">Se connecter</span>';
         h += '</button>';
         h += '<div class="login-divider">ou</div>';
-        h += '<button class="btn btn-outline btn-block" onclick="App.showFreeRegisterPage()" style="border-color:rgba(61,219,125,0.4);color:#3DDB7D;">';
-        h += '<i class="fas fa-gift"></i> Essayer gratuitement — 30 jours';
+        h += '<button class="btn btn-outline btn-block" onclick="App.showTrialSuspendedModal()" style="border-color:rgba(61,219,125,0.4);color:#3DDB7D;font-size:13px;">';
+        h += '<i class="fas fa-gift"></i> Essayer gratuitement';
         h += '</button>';
-        h += '<button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="window.open(\'' + CONFIG.LANDING_URL + '\', \'_blank\')">';
+        h += '<button class="btn btn-outline btn-block" style="margin-top:8px;font-size:13px;" onclick="window.open(\'' + CONFIG.LANDING_URL + '\', \'_blank\')">';
         h += '<i class="fas fa-crown"></i> Voir les plans (3 500 F / mois)';
         h += '</button>';
         h += '</div>';
@@ -672,6 +672,34 @@ var App = {
 
         btn.classList.remove('btn-loading');
         btn.disabled = false;
+    },
+
+    showTrialSuspendedModal: function() {
+        var existing = document.getElementById('ako-trial-suspended');
+        if (existing) { existing.style.display = 'flex'; return; }
+
+        var modal = document.createElement('div');
+        modal.id = 'ako-trial-suspended';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.82);display:flex;align-items:center;justify-content:center;padding:20px;';
+
+        modal.innerHTML = [
+            '<div style="background:linear-gradient(160deg,#1A1A2E 0%,#16213E 100%);border:1px solid rgba(212,175,55,0.25);border-radius:24px;padding:36px 24px 28px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);position:relative;">',
+                '<button onclick="document.getElementById(\'ako-trial-suspended\').style.display=\'none\'" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:none;color:#9B97B5;width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer;">✕</button>',
+                '<div style="font-size:48px;margin-bottom:14px;">⏸️</div>',
+                '<div style="font-family:Cinzel,Georgia,serif;font-size:16px;font-weight:700;color:#D4AF37;margin-bottom:10px;line-height:1.4;">Essais gratuits<br>momentanément suspendus</div>',
+                '<p style="font-size:13px;color:#AEAEBE;line-height:1.7;margin-bottom:22px;">Nous améliorons l\'expérience AKOLABS pour nos prochains membres.<br><br>Profite de nos offres à partir de <strong style=\"color:#D4AF37;\">3 500 F / mois</strong> — accès complet immédiat.</p>',
+                '<button onclick="document.getElementById(\'ako-trial-suspended\').style.display=\'none\';window.open(\'' + (CONFIG.LANDING_URL || '/app-store/') + '\', \'_blank\')" style="width:100%;padding:13px;background:linear-gradient(135deg,#D4AF37,#C9A84C);color:#1A0A00;border:none;border-radius:50px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">',
+                    '<i class=\"fas fa-rocket\"></i> Voir les plans — dès 3 500 F',
+                '</button>',
+                '<p style="font-size:11px;color:#6C6C7E;margin-top:14px;">Paiement Mobile Money sécurisé.<br>Accès activé immédiatement.</p>',
+            '</div>'
+        ].join('');
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+
+        document.body.appendChild(modal);
     },
 
     logout: async function() {

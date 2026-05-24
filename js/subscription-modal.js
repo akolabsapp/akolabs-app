@@ -265,15 +265,19 @@ var SubscriptionModal = {
         var plan = CONFIG.PLANS[planId];
         if (!plan) return;
 
-        var whatsappFull = dial + waPhone.replace(/\D/g, '');
+        // Conserver le 0 initial si présent (ex: Bénin "0190086267" → "+2290190086267")
+        var waDigits     = waPhone.trim().replace(/\D/g, ''); // garde le 0 initial
+        var whatsappFull = dial + waDigits;
 
-        // Sauvegarder le numéro WhatsApp et pays
+        // Sauvegarder le profil — await + try/catch (pas de .catch() sur Supabase v2)
         if (App.profile) {
-            db.from('users').update({
-                whatsapp_number: whatsappFull,
-                country: country,
-                country_code: dial
-            }).eq('id', App.profile.id).catch(function() {});
+            try {
+                await db.from('users').update({
+                    whatsapp_number: whatsappFull,
+                    country: country,
+                    country_code: dial
+                }).eq('id', App.profile.id);
+            } catch(e) { console.warn('[SubModal] Save profile:', e); }
         }
 
         if (btn) { btn.disabled = true; btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:#1A0A00;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;"></span> Connexion...'; }
@@ -443,14 +447,16 @@ var SubscriptionModal = {
                 payment_provider: CONFIG.TEST_MODE ? 'test' : 'feexpay_or_geniuspay',
                 status: 'confirmed',
                 confirmed_at: new Date().toISOString()
-            }).catch(function(e) { console.warn('[SubModal] Insert purchase:', e); });
+            }).then(function(r) {
+                if (r.error) console.warn('[SubModal] Insert purchase:', r.error);
+            });
 
             // Analytics
-            await db.from('app_analytics').insert({
+            db.from('app_analytics').insert({
                 event_type: 'subscription',
                 user_id: userId,
                 metadata: { plan: planId, amount: plan.price, transaction_id: transactionId }
-            }).catch(function() {});
+            }).then(function() {}).catch(function() {});
 
             Utils.showConfetti();
             Utils.vibrate([100, 50, 100, 50, 200]);
