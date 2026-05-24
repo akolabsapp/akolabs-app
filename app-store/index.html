@@ -1792,10 +1792,70 @@ const LandingApp = {
     // ESSAI GRATUIT (landing)
     // =====================
     openFreeRegister() {
-        // Rediriger vers l'app avec le hash de register
-        window.location.href = '/index.html#free-register';
-        // Ou si l'app est sur la même origine, naviguer directement
-        // Pour la landing page, on redirige vers l'app
+        // Créer le modal si pas encore présent
+        var existing = document.getElementById('free-trial-suspended-modal');
+        if (existing) { existing.style.display = 'flex'; return; }
+
+        var modal = document.createElement('div');
+        modal.id = 'free-trial-suspended-modal';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.80);display:flex;align-items:center;justify-content:center;padding:20px;';
+
+        modal.innerHTML = `
+        <div style="
+            background:linear-gradient(160deg,#1A1A2E 0%,#16213E 100%);
+            border:1px solid rgba(212,175,55,0.25);
+            border-radius:24px;
+            padding:36px 28px;
+            max-width:380px;
+            width:100%;
+            text-align:center;
+            box-shadow:0 20px 60px rgba(0,0,0,0.6);
+            position:relative;
+        ">
+            <!-- Bouton fermer -->
+            <button onclick="document.getElementById('free-trial-suspended-modal').style.display='none'"
+                style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:#9B97B5;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                ✕
+            </button>
+
+            <!-- Icône -->
+            <div style="font-size:52px;margin-bottom:16px;">⏸️</div>
+
+            <!-- Titre -->
+            <div style="font-family:'Cinzel',Georgia,serif;font-size:18px;font-weight:700;color:#D4AF37;margin-bottom:10px;line-height:1.3;">
+                Essais gratuits<br>momentanément suspendus
+            </div>
+
+            <!-- Message -->
+            <p style="font-size:13px;color:#AEAEBE;line-height:1.7;margin-bottom:24px;">
+                Nous travaillons à améliorer l'expérience AKOLABS pour nos prochains membres.<br><br>
+                En attendant, profite de nos offres d'abonnement à partir de seulement <strong style="color:#D4AF37;">3 500 F / mois</strong> — accès complet immédiat, sans attente.
+            </p>
+
+            <!-- CTA principal -->
+            <button onclick="document.getElementById('free-trial-suspended-modal').style.display='none';LandingApp.openPlanModal('monthly')"
+                style="width:100%;padding:14px;background:linear-gradient(135deg,#D4AF37,#C9A84C);color:#1A0A00;border:none;border-radius:50px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;">
+                <i class="fas fa-rocket"></i> S'abonner — 3 500 F / mois
+            </button>
+
+            <!-- CTA secondaire -->
+            <button onclick="document.getElementById('free-trial-suspended-modal').style.display='none';LandingApp.openPlanModal('quarterly')"
+                style="width:100%;padding:12px;background:transparent;color:#AEAEBE;border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
+                <i class="fas fa-gem"></i> Voir le plan Trimestriel — 7 500 F
+            </button>
+
+            <!-- Note bas -->
+            <p style="font-size:11px;color:#6C6C7E;margin-top:16px;line-height:1.5;">
+                Paiement sécurisé via Mobile Money.<br>Accès activé immédiatement après paiement.
+            </p>
+        </div>`;
+
+        // Fermer en cliquant sur le fond
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+
+        document.body.appendChild(modal);
     },
 
     // =====================
