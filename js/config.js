@@ -5,7 +5,7 @@
 var CONFIG = {
     // ---- SUPABASE ----
     SUPABASE_URL: 'https://cwjnjmawjcphtajfzlod.supabase.co',
-    SUPABASE_ANON_KEY: 'sb_publishable_UJ_ykbUaJsnBqKzgvbSmoQ_scUnivc8',
+    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3am5qbWF3amNwaHRhamZ6bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzY2OTAsImV4cCI6MjA4ODMxMjY5MH0.sC3ggUFUbW6ZeFR2KKj5dpBAqy10EVLmNA6kRjMVEDY',
 
     // ---- CLOUDINARY ----
     CLOUDINARY_CLOUD_NAME: 'dtowyvewa',
