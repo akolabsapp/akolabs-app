@@ -50,7 +50,7 @@ var CONFIG = {
     },
 
     // ---- EMAIL ADMIN (notification vente) -------------------
-    ADMIN_EMAIL: 'contactrakotouitch@gmail.com', // ← ton email pour recevoir les alertes vente
+    ADMIN_EMAIL: 'akolabs.app@gmail.com', // ← ton email pour recevoir les alertes vente
 
     // ---- EMAILJS ----
     EMAILJS_PUBLIC_KEY: 'Mq1BDoeRayGXaxxlE',
