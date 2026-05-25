@@ -2155,6 +2155,32 @@ const LandingApp = {
                 console.log('[Landing] Email bienvenue envoyé');
             } catch(e) { console.error('[Landing] Erreur email:', e); }
 
+            // 10b. Email notification admin (nouvelle vente)
+            try {
+                await fetch(CONFIG.EMAIL_EDGE_FN, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({
+                        type: 'admin_sale',
+                        to: CONFIG.ADMIN_EMAIL,
+                        data: {
+                            buyerName:     purchaseData.name,
+                            buyerEmail:    purchaseData.email,
+                            buyerPhone:    purchaseData.phone || purchaseData.whatsapp_number || '',
+                            buyerCountry:  purchaseData.country || '',
+                            plan:          plan.id,
+                            amount:        purchaseData.amount,
+                            expiresAt:     subscriptionExpiresAt,
+                            transactionId: String(transactionId || '')
+                        }
+                    })
+                });
+                console.log('[Landing] Email admin envoyé');
+            } catch(e) { console.warn('[Landing] Email admin:', e); }
+
             // 11. SignOut
             await db.auth.signOut().catch(() => {});
 
