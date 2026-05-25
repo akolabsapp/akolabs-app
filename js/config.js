@@ -5,7 +5,7 @@
 var CONFIG = {
     // ---- SUPABASE ----
     SUPABASE_URL: 'https://cwjnjmawjcphtajfzlod.supabase.co',
-    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3am5qbWF3amNwaHRhamZ6bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzY2OTAsImV4cCI6MjA4ODMxMjY5MH0.sC3ggUFUbW6ZeFR2KKj5dpBAqy10EVLmNA6kRjMVEDY',
+    SUPABASE_ANON_KEY: 'sb_publishable_UJ_ykbUaJsnBqKzgvbSmoQ_scUnivc8',
 
     // ---- CLOUDINARY ----
     CLOUDINARY_CLOUD_NAME: 'dtowyvewa',
@@ -48,6 +48,9 @@ var CONFIG = {
         'MR': { name: 'Mauritanie',     flag: '🇲🇷', dial: '+222' },
         'TD': { name: 'Tchad',          flag: '🇹🇩', dial: '+235' }
     },
+
+    // ---- EMAIL ADMIN (notification vente) -------------------
+    ADMIN_EMAIL: 'contactrakotouitch@gmail.com', // ← ton email pour recevoir les alertes vente
 
     // ---- EMAILJS ----
     EMAILJS_PUBLIC_KEY: 'Mq1BDoeRayGXaxxlE',

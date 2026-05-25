@@ -466,6 +466,31 @@ var SubscriptionModal = {
                 metadata: { plan: planId, amount: plan.price, transaction_id: transactionId }
             }).then(function() {}).catch(function() {});
 
+            // Notification email admin
+            try {
+                fetch(CONFIG.EMAIL_EDGE_FN, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + CONFIG.SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({
+                        type: 'admin_sale',
+                        to: CONFIG.ADMIN_EMAIL,
+                        data: {
+                            buyerName:     App.profile ? (App.profile.full_name || 'Utilisateur') : 'Utilisateur',
+                            buyerEmail:    App.profile ? (App.profile.email || '') : '',
+                            buyerPhone:    App.profile ? (App.profile.whatsapp_number || '') : '',
+                            buyerCountry:  App.profile ? (App.profile.country || '') : '',
+                            plan:          planId,
+                            amount:        plan.price,
+                            expiresAt:     expiresAt.toISOString(),
+                            transactionId: String(transactionId || '')
+                        }
+                    })
+                }).catch(function() {});
+            } catch(e) { console.warn('[SubModal] Email admin:', e); }
+
             Utils.showConfetti();
             Utils.vibrate([100, 50, 100, 50, 200]);
 
