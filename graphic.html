@@ -204,17 +204,16 @@
 
     const body = {
       amount: 60500,
-      currency: 'XAF',
+      currency: 'XOF',
       description: 'Paiement AKOLABS — MTN MoMo CM',
       reference: reference,
       success_url: 'https://akolabs.store/?payment=success&ref=' + reference,
       error_url:   'https://akolabs.store/?payment=error',
       customer: {
         name: 'Client AKOLABS',
+        email: 'client@akolabs.store',
         phone: '+237654341137',
-        country: 'CM'
       },
-      metadata: { phone: '+237654341137', country: 'CM', network: 'MTN_MOMO_CMR' }
     };
 
     try {
