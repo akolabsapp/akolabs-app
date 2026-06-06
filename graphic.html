@@ -9,300 +9,139 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
-      --violet: #4B0082;
-      --violet-light: #6A1B9A;
-      --gold: #C9A84C;
-      --gold-light: #D4AF37;
-      --bg: #F5F4F8;
-      --card: #FFFFFF;
-      --text: #1A0A2E;
-      --text-sec: #4A4767;
-      --muted: #8A87A0;
-      --border: rgba(75,0,130,0.12);
-      --success: #2E9E5B;
-      --font-head: 'Cinzel', serif;
-      --font-body: 'Poppins', sans-serif;
+      --violet: #4B0082; --violet-light: #6A1B9A;
+      --gold: #C9A84C; --gold-light: #D4AF37;
+      --bg: #F5F4F8; --card: #FFFFFF;
+      --text: #1A0A2E; --text-sec: #4A4767; --muted: #8A87A0;
+      --border: rgba(75,0,130,0.12); --success: #2E9E5B;
+      --font-head: 'Cinzel', serif; --font-body: 'Poppins', sans-serif;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      background: var(--bg);
-      font-family: var(--font-body);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
+      background: var(--bg); font-family: var(--font-body);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 20px; position: relative; overflow-x: hidden;
     }
-
-    /* Background décoratif */
     body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(75,0,130,0.08) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 50%);
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(75,0,130,0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 50%);
       pointer-events: none;
     }
-
-    /* Orbes animés */
-    .orb {
-      position: fixed; border-radius: 50%; filter: blur(60px);
-      opacity: 0.12; pointer-events: none; animation: float 10s ease-in-out infinite;
-    }
-    .orb1 { width: 300px; height: 300px; background: var(--violet); top: -80px; left: -80px; animation-delay: 0s; }
+    .orb { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.12; pointer-events: none; animation: float 10s ease-in-out infinite; }
+    .orb1 { width: 300px; height: 300px; background: var(--violet); top: -80px; left: -80px; }
     .orb2 { width: 200px; height: 200px; background: var(--gold); bottom: -60px; right: -60px; animation-delay: 4s; }
-    @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-20px) scale(1.05); }
-    }
+    @keyframes float { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-20px) scale(1.05)} }
 
-    /* Carte principale */
     .pay-card {
-      position: relative; z-index: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px 28px;
-      width: 100%; max-width: 420px;
+      position: relative; z-index: 1; background: var(--card);
+      border: 1px solid var(--border); border-radius: 24px;
+      padding: 36px 28px; width: 100%; max-width: 420px;
       box-shadow: 0 8px 48px rgba(75,0,130,0.12), 0 2px 8px rgba(0,0,0,0.05);
       animation: slideUp 0.5s ease both;
     }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 
-    /* Header */
-    .pay-header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
+    .pay-header { text-align: center; margin-bottom: 28px; }
     .pay-logo {
       display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--font-head); font-size: 20px;
-      color: var(--violet); font-weight: 700;
-      margin-bottom: 16px;
+      font-family: var(--font-head); font-size: 20px; color: var(--violet); font-weight: 700; margin-bottom: 16px;
     }
     .pay-logo-icon {
       width: 36px; height: 36px; border-radius: 10px;
       background: linear-gradient(135deg, var(--violet), var(--violet-light));
-      display: flex; align-items: center; justify-content: center;
-      color: var(--gold); font-size: 16px;
+      display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 16px;
     }
     .pay-secure-badge {
       display: inline-flex; align-items: center; gap: 5px;
       background: rgba(46,158,91,0.08); border: 1px solid rgba(46,158,91,0.2);
-      color: var(--success); font-size: 11px; font-weight: 600;
-      padding: 4px 12px; border-radius: 50px;
+      color: var(--success); font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 50px;
     }
-
-    /* Montant */
     .pay-amount-box {
       background: linear-gradient(135deg, #4B0082, #5D1494);
-      border-radius: 18px; padding: 24px;
-      text-align: center; margin-bottom: 24px;
+      border-radius: 18px; padding: 24px; text-align: center; margin-bottom: 24px;
       position: relative; overflow: hidden;
     }
     .pay-amount-box::before {
-      content: '';
-      position: absolute; top: -30px; right: -30px;
-      width: 100px; height: 100px; border-radius: 50%;
-      background: rgba(201,168,76,0.12);
+      content: ''; position: absolute; top: -30px; right: -30px;
+      width: 100px; height: 100px; border-radius: 50%; background: rgba(201,168,76,0.12);
     }
-    .pay-amount-label {
-      font-size: 11px; color: rgba(255,255,255,0.65);
-      text-transform: uppercase; letter-spacing: 1.5px;
-      margin-bottom: 6px;
-    }
-    .pay-amount-value {
-      font-family: var(--font-head);
-      font-size: 38px; color: #fff; font-weight: 700; line-height: 1;
-      margin-bottom: 4px;
-    }
+    .pay-amount-label { font-size: 11px; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+    .pay-amount-value { font-family: var(--font-head); font-size: 38px; color: #fff; font-weight: 700; line-height: 1; margin-bottom: 4px; }
     .pay-amount-value span { font-size: 18px; color: var(--gold-light); }
-    .pay-amount-fees {
-      font-size: 11px; color: rgba(255,255,255,0.5);
-    }
+    .pay-amount-fees { font-size: 11px; color: rgba(255,255,255,0.5); }
 
-    /* Infos client */
-    .pay-info-block {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px;
-      margin-bottom: 20px;
-    }
-    .pay-info-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 6px 0;
-      font-size: 13px;
-    }
-    .pay-info-row:not(:last-child) {
-      border-bottom: 1px solid var(--border);
-    }
-    .pay-info-label {
-      color: var(--muted); display: flex; align-items: center; gap: 7px;
-    }
+    .pay-info-block { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 20px; }
+    .pay-info-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+    .pay-info-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+    .pay-info-label { color: var(--muted); display: flex; align-items: center; gap: 7px; }
     .pay-info-label i { width: 14px; color: var(--violet); }
     .pay-info-val { font-weight: 600; color: var(--text); }
-    .pay-mtn-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #FFC107; color: #000;
-      font-size: 11px; font-weight: 700;
-      padding: 3px 10px; border-radius: 50px;
-    }
+    .pay-mtn-badge { display: inline-flex; align-items: center; gap: 5px; background: #FFC107; color: #000; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 50px; }
 
-    /* Bouton payer */
     .btn-pay {
       width: 100%; padding: 17px;
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      color: #1A0A00; font-weight: 700; font-size: 15px;
-      font-family: var(--font-head);
+      color: #1A0A00; font-weight: 700; font-size: 15px; font-family: var(--font-head);
       border: none; border-radius: 50px; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 10px;
-      box-shadow: 0 6px 28px rgba(201,168,76,0.4);
-      transition: transform .2s, box-shadow .2s;
-      margin-bottom: 14px;
+      box-shadow: 0 6px 28px rgba(201,168,76,0.4); transition: transform .2s, box-shadow .2s; margin-bottom: 14px;
     }
     .btn-pay:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 36px rgba(201,168,76,0.5); }
     .btn-pay:disabled { opacity: 0.7; cursor: not-allowed; }
-
-    .btn-pay .spinner {
-      width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2);
-      border-top-color: #1A0A00; border-radius: 50%;
-      animation: spin 0.8s linear infinite; display: none;
-    }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #1A0A00; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
     .btn-pay.loading .spinner { display: block; }
     .btn-pay.loading .btn-text { display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Note frais */
-    .pay-note {
-      text-align: center; font-size: 11px; color: var(--muted);
-      margin-bottom: 20px; line-height: 1.6;
-    }
+    .pay-note { text-align: center; font-size: 11px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
     .pay-note i { color: var(--gold); }
-
-    /* Séparateur */
-    .pay-divider {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 16px;
-    }
-    .pay-divider::before, .pay-divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
-    }
+    .pay-divider { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .pay-divider::before, .pay-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
     .pay-divider span { font-size: 11px; color: var(--muted); white-space: nowrap; }
-
-    /* Powered by */
-    .pay-powered {
-      text-align: center; font-size: 11px; color: var(--muted);
-      display: flex; align-items: center; justify-content: center; gap: 5px;
-    }
+    .pay-powered { text-align: center; font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 5px; }
     .pay-powered strong { color: var(--violet); }
 
-    /* États */
-    .pay-result {
-      display: none;
-      text-align: center;
-    }
-    .pay-result.show { display: block; }
-
-    .result-icon {
-      font-size: 52px; margin-bottom: 16px;
-    }
-    .result-title {
-      font-family: var(--font-head); font-size: 20px;
-      font-weight: 700; margin-bottom: 8px;
-    }
-    .result-sub {
-      font-size: 13px; color: var(--text-sec);
-      margin-bottom: 20px; line-height: 1.7;
-    }
-    .result-link-box {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px;
-      word-break: break-all; font-size: 12px;
-      color: var(--violet); margin-bottom: 16px;
-      text-align: left; line-height: 1.6;
-    }
-    .btn-copy {
-      width: 100%; padding: 14px;
-      background: linear-gradient(135deg, var(--violet), var(--violet-light));
-      color: #fff; font-weight: 700; font-size: 14px;
-      font-family: var(--font-head);
-      border: none; border-radius: 50px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: transform .2s, opacity .2s;
-      margin-bottom: 10px;
-    }
-    .btn-copy:hover { transform: translateY(-2px); opacity: 0.92; }
-    .btn-open {
-      width: 100%; padding: 14px;
-      background: rgba(75,0,130,0.05);
-      color: var(--violet); font-weight: 700; font-size: 14px;
-      font-family: var(--font-head);
-      border: 2px solid var(--violet); border-radius: 50px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: background .2s;
-      text-decoration: none;
-    }
-    .btn-open:hover { background: rgba(75,0,130,0.1); }
-
-    /* Erreur */
-    .pay-error {
-      display: none;
-      background: rgba(255,100,100,0.08); border: 1px solid rgba(255,100,100,0.25);
-      border-radius: 12px; padding: 14px;
-      font-size: 13px; color: #CC3333;
-      margin-bottom: 14px; text-align: center;
-    }
+    .pay-error { display: none; background: rgba(255,100,100,0.08); border: 1px solid rgba(255,100,100,0.25); border-radius: 12px; padding: 14px; font-size: 13px; color: #CC3333; margin-bottom: 14px; text-align: center; }
     .pay-error.show { display: block; }
 
-    /* Toast */
-    .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: var(--text); color: #fff;
-      font-size: 13px; font-weight: 500;
-      padding: 12px 22px; border-radius: 50px;
-      transition: transform .3s ease; z-index: 999;
-    }
+    /* Résultat */
+    .pay-result { display: none; text-align: center; }
+    .pay-result.show { display: block; }
+    .result-icon { font-size: 52px; margin-bottom: 16px; }
+    .result-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .result-sub { font-size: 13px; color: var(--text-sec); margin-bottom: 20px; line-height: 1.7; }
+    .result-link-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; word-break: break-all; font-size: 12px; color: var(--violet); margin-bottom: 16px; text-align: left; line-height: 1.6; }
+    .btn-copy { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--violet), var(--violet-light)); color: #fff; font-weight: 700; font-size: 14px; font-family: var(--font-head); border: none; border-radius: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .2s, opacity .2s; margin-bottom: 10px; }
+    .btn-copy:hover { transform: translateY(-2px); opacity: 0.92; }
+    .btn-open { width: 100%; padding: 14px; background: rgba(75,0,130,0.05); color: var(--violet); font-weight: 700; font-size: 14px; font-family: var(--font-head); border: 2px solid var(--violet); border-radius: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .2s; text-decoration: none; }
+    .btn-open:hover { background: rgba(75,0,130,0.1); }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; font-size: 13px; font-weight: 500; padding: 12px 22px; border-radius: 50px; transition: transform .3s ease; z-index: 999; }
     .toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
-
 <div class="orb orb1"></div>
 <div class="orb orb2"></div>
 
-<div class="pay-card" id="mainCard">
-
-  <!-- Header -->
+<div class="pay-card">
   <div class="pay-header">
     <div class="pay-logo">
       <div class="pay-logo-icon"><i class="fas fa-bolt"></i></div>
       AKOLABS
-    </div>
-    <br>
-    <div class="pay-secure-badge">
-      <i class="fas fa-lock"></i> Paiement 100% sécurisé
-    </div>
+    </div><br>
+    <div class="pay-secure-badge"><i class="fas fa-lock"></i> Paiement 100% sécurisé</div>
   </div>
 
-  <!-- Zone paiement -->
   <div id="payForm">
-
-    <!-- Montant -->
     <div class="pay-amount-box">
       <div class="pay-amount-label">Montant à payer</div>
       <div class="pay-amount-value"><span>XAF</span> 60 500</div>
       <div class="pay-amount-fees">Frais inclus à la charge du client</div>
     </div>
 
-    <!-- Infos -->
     <div class="pay-info-block">
       <div class="pay-info-row">
         <div class="pay-info-label"><i class="fas fa-user"></i> Numéro</div>
@@ -314,113 +153,95 @@
       </div>
       <div class="pay-info-row">
         <div class="pay-info-label"><i class="fas fa-mobile-alt"></i> Réseau</div>
-        <div class="pay-info-val">
-          <span class="pay-mtn-badge">📶 MTN MoMo</span>
-        </div>
+        <div class="pay-info-val"><span class="pay-mtn-badge">📶 MTN MoMo</span></div>
       </div>
     </div>
 
-    <!-- Erreur -->
     <div class="pay-error" id="payError"></div>
 
-    <!-- Note -->
     <p class="pay-note">
       <i class="fas fa-info-circle"></i>
-      En cliquant sur Payer, un lien de paiement MTN Mobile Money sera généré et vous sera communiqué.
+      Un lien de paiement MTN Mobile Money sécurisé sera généré via GeniusPay.
     </p>
 
-    <!-- Bouton -->
     <button class="btn-pay" id="btnPay" onclick="initPaiement()">
       <span class="spinner"></span>
       <span class="btn-text"><i class="fas fa-lock"></i> &nbsp;Payer 60 500 XAF</span>
     </button>
 
-    <div class="pay-divider"><span>Sécurisé par GeniusPay</span></div>
-    <div class="pay-powered">
-      <i class="fas fa-shield-alt"></i>
-      Propulsé par <strong>GeniusPay</strong> &nbsp;·&nbsp; SSL 256-bit
-    </div>
+    <div class="pay-divider"><span>Sécurisé par GeniusPay × Supabase</span></div>
+    <div class="pay-powered"><i class="fas fa-shield-alt"></i> Propulsé par <strong>GeniusPay</strong> &nbsp;·&nbsp; SSL 256-bit</div>
   </div>
 
-  <!-- Résultat succès -->
   <div class="pay-result" id="payResult">
     <div class="result-icon">✅</div>
-    <div class="result-title" style="color:var(--success)">Lien généré !</div>
-    <div class="result-sub">
-      Votre lien de paiement MTN Mobile Money est prêt.<br>
-      Copiez-le et envoyez-le au client.
-    </div>
+    <div class="result-title" style="color:#2E9E5B">Lien généré !</div>
+    <div class="result-sub">Votre lien de paiement MTN Mobile Money est prêt.<br>Copiez-le et envoyez-le au client.</div>
     <div class="result-link-box" id="resultLink"></div>
-    <button class="btn-copy" onclick="copyLink()">
-      <i class="fas fa-copy"></i> Copier le lien
-    </button>
-    <a class="btn-open" id="btnOpen" href="#" target="_blank">
-      <i class="fas fa-external-link-alt"></i> Ouvrir le lien
-    </a>
+    <button class="btn-copy" onclick="copyLink()"><i class="fas fa-copy"></i> Copier le lien</button>
+    <a class="btn-open" id="btnOpen" href="#" target="_blank"><i class="fas fa-external-link-alt"></i> Ouvrir le lien</a>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-  const API_KEY    = 'pk_live_fb5Yal0gDefCjOxl5t2EhIIpFlB1LWBy';
-  const API_SECRET = 'sk_live_fd4e78b203e2753763e065fa18935e33bf1498b9432de515c2a0c59311280659';
-  const API_URL    = 'https://corsproxy.io/?url=https://geniuspay.ci/api/v1/merchant/payments';
+  // ── Config (même que config.js) ──
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3am5qbWF3amNwaHRhamZ6bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzY2OTAsImV4cCI6MjA4ODMxMjY5MH0.sC3ggUFUbW6ZeFR2KKj5dpBAqy10EVLmNA6kRjMVEDY';
+  const PAYMENT_EDGE_FN   = 'https://cwjnjmawjcphtajfzlod.supabase.co/functions/v1/create-payment';
 
   let paymentLink = '';
 
   async function initPaiement() {
-    const btn = document.getElementById('btnPay');
+    const btn    = document.getElementById('btnPay');
     const errBox = document.getElementById('payError');
 
     btn.disabled = true;
     btn.classList.add('loading');
     errBox.classList.remove('show');
 
+    const reference = 'AKO-' + Date.now() + '-' + Math.random().toString(36).slice(2,7).toUpperCase();
+
     const body = {
       amount: 60500,
       currency: 'XAF',
-      payment_method: 'pawapay',
-      mmo_provider: 'MTN_MOMO_CMR',
-      description: 'Paiement AKOLABS',
+      description: 'Paiement AKOLABS — MTN MoMo CM',
+      reference: reference,
       customer: {
+        name: 'Client AKOLABS',
         phone: '+237654341137',
         country: 'CM'
-      }
+      },
+      metadata: { phone: '+237654341137', country: 'CM', network: 'MTN_MOMO_CMR' }
     };
 
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(PAYMENT_EDGE_FN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': API_KEY,
-          'X-API-Secret': API_SECRET
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
         },
         body: JSON.stringify(body)
       });
 
       const data = await res.json();
 
-      if (data.success) {
-        const link = data.data.checkout_url || data.data.payment_url;
-        paymentLink = link;
-
-        document.getElementById('resultLink').textContent = link;
-        document.getElementById('btnOpen').href = link;
-
+      if (res.ok && (data.checkout_url || data.payment_url)) {
+        paymentLink = data.checkout_url || data.payment_url;
+        document.getElementById('resultLink').textContent = paymentLink;
+        document.getElementById('btnOpen').href = paymentLink;
         document.getElementById('payForm').style.display = 'none';
         document.getElementById('payResult').classList.add('show');
       } else {
-        const msg = data.error?.message || 'Une erreur est survenue.';
+        const msg = data.error || data.message || JSON.stringify(data);
         errBox.textContent = '⚠️ ' + msg;
         errBox.classList.add('show');
         btn.disabled = false;
         btn.classList.remove('loading');
       }
     } catch (e) {
-      errBox.textContent = '⚠️ Erreur réseau. Vérifiez votre connexion et réessayez.';
+      errBox.textContent = '⚠️ Erreur réseau : ' + e.message;
       errBox.classList.add('show');
       btn.disabled = false;
       btn.classList.remove('loading');
@@ -429,10 +250,7 @@
 
   function copyLink() {
     if (!paymentLink) return;
-    navigator.clipboard.writeText(paymentLink).then(() => {
-      showToast('✅ Lien copié !');
-    }).catch(() => {
-      // Fallback
+    navigator.clipboard.writeText(paymentLink).then(() => showToast('✅ Lien copié !')).catch(() => {
       const el = document.createElement('textarea');
       el.value = paymentLink;
       document.body.appendChild(el);
@@ -450,6 +268,5 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 </script>
-
 </body>
 </html>
