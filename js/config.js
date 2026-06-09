@@ -78,7 +78,7 @@ var CONFIG = {
         monthly: {
             id: 'monthly',
             name: 'Mensuel',
-            price: 60000,
+            price: 3500,
             durationMonths: 1,
             fullAccess: true
         },
